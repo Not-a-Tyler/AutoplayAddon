@@ -31,16 +31,16 @@ public class CraftUtil {
                     Vec3d e = SmartGoto.gotoblock(List.of(Blocks.CRAFTING_TABLE));
                     BlockPos epos = new BlockPos((int) Math.floor(e.getX()), (int) Math.floor(e.getY()), (int) Math.floor(e.getZ()));
                     ChatUtils.info("going to crafting table at: " + e + " Blockpos: " + epos.toShortString());
-
-                    Vec3d playerEyePos = mc.player.getEyePos();
-                    Vec3d vec3d = playerEyePos.add(e.subtract(playerEyePos).normalize().multiply(0.5));
-                    BlockHitResult blockHitResult = new BlockHitResult(vec3d, Direction.UP, epos, false);
-                    ChatUtils.info("waiting before clicking table");
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ee) {
                         ee.printStackTrace();
                     }
+                    Vec3d playerEyePos = mc.player.getEyePos();
+                    Vec3d vec3d = playerEyePos.add(e.subtract(playerEyePos).normalize().multiply(0.5));
+                    BlockHitResult blockHitResult = new BlockHitResult(vec3d, Direction.UP, epos, false);
+                    ChatUtils.info("waiting before clicking table");
+
                     BlockUtils.interact(blockHitResult, Hand.MAIN_HAND, false);
                     ChatUtils.info("clicked table, waiting before crafting");
                     try {

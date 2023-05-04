@@ -87,6 +87,22 @@ public class Speedrun extends Module {
             wait1sec();
             List<Item> targetBlocks5 = Arrays.asList(Items.RAW_IRON);
             itemCollection.collect(targetBlocks5);
+            wait1sec();
+            for (int i = 0; i < 9; i++) {
+                smartMine.processBlocks(targetBlocks2);
+            }
+            wait1sec();
+            itemCollection.collect(targetBlocks3);
+            wait1sec();
+            List<Item> targetBlocks6 = Arrays.asList(Items.COAL_ORE);
+            List<Item> targetBlocks7 = Arrays.asList(Items.COAL);
+            smartMine.processBlocks(targetBlocks6);
+            wait1sec();
+            itemCollection.collect(targetBlocks7);
+            wait1sec();
+            CraftUtil.craftItem(Items.FURNACE, 1);
+            wait1sec();
+            PlaceUtil.randomplace(Blocks.FURNACE);
             toggle();
         });
         waitForTickEventThread.start();

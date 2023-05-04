@@ -45,6 +45,7 @@ public class AutoplayAddon extends MeteorAddon {
         Commands.add(new testcommand8());
         Commands.add(new testcommand9());
         Commands.add(new testcommand10());
+        Commands.add(new testcommand11());
     }
 
     @Override
@@ -71,7 +72,6 @@ public class AutoplayAddon extends MeteorAddon {
             .getCustomValue("github:sha")
             .getAsString();
         return commit.isEmpty() ? null : commit.trim();
-
     }
 
     public String getPackage() {
