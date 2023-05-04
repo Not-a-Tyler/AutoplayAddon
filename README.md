@@ -1,8 +1,4 @@
-# Meteor Addon Template
+# Meteor AutoplayAddon
 
-A template to allow easy usage of the Meteor Addon API.
-
-### How to use:  
-- Clone this project
-- Use this template to create new modules/commands
-- Run the mod with Meteor.
+Meteor addon that tries to beat minecraft
+currently in developement
