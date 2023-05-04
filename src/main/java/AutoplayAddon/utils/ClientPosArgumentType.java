@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.client.MinecraftClient;
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.*;
 import net.minecraft.server.command.CommandManager;
@@ -16,8 +16,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class ClientPosArgumentType implements ArgumentType<Vec3d> {
-    private static final Collection<String> EXAMPLES = Arrays.asList("0 0 0", "~ ~ ~", "~0.5 ~1 ~-5");
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+
 
     public ClientPosArgumentType() {
     }

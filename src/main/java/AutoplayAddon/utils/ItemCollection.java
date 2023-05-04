@@ -1,7 +1,6 @@
 package AutoplayAddon.utils;
-import net.minecraft.client.MinecraftClient;
 import meteordevelopment.meteorclient.MeteorClient;
-import net.minecraft.block.Block;
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.BlockPos;
@@ -12,7 +11,6 @@ import java.util.List;
 
 public class ItemCollection {
     private final GotoUtil gotoUtil = new GotoUtil();
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
     public void collect(List<Item> targetItems) {
         List<BlockPos> itemPositions = GetLocUtil.findItemEntities(targetItems, 100);
         for (BlockPos itemPosition : itemPositions) {

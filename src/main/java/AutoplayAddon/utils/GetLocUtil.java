@@ -15,9 +15,8 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.ItemEntity;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class GetLocUtil {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public static Optional<UUID> findEntitys(List<EntityType<?>> entityTypes, LivingEntity searchingEntity, double searchRadius) {
         ClientWorld clientWorld = MinecraftClient.getInstance().world;

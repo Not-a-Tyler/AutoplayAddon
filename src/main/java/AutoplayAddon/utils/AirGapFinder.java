@@ -1,17 +1,15 @@
 package AutoplayAddon.utils;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AirGapFinder {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public static List<Vec3d> findClosestValidPos(List<Block> targetBlocks, double searchRadius, double maxAirGapDistance) {
         World world = mc.player.getEntityWorld();

@@ -4,7 +4,6 @@ import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -14,11 +13,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 import java.util.List;
 
 public class CookingUtils {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public static void cook(Item itemToCook) {
         ChatUtils.info("going to furnace");

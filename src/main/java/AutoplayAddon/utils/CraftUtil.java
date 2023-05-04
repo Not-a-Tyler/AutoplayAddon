@@ -1,6 +1,5 @@
 package AutoplayAddon.utils;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
@@ -16,10 +15,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import java.util.List;
-
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class CraftUtil {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public static ItemStack craftItem(Item itemToCraft, int craftCount) {
         Recipe<?> recipeToCraft = findRecipeForItem(itemToCraft);

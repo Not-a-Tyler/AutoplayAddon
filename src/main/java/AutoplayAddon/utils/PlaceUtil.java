@@ -16,13 +16,6 @@ import java.util.List;
 
 public class PlaceUtil {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
-
-
-    List<Block> targetBlocks = Collections.singletonList(Blocks.AIR);
-
-    GetLocUtil getLocUtil = new GetLocUtil();
-
-
     public static void randomplace(Block block) {
         Item item = block.asItem();
         ChatUtils.info("Looking for: " + item);
@@ -34,27 +27,7 @@ public class PlaceUtil {
         BlockPos loc1 = loc.get(0);
         ChatUtils.info("Placing at: " + loc1);
         BlockUtils.place(loc1, Hand.MAIN_HAND, craftedSlot, false, 0, true, true, false);
-        //placeBlock(loc1, craftedSlot);
     }
 
-    //public static void placeBlock(BlockPos pos, int slot) {
-    //    Direction side = null;
-    //    Vec3d hitVec = null;
-
-        //for (Direction direction : Direction.values()) {
-        //    BlockPos neighbor = pos.offset(direction);
-        //    if (mc.world.getBlockState(neighbor).isAir() || mc.world.getBlockState(neighbor).getMaterial().isReplaceable()) {
-        //        side = direction;
-        //        hitVec = new Vec3d(neighbor.getX() + 0.5, neighbor.getY() + 0.5, neighbor.getZ() + 0.5).add(new Vec3d(side.getVector().getX(), side.getVector().getY(), side.getVector().getZ()).multiply(0.5));
-        //        break;
-        //    }
-        //}
-
-        //if (side == null || hitVec == null) {
-        //    return;
-        //}
-
-    //    BlockUtils.place(pos, Hand.MAIN_HAND, slot, false, 0, true, true, false);
-    //}
 
 }

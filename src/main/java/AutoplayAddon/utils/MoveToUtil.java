@@ -1,14 +1,12 @@
 package AutoplayAddon.utils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 
 public class MoveToUtil {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public static void moveTo(double xpos, double ypos, double zpos, boolean  preserve, boolean onground) {
         Vec3d newPos = new Vec3d(xpos, ypos, zpos);

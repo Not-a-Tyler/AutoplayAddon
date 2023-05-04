@@ -3,11 +3,10 @@ package AutoplayAddon.utils;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.block.Block;
-import net.minecraft.client.MinecraftClient;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import java.util.Comparator;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CanPickUpTest {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public static List<Vec3d> findCollectableItem(List<Item> targetItems, double searchRadius) {
         List<Block> targetBlocks = new ArrayList<>();

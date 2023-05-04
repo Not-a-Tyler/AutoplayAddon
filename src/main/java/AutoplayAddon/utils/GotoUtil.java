@@ -5,8 +5,8 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.Vec3d;
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class GotoUtil {
     @EventHandler
@@ -32,8 +32,7 @@ public class GotoUtil {
     }
 
 
-    private static CompletableFuture<Void> tickEventFuture;
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static CompletableFuture<Void> tickEventFuture;;
 
     private double xpos;
     private double ypos;
