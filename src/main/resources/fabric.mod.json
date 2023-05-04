@@ -1,27 +1,25 @@
 {
   "schemaVersion": 1,
-  "id": "addon-template",
-  "version": "${version}",
-  "name": "Addon Template",
-  "description": "An addon template for the Meteor addons.",
-  "authors": [
-    "seasnail"
-  ],
+  "id": "autoplay-addon",
+  "version": "0.1indev",
+  "name": "AutoplayAddon",
+  "description": "AutoplayAddon, but it crashes your game.",
+  "authors": ["Tyler"],
   "contact": {
-    "repo": "https://github.com/MeteorDevelopment/meteor-addon-template"
+    "repo": ""
   },
-  "icon": "assets/template/icon.png",
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "com.example.addon.Addon"
+      "AutoplayAddon.AutoplayAddon"
     ]
   },
   "mixins": [
-    "addon-template.mixins.json"
+    "meteorcrashaddon.mixins.json"
   ],
   "custom": {
-    "meteor-client:color": "225,25,25"
+    "meteor-client:color": "229,255,0",
+    "github:sha": "@gh_hash@"
   },
   "depends": {
     "java": ">=17",
