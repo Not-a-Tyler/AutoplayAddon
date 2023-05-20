@@ -11,32 +11,35 @@ import java.util.List;
 
 public class AirGapFinder {
 
-    public static List<Vec3d> findClosestValidPos(List<Block> targetBlocks, double searchRadius, double maxAirGapDistance) {
-        World world = mc.player.getEntityWorld();
-        BlockPos playerPos = mc.player.getBlockPos();
-        for (double x = -searchRadius; x <= searchRadius; x++) {
-            for (double y = -searchRadius; y <= searchRadius; y++) {
-                for (double z = -searchRadius; z <= searchRadius; z++) {
-                    BlockPos currentPos = playerPos.add((int) x, (int) y, (int) z);
-                    Block currentBlock = world.getBlockState(currentPos).getBlock();
 
-                    if (targetBlocks.contains(currentBlock) && !GetLocUtil.isPositionOccupied(world, currentPos)) {
-                        if (PlayerUtils.distanceTo(currentPos) <= searchRadius) {
-                            Vec3d airGapPos = findAirGapNearBlock(currentPos, maxAirGapDistance);
-                            if (airGapPos != null) {
-                                List<Vec3d> result = new ArrayList<>();
-                                result.add(currentPos.toCenterPos());
-                                result.add(airGapPos);
-                                return result;
+
+    public static List<Vec3d> findClosestValidPos(List<Block> targetBlocks, double searchRadius, double maxAirGapDistance) {
+            World world = mc.player.getEntityWorld();
+            BlockPos playerPos = mc.player.getBlockPos();
+            for (int r = 0; r <= searchRadius; r++) {
+                for (int dx = -r; dx <= r; dx++) {
+                    for (int dz = -r; dz <= r; dz++) {
+                        if(Math.abs(dx) != r && Math.abs(dz) != r) continue;
+                        for (int dy = -r; dy <= r; dy++) {
+                            BlockPos currentPos = playerPos.add(dx, dy, dz);
+                            Block currentBlock = world.getBlockState(currentPos).getBlock();
+                            if (targetBlocks.contains(currentBlock)) {
+                                if (PlayerUtils.distanceTo(currentPos) <= searchRadius) {
+                                    Vec3d airGapPos = findAirGapNearBlock(currentPos, maxAirGapDistance);
+                                    if (airGapPos != null) {
+                                        List<Vec3d> result = new ArrayList<>();
+                                        result.add(currentPos.toCenterPos());
+                                        result.add(airGapPos);
+                                        return result;
+                                    }
+                                }
                             }
                         }
                     }
-
                 }
             }
+            return null;
         }
-        return null;
-    }
 
     public static Vec3d findAirGapNearBlock(BlockPos targetPos, double maxAirGapDistance) {
         World world = mc.player.getEntityWorld();
@@ -45,7 +48,7 @@ public class AirGapFinder {
 
         for (BlockPos pos : BlockPos.iterate(targetPos.add((int) -maxAirGapDistance, (int) -maxAirGapDistance, (int) -maxAirGapDistance),
             targetPos.add((int) maxAirGapDistance, (int) maxAirGapDistance, (int) maxAirGapDistance))) {
-            if (isValidAirGap(world, pos)) {
+            if (world.isAir(pos) && world.isAir(pos.up())) {
                 double distance = distanceBetweenBlockPos(targetPos, pos);
                 if (distance <= maxAirGapDistance && distance < minDistance) {
                     closestValidPos = pos.toImmutable();
@@ -62,12 +65,6 @@ public class AirGapFinder {
         double offsetZ = closestValidPos.getZ() < targetPos.getZ() ? 0.7 : (closestValidPos.getZ() > targetPos.getZ() ? 0.3 : 0.5);
 
         return new Vec3d(closestValidPos.getX() + offsetX, closestValidPos.getY(), closestValidPos.getZ() + offsetZ);
-    }
-
-
-
-    private static boolean isValidAirGap(World world, BlockPos pos) {
-        return world.isAir(pos) && world.isAir(pos.up());
     }
 
     private static double distanceBetweenBlockPos(BlockPos pos1, BlockPos pos2) {

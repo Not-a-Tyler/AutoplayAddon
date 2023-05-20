@@ -1,10 +1,8 @@
 package AutoplayAddon.utils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.util.math.Vec3d;

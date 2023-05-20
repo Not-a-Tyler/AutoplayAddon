@@ -1,5 +1,4 @@
 package AutoplayAddon.utils;
-
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
@@ -7,9 +6,7 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.block.Block;
-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,49 +30,37 @@ public class CanPickUpTest {
 
 
 
+
     public static List<Vec3d> findCollectableBlock(List<Block> targetBlocks, double searchRadius) {
         World world = mc.player.getEntityWorld();
         BlockPos playerPos = mc.player.getBlockPos();
-        List<BlockPos> validBlockPositions = new ArrayList<>();
-
-        for (double x = -searchRadius; x <= searchRadius; x++) {
-            for (double y = -searchRadius; y <= searchRadius; y++) {
-                for (double z = -searchRadius; z <= searchRadius; z++) {
-                    double distanceSquared = x * x + y * y + z * z;
-                    if (distanceSquared <= searchRadius * searchRadius) {
-                        BlockPos currentPos = playerPos.add((int) x, (int) y, (int) z);
+        for (int r = 0; r <= searchRadius; r++) {
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if(Math.abs(dx) != r && Math.abs(dz) != r) continue;
+                    for (int dy = -r; dy <= r; dy++) {
+                        BlockPos currentPos = playerPos.add(dx, dy, dz);
                         Block currentBlock = world.getBlockState(currentPos).getBlock();
-
                         if (targetBlocks.contains(currentBlock)) {
+
                             boolean hasAirAdjacent = hasAirAdjacent(world, currentPos);
                             boolean hasAirBlockAboveOrBelow = world.getBlockState(currentPos.up()).getBlock() == Blocks.AIR || world.getBlockState(currentPos.down()).getBlock() == Blocks.AIR;
-
                             if (hasAirAdjacent || hasAirBlockAboveOrBelow) {
-                                validBlockPositions.add(currentPos);
+                                Vec3d airGapPos = AirGapFinder.findAirGapNearBlock(currentPos, 5);
+                                if (airGapPos != null) {
+                                    List<Vec3d> result = new ArrayList<>();
+                                    ChatUtils.info("AirGapPos: " + airGapPos);
+                                    result.add(currentPos.toCenterPos());
+                                    result.add(airGapPos);
+                                    return result;
+                                }
                             }
-                        }
 
+                        }
                     }
                 }
             }
         }
-
-        if (validBlockPositions.isEmpty()) {
-            return null;
-        }
-
-        validBlockPositions.sort(Comparator.comparingDouble(blockPos -> PlayerUtils.distanceTo(blockPos)));
-
-        BlockPos closestBlockPos = validBlockPositions.get(0);
-        Vec3d airGapPos = AirGapFinder.findAirGapNearBlock(closestBlockPos, 5);
-        if (airGapPos != null) {
-            List<Vec3d> result = new ArrayList<>();
-            ChatUtils.info("AirGapPos: " + airGapPos);
-            result.add(closestBlockPos.toCenterPos());
-            result.add(airGapPos);
-            return result;
-        }
-
         return null;
     }
 

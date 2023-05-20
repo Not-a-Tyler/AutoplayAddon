@@ -64,7 +64,7 @@ public class GetLocUtil {
                     for (int dy = -r; dy <= r; dy++) {
                         BlockPos currentPos = playerPos.add(dx, dy, dz);
                         Block currentBlock = world.getBlockState(currentPos).getBlock();
-                        if (targetBlocks.contains(currentBlock)) {
+                        if (targetBlocks.contains(currentBlock) && !isPositionOccupied(world, currentPos)) {
                             return currentPos;
                         }
                     }
@@ -73,6 +73,7 @@ public class GetLocUtil {
         }
         return null;
     }
+
 
 
 
