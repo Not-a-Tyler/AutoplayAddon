@@ -23,22 +23,14 @@ public class CookingUtils {
         Vec3d e = SmartGoto.gotoblock(List.of(Blocks.FURNACE));
         BlockPos epos = new BlockPos((int) Math.floor(e.getX()), (int) Math.floor(e.getY()), (int) Math.floor(e.getZ()));
         ChatUtils.info("Waiting before cooking");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ee) {
-            ee.printStackTrace();
-        }
+        WaitUtil.wait1sec();
 
         Vec3d playerEyePos = mc.player.getEyePos();
         Vec3d vec3d = playerEyePos.add(e.subtract(playerEyePos).normalize().multiply(0.5));
         BlockHitResult blockHitResult = new BlockHitResult(vec3d, Direction.UP, epos, false);
         BlockUtils.interact(blockHitResult, Hand.MAIN_HAND, false);
         ChatUtils.info("clicked furnace, waiting before cooking");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ee) {
-            ee.printStackTrace();
-        }
+        WaitUtil.wait1sec();
         int itemslot = InvUtils.find(itemToCook).slot();
         int fuelslot = InvUtils.find(Items.COAL).slot();
         ChatUtils.info("coal slot: " + fuelslot + " itemslot: " + itemslot);

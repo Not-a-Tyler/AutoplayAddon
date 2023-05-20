@@ -54,27 +54,27 @@ public class GetLocUtil {
 
 
 
-    public static List<BlockPos> findBlocks(List<Block> targetBlocks, double searchRadius) {
+    public static BlockPos findBlocks(List<Block> targetBlocks, int searchRadius) {
         World world = mc.player.getEntityWorld();
         BlockPos playerPos = mc.player.getBlockPos();
-        Vec3d playerVec = mc.player.getPos();
-        List<BlockPos> blockPositions = new ArrayList<>();
-        for (double x = -searchRadius; x <= searchRadius; x++) {
-            for (double y = -searchRadius; y <= searchRadius; y++) {
-                for (double z = -searchRadius; z <= searchRadius; z++) {
-                    BlockPos currentPos = playerPos.add((int) x, (int) y, (int) z);
-                    Block currentBlock = world.getBlockState(currentPos).getBlock();
-                    if (targetBlocks.contains(currentBlock) && !isPositionOccupied(world, currentPos)) {
-                        if (PlayerUtils.distanceTo(currentPos) <= searchRadius) {
-                            blockPositions.add(currentPos);
+        for (int r = 0; r <= searchRadius; r++) {
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if(Math.abs(dx) != r && Math.abs(dz) != r) continue;
+                    for (int dy = -r; dy <= r; dy++) {
+                        BlockPos currentPos = playerPos.add(dx, dy, dz);
+                        Block currentBlock = world.getBlockState(currentPos).getBlock();
+                        if (targetBlocks.contains(currentBlock)) {
+                            return currentPos;
                         }
                     }
                 }
             }
         }
-        blockPositions.sort(Comparator.comparingDouble(o -> o.getSquaredDistance(playerVec)));
-        return blockPositions;
+        return null;
     }
+
+
 
     public static boolean isPositionOccupied(World world, BlockPos pos) {
         // Check for entities in the given position

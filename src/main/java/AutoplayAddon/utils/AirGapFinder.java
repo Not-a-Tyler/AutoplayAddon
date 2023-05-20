@@ -19,6 +19,7 @@ public class AirGapFinder {
                 for (double z = -searchRadius; z <= searchRadius; z++) {
                     BlockPos currentPos = playerPos.add((int) x, (int) y, (int) z);
                     Block currentBlock = world.getBlockState(currentPos).getBlock();
+
                     if (targetBlocks.contains(currentBlock) && !GetLocUtil.isPositionOccupied(world, currentPos)) {
                         if (PlayerUtils.distanceTo(currentPos) <= searchRadius) {
                             Vec3d airGapPos = findAirGapNearBlock(currentPos, maxAirGapDistance);
@@ -30,6 +31,7 @@ public class AirGapFinder {
                             }
                         }
                     }
+
                 }
             }
         }

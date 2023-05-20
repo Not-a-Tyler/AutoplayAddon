@@ -23,10 +23,10 @@ public class PlaceUtil {
         int craftedSlot = result.slot();
         ChatUtils.info("Crafted slot: " + craftedSlot);
         List<Block> targetBlocks = Arrays.asList(Blocks.AIR);
-        List<BlockPos> loc = GetLocUtil.findBlocks(targetBlocks, 5);
-        BlockPos loc1 = loc.get(0);
-        ChatUtils.info("Placing at: " + loc1);
-        BlockUtils.place(loc1, Hand.MAIN_HAND, craftedSlot, false, 0, true, true, false);
+        //List<BlockPos> loc = GetLocUtil.findBlocks(targetBlocks, 5);
+        //BlockPos loc1 = loc.get(0);
+        //ChatUtils.info("Placing at: " + loc1);
+        //BlockUtils.place(loc1, Hand.MAIN_HAND, craftedSlot, false, 0, true, true, false);
     }
 
 

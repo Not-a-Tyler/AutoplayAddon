@@ -1,6 +1,8 @@
 package AutoplayAddon.utils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.orbit.EventHandler;
@@ -46,7 +48,7 @@ public class GotoUtil {
         this.zpos = zpos;
         ChatUtils.info("Moving to " + xpos + " " + ypos + " " + zpos);
         Vec3d newPos = new Vec3d(xpos, mc.player.getY(), zpos);
-        double distance = PlayerUtils.distanceTo(newPos);
+        MeteorClient.EVENT_BUS.subscribe(this);
         //add more than 200block tp here no leaks :)
         tickEventFuture = new CompletableFuture<>();
         try {
@@ -54,5 +56,6 @@ public class GotoUtil {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+        MeteorClient.EVENT_BUS.unsubscribe(this);
     }
 }

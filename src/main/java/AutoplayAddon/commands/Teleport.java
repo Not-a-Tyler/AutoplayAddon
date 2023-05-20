@@ -11,7 +11,6 @@ import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 public class Teleport extends Command {
 
-    private final GotoUtil gotoUtil = new GotoUtil();
     public Teleport() {
         super("sexteleport","Sends a packet to the server with new position. Allows to teleport small distances.", "tpbypass", "tpb", "tp");
     }
@@ -22,9 +21,7 @@ public class Teleport extends Command {
             Thread waitForTickEventThread = new Thread(() -> {
                 Vec3d pos = ClientPosArgumentType.getPos(ctx, "pos");
                 info("pos: " + pos);
-                MeteorClient.EVENT_BUS.subscribe(gotoUtil);
-                gotoUtil.moveto(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-                MeteorClient.EVENT_BUS.unsubscribe(gotoUtil);
+                new GotoUtil().moveto(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
             });
             waitForTickEventThread.start();
             return SINGLE_SUCCESS;

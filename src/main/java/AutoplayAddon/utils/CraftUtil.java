@@ -29,23 +29,13 @@ public class CraftUtil {
                     Vec3d e = SmartGoto.gotoblock(List.of(Blocks.CRAFTING_TABLE));
                     BlockPos epos = new BlockPos((int) Math.floor(e.getX()), (int) Math.floor(e.getY()), (int) Math.floor(e.getZ()));
                     ChatUtils.info("going to crafting table at: " + e + " Blockpos: " + epos.toShortString());
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ee) {
-                        ee.printStackTrace();
-                    }
+                    WaitUtil.wait1sec();
                     Vec3d playerEyePos = mc.player.getEyePos();
                     Vec3d vec3d = playerEyePos.add(e.subtract(playerEyePos).normalize().multiply(0.5));
                     BlockHitResult blockHitResult = new BlockHitResult(vec3d, Direction.UP, epos, false);
-                    ChatUtils.info("waiting before clicking table");
-
-                    BlockUtils.interact(blockHitResult, Hand.MAIN_HAND, false);
+                    BlockUtils.interact(blockHitResult, Hand.MAIN_HAND, true);
                     ChatUtils.info("clicked table, waiting before crafting");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ee) {
-                        ee.printStackTrace();
-                    }
+                    WaitUtil.wait1sec();
                     mc.interactionManager.clickRecipe(mc.player.currentScreenHandler.syncId, recipeToCraft, false);
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, 0, 0, SlotActionType.QUICK_MOVE, mc.player);
                     ChatUtils.info("Crafted " + itemToCraft +" with Crafting Table");
@@ -88,7 +78,6 @@ public class CraftUtil {
             return null;
         }
     }
-
 
     private static boolean needsCraftingTable(Recipe<?> recipe) {
         if (recipe instanceof ShapedRecipe) {

@@ -1,5 +1,6 @@
 package AutoplayAddon.utils;
 
+import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
@@ -12,9 +13,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class MineUtil {
-    private CompletableFuture<Void> tickEventFuture;
+    private static CompletableFuture<Void> tickEventFuture;
     private BlockPos targetBlockPos;
-    //private Direction targetDirection;
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
@@ -28,16 +28,18 @@ public class MineUtil {
         }
     }
 
-
     public void mine(BlockPos blockPos) {
         this.targetBlockPos = blockPos;
         ChatUtils.info("Mining block at " + targetBlockPos.toShortString());
         mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, targetBlockPos, Direction.UP));
+        MeteorClient.EVENT_BUS.subscribe(this);
         tickEventFuture = new CompletableFuture<>();
         try {
             tickEventFuture.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+        MeteorClient.EVENT_BUS.unsubscribe(this);
     }
 }
+

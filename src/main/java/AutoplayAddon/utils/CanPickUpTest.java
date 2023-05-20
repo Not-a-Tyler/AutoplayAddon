@@ -54,6 +54,7 @@ public class CanPickUpTest {
                                 validBlockPositions.add(currentPos);
                             }
                         }
+
                     }
                 }
             }

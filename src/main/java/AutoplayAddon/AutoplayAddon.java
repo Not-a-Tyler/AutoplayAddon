@@ -32,20 +32,13 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new TeleportInfo());
 
 
-
+        Commands.add(new Mine());
         Commands.add(new TP2cam());
         Commands.add(new Teleport());
-        Commands.add(new testcommand());
-        Commands.add(new testcommand2());
-        Commands.add(new testcommand3());
-        Commands.add(new testcommand4());
-        Commands.add(new testcommand5());
-        Commands.add(new testcommand6());
-        Commands.add(new testcommand7());
-        Commands.add(new testcommand8());
-        Commands.add(new testcommand9());
-        Commands.add(new testcommand10());
-        Commands.add(new testcommand11());
+        Commands.add(new Craft());
+        Commands.add(new ItemCollect());
+        Commands.add(new SearchFor());
+
     }
 
     @Override

@@ -1,4 +1,5 @@
 package AutoplayAddon.utils;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
@@ -11,8 +12,9 @@ public class MoveToUtil {
     public static void moveTo(double xpos, double ypos, double zpos, boolean  preserve, boolean onground) {
         Vec3d newPos = new Vec3d(xpos, ypos, zpos);
         double dist = PlayerUtils.distanceTo(newPos);
-        int packetsRequired = (int) Math.ceil(dist / 10.0);
-        //ChatUtils.info("Moving to " + xpos + ", " + ypos + ", " + zpos + " with " + packetsRequired + " packets" + " preserve: " + preserve);
+        //int packetsRequired = (int) Math.ceil(dist / 10.0);
+        int packetsRequired = 18;
+        ChatUtils.info("Moving to " + xpos + ", " + ypos + ", " + zpos + " with " + packetsRequired + " packets" + " preserve: " + preserve);
         sendpackets(packetsRequired, preserve, onground);
         moveplayer(xpos, ypos, zpos, preserve, onground);
     }
