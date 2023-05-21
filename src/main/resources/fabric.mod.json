@@ -14,9 +14,6 @@
       "AutoplayAddon.AutoplayAddon"
     ]
   },
-  "mixins": [
-    "meteorcrashaddon.mixins.json"
-  ],
   "custom": {
     "meteor-client:color": "229,255,0",
     "github:sha": "@gh_hash@"

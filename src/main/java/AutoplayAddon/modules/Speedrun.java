@@ -1,10 +1,10 @@
 package AutoplayAddon.modules;
 
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
-import meteordevelopment.meteorclient.settings.IntSetting;
-import meteordevelopment.meteorclient.settings.Setting;
-import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.renderer.ShapeMode;
+import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
@@ -22,6 +22,7 @@ import AutoplayAddon.AutoplayAddon;
 
 public class Speedrun extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
+    private final SettingGroup sgRender = settings.createGroup("Render");
 
     public Setting<Integer> amount = sgGeneral.add(new IntSetting.Builder()
         .name("Amount of logs to mine")
@@ -38,6 +39,28 @@ public class Speedrun extends Module {
         .defaultValue(3)
         .min(0)
         .sliderMax(10)
+        .build()
+    );
+
+
+    private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
+        .name("shape-mode")
+        .description("How the shapes are rendered.")
+        .defaultValue(ShapeMode.Both)
+        .build()
+    );
+
+    private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
+        .name("side-color-solid-block")
+        .description("The color of the sides of the blocks being rendered.")
+        .defaultValue(new SettingColor(255, 0, 255, 15))
+        .build()
+    );
+
+    private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
+        .name("line-color-solid-block")
+        .description("The color of the lines of the blocks being rendered.")
+        .defaultValue(new SettingColor(255, 0, 255, 255))
         .build()
     );
 

@@ -57,22 +57,42 @@ public class GetLocUtil {
     public static BlockPos findBlocks(List<Block> targetBlocks, int searchRadius) {
         World world = mc.player.getEntityWorld();
         BlockPos playerPos = mc.player.getBlockPos();
-        for (int r = 0; r <= searchRadius; r++) {
+
+        for (int dy = -searchRadius; dy <= searchRadius; dy++) {
+            BlockPos currentPos = playerPos.add(0, dy, 0);
+            Block currentBlock = world.getBlockState(currentPos).getBlock();
+            if (targetBlocks.contains(currentBlock) && !isPositionOccupied(world, currentPos) && (PlayerUtils.distanceTo(currentPos) < searchRadius)) {
+                return currentPos;
+            }
+        }
+
+        for (int r = 0; r <= searchRadius + 4; r++) {
             for (int dx = -r; dx <= r; dx++) {
                 for (int dz = -r; dz <= r; dz++) {
                     if(Math.abs(dx) != r && Math.abs(dz) != r) continue;
-                    for (int dy = -r; dy <= r; dy++) {
+                    for (int dy = -r+1; dy < r; dy++) { // The vertical range is adjusted to avoid rechecking directly above and below
                         BlockPos currentPos = playerPos.add(dx, dy, dz);
                         Block currentBlock = world.getBlockState(currentPos).getBlock();
-                        if (targetBlocks.contains(currentBlock) && !isPositionOccupied(world, currentPos)) {
+                        if (targetBlocks.contains(currentBlock) && !isPositionOccupied(world, currentPos) && (PlayerUtils.distanceTo(currentPos) < searchRadius)) {
                             return currentPos;
                         }
                     }
                 }
             }
         }
+
+        for (int dy = -searchRadius; dy <= searchRadius; dy++) {
+            BlockPos currentPos = playerPos.add(0, dy, 0);
+            Block currentBlock = world.getBlockState(currentPos).getBlock();
+            if (targetBlocks.contains(currentBlock) && !isPositionOccupied(world, currentPos) && (PlayerUtils.distanceTo(currentPos) < searchRadius)) {
+                return currentPos;
+            }
+        }
+
         return null;
     }
+
+
 
 
 
@@ -86,9 +106,9 @@ public class GetLocUtil {
 
         // Check if the player is in the given position
         Box playerBoundingBox = mc.player.getBoundingBox();
-        Box expandedBoundingBox = playerBoundingBox.expand(0.1, 0.1, 0.1); // Expand the bounding box slightly to avoid edge cases
+        //Box expandedBoundingBox = playerBoundingBox.expand(0.1, 0.1, 0.1); // Expand the bounding box slightly to avoid edge cases
 
-        if (expandedBoundingBox.intersects(new Box(pos, pos.add(1, 1, 1)))) {
+        if (playerBoundingBox.intersects(new Box(pos, pos.add(1, 1, 1)))) {
             return true;
         }
 

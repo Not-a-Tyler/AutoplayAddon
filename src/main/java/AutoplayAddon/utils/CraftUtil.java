@@ -9,6 +9,7 @@ import net.minecraft.registry.DynamicRegistryManager;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -28,12 +29,17 @@ public class CraftUtil {
                     ChatUtils.info("going to crafting table");
                     Vec3d e = SmartGoto.gotoblock(List.of(Blocks.CRAFTING_TABLE));
                     BlockPos epos = new BlockPos((int) Math.floor(e.getX()), (int) Math.floor(e.getY()), (int) Math.floor(e.getZ()));
-                    ChatUtils.info("going to crafting table at: " + e + " Blockpos: " + epos.toShortString());
+                    ChatUtils.info("went to crafting table at: " + e + " Blockpos: " + epos.toShortString());
                     WaitUtil.wait1sec();
                     Vec3d playerEyePos = mc.player.getEyePos();
                     Vec3d vec3d = playerEyePos.add(e.subtract(playerEyePos).normalize().multiply(0.5));
                     BlockHitResult blockHitResult = new BlockHitResult(vec3d, Direction.UP, epos, false);
-                    BlockUtils.interact(blockHitResult, Hand.MAIN_HAND, true);
+
+                    //interact with crafting table here
+                    if(mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult) == ActionResult.SUCCESS) {
+                        mc.player.swingHand(Hand.MAIN_HAND);
+                    }
+
                     ChatUtils.info("clicked table, waiting before crafting");
                     WaitUtil.wait1sec();
                     mc.interactionManager.clickRecipe(mc.player.currentScreenHandler.syncId, recipeToCraft, false);

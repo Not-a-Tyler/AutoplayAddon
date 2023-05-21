@@ -1,6 +1,6 @@
 {
-  "required": true,
-  "package": "AutoplayAddon.mixins",
+  "required": false,
+  "package": "AutoplayAddon",
   "mixins": [
   ],
   "compatibilityLevel": "JAVA_17",

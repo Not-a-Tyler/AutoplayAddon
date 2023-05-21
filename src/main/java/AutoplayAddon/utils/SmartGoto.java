@@ -9,12 +9,12 @@ public class SmartGoto {
 
     public static Vec3d gotoblock(List<Block> targetBlocks) {
         ChatUtils.info("Searching for blocks " + targetBlocks.toString());
-        //List<BlockPos> targetBlockPositions = GetLocUtil.findBlocks(targetBlocks, 5);
-        //if (targetBlockPositions.isEmpty()) {
-        //    ChatUtils.info("No target blocks found within 5 blocks.");
-        //} else {
-        //    return targetBlockPositions.get(0).toCenterPos();
-       // }
+        BlockPos targetBlockPositions = GetLocUtil.findBlocks(targetBlocks, 5);
+        if (targetBlockPositions == null) {
+            ChatUtils.info("No target blocks found within 5 blocks.");
+        } else {
+            return targetBlockPositions.toCenterPos();
+        }
         List<Vec3d> collectableBlock = AirGapFinder.findClosestValidPos(targetBlocks, 100, 5);
         Vec3d currentPos = collectableBlock.get(0);
         Vec3d airGapPos = collectableBlock.get(1);

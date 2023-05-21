@@ -1,4 +1,5 @@
 package AutoplayAddon.utils;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
@@ -7,6 +8,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.block.Block;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 

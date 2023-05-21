@@ -16,11 +16,11 @@ public class AirGapFinder {
     public static List<Vec3d> findClosestValidPos(List<Block> targetBlocks, double searchRadius, double maxAirGapDistance) {
             World world = mc.player.getEntityWorld();
             BlockPos playerPos = mc.player.getBlockPos();
-            for (int r = 0; r <= searchRadius; r++) {
-                for (int dx = -r; dx <= r; dx++) {
-                    for (int dz = -r; dz <= r; dz++) {
-                        if(Math.abs(dx) != r && Math.abs(dz) != r) continue;
-                        for (int dy = -r; dy <= r; dy++) {
+            for (int dy = (int) -searchRadius; dy <= searchRadius; dy++) {
+                for (int r = 0; r <= searchRadius + 4; r++) {
+                    for (int dx = -r; dx <= r; dx++) {
+                        for (int dz = -r; dz <= r; dz++) {
+                            if(Math.abs(dx) != r && Math.abs(dz) != r) continue;
                             BlockPos currentPos = playerPos.add(dx, dy, dz);
                             Block currentBlock = world.getBlockState(currentPos).getBlock();
                             if (targetBlocks.contains(currentBlock)) {

@@ -5,11 +5,15 @@ import meteordevelopment.meteorclient.commands.Commands;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.Block;
+import net.minecraft.util.math.BlockPos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import AutoplayAddon.commands.*;
 import AutoplayAddon.modules.*;
 import net.minecraft.item.*;
+
+import java.util.HashMap;
 
 
 public class AutoplayAddon extends MeteorAddon {
@@ -21,15 +25,14 @@ public class AutoplayAddon extends MeteorAddon {
 
     @Override
     public void onInitialize() {
+
         LOG.info("Initializing AutoplayAddon");
 
-
-
-        //misc
 
         Modules.get().add(new Disabler());
         Modules.get().add(new Speedrun());
         Modules.get().add(new TeleportInfo());
+        Modules.get().add(new BlockDebug());
 
 
         Commands.add(new Mine());
