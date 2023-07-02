@@ -1,6 +1,5 @@
 package AutoplayAddon.modules;
 
-import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
@@ -15,8 +14,7 @@ public class TeleportInfo extends Module {
 
     @EventHandler(priority = EventPriority.HIGHEST + 1)
     private void onReceivePacket(PacketEvent.Receive event) {
-        if (event.packet instanceof PlayerPositionLookS2CPacket) {
-            PlayerPositionLookS2CPacket packet = (PlayerPositionLookS2CPacket) event.packet;
+        if (event.packet instanceof PlayerPositionLookS2CPacket packet) {
             info("Server Teleported you to: " +  packet.getX() + ", " + packet.getY() + ", " + packet.getZ());
         }
     }

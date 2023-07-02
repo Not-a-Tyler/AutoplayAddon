@@ -1,7 +1,7 @@
 package AutoplayAddon.commands;
-import AutoplayAddon.utils.*;
-import meteordevelopment.meteorclient.MeteorClient;
 
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Other.ClientPosArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.Command;
 import net.minecraft.command.CommandSource;

@@ -1,6 +1,6 @@
 package AutoplayAddon.commands;
 
-import AutoplayAddon.utils.SmartMine;
+import AutoplayAddon.AutoPlay.Controller.SmartMine;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import meteordevelopment.meteorclient.commands.Command;
@@ -11,9 +11,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.BlockPos;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -33,7 +32,7 @@ public class Mine extends Command {
 
             if (stack == null || stack.getItem() == Items.AIR) ChatUtils.info("e");
             ChatUtils.info(stack.getItem().getName().getString());
-            List<Item> itemslist = Arrays.asList(stack.getItem());
+            List<Item> itemslist = Collections.singletonList(stack.getItem());
             new Thread(() -> {
                 SmartMine.mineBlocks(itemslist);
 

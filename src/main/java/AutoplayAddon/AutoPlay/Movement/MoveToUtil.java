@@ -1,4 +1,4 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Movement;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;

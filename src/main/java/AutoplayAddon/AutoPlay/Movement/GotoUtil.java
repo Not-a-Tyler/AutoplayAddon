@@ -1,4 +1,4 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Movement;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

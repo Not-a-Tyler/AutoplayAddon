@@ -1,5 +1,8 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Controller;
+import AutoplayAddon.AutoPlay.Actions.MineUtil;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
+import AutoplayAddon.AutoPlay.Locator.CanPickUpTest;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import java.util.List;
@@ -10,7 +13,7 @@ public class SmartMine {
 
 
     public static void mineBlocks(List<Item> targetBlocks) {
-        List<Vec3d> collectableBlock = CanPickUpTest.findCollectableItem(targetBlocks, 100);
+        List<Vec3d> collectableBlock = CanPickUpTest.findCollectableItem(targetBlocks);
         if (collectableBlock != null) {
             Vec3d targetpos = collectableBlock.get(0);
             Vec3d airGapPos = collectableBlock.get(1);

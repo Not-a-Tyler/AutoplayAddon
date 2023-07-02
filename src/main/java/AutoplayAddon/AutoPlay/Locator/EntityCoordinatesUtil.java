@@ -1,4 +1,4 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Locator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;

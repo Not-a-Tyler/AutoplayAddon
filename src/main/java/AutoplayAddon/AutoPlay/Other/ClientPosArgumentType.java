@@ -1,4 +1,4 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Other;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;

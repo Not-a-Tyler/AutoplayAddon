@@ -1,4 +1,6 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Actions;
+import AutoplayAddon.AutoPlay.Controller.SmartGoto;
+import AutoplayAddon.AutoPlay.Other.WaitUtil;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -8,7 +10,6 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.registry.DynamicRegistryManager;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -86,8 +87,7 @@ public class CraftUtil {
     }
 
     private static boolean needsCraftingTable(Recipe<?> recipe) {
-        if (recipe instanceof ShapedRecipe) {
-            ShapedRecipe shapedRecipe = (ShapedRecipe) recipe;
+        if (recipe instanceof ShapedRecipe shapedRecipe) {
             int width = shapedRecipe.getWidth();
             int height = shapedRecipe.getHeight();
             return width > 2 || height > 2;

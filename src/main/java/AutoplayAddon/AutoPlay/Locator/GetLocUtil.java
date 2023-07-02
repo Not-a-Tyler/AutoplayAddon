@@ -1,4 +1,4 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Locator;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
@@ -108,11 +108,7 @@ public class GetLocUtil {
         Box playerBoundingBox = mc.player.getBoundingBox();
         //Box expandedBoundingBox = playerBoundingBox.expand(0.1, 0.1, 0.1); // Expand the bounding box slightly to avoid edge cases
 
-        if (playerBoundingBox.intersects(new Box(pos, pos.add(1, 1, 1)))) {
-            return true;
-        }
-
-        return false;
+        return playerBoundingBox.intersects(new Box(pos, pos.add(1, 1, 1)));
     }
 
 

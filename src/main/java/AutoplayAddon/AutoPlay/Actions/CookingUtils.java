@@ -1,5 +1,7 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Actions;
 
+import AutoplayAddon.AutoPlay.Controller.SmartGoto;
+import AutoplayAddon.AutoPlay.Other.WaitUtil;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
@@ -41,8 +43,7 @@ public class CookingUtils {
         // Wait for the item to cook
         boolean itemCooked = false;
         while (!itemCooked) {
-            if (mc.player.currentScreenHandler instanceof FurnaceScreenHandler) {
-                FurnaceScreenHandler furnaceScreenHandler = (FurnaceScreenHandler) mc.player.currentScreenHandler;
+            if (mc.player.currentScreenHandler instanceof FurnaceScreenHandler furnaceScreenHandler) {
                 ItemStack outputStack = furnaceScreenHandler.getSlot(2).getStack();
                 if (!outputStack.isEmpty() && outputStack.getItem() != itemToCook) {
                     itemCooked = true;

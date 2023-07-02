@@ -3,7 +3,7 @@
   "id": "autoplay-addon",
   "version": "0.1indev",
   "name": "AutoplayAddon",
-  "description": "AutoplayAddon, but it crashes your game.",
+  "description": "AutoplayAddon",
   "authors": ["Tyler"],
   "contact": {
     "repo": ""
@@ -20,7 +20,7 @@
   },
   "depends": {
     "java": ">=17",
-    "minecraft": ">=${mc_version}",
+    "minecraft": "*",
     "meteor-client": "*"
   }
 }

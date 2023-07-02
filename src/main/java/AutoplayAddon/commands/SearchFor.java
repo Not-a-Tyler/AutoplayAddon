@@ -1,46 +1,42 @@
 package AutoplayAddon.commands;
-import AutoplayAddon.utils.GetLocUtil;
+
+import AutoplayAddon.AutoplayAddon;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import meteordevelopment.meteorclient.commands.Command;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class SearchFor extends Command {
     public SearchFor() {
-        super("searchfor", "Mines a Block");
+        super("searchfor", "attempts to locate a block");
     }
 
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
-        // Specific item
         builder.then(argument("item", ItemStackArgumentType.itemStack(REGISTRY_ACCESS)).executes(context -> printItemName(player -> {
+            // Get the current time in milliseconds
             ItemStack stack = ItemStackArgumentType.getItemStackArgument(context, "item").createStack(1, false);
-
-            if (stack == null || stack.getItem() == Items.AIR) ChatUtils.info("e");
-            ChatUtils.info(stack.getItem().getName().getString());
-            List<Block> itemslist = Arrays.asList(Block.getBlockFromItem(stack.getItem()));
-
+            Block block = Block.getBlockFromItem(stack.getItem());
+            ChatUtils.info("Looking for " + block.getName().getString());
             long startTime = System.currentTimeMillis();
-
-            new Thread(() -> {
-                BlockPos pos = GetLocUtil.findBlocks(itemslist, 200);
-                long endTime = System.currentTimeMillis();
-                long executionTime = endTime - startTime;
-                ChatUtils.info("Thread execution time: " + executionTime + " milliseconds " + pos.toShortString());
-            }).start();
+            BlockPos bruz = AutoplayAddon.blockCache.getNearestBlock(block);
+            long endTime = System.currentTimeMillis(); // Get the current time after calculating BlockPos
+            long timeTaken = endTime - startTime; // Calculate the time taken in milliseconds
+            ChatUtils.info("Time taken: " + timeTaken + " milliseconds");
+            if (bruz != null) {
+                ChatUtils.info(bruz.toShortString());
+            } else {
+                ChatUtils.info("Didn't find anything");
+            }
         })));
     }
 

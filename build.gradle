@@ -25,16 +25,18 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    // Fabric API
+    //fabric api
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabricapi_version}+${project.minecraft_version}")
 
+    //baritone
+    modImplementation "baritone:fabric:${project.minecraft_version}-SNAPSHOT"
     // Meteor
     modImplementation "meteordevelopment:meteor-client:${project.meteor_version}"
 }
 
 processResources {
     filesMatching("fabric.mod.json") {
-        expand "version": project.version, "mc_version": project.minecraft_version
+        expand "version": project.version
     }
 }
 

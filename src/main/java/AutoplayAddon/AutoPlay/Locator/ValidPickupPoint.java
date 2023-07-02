@@ -1,4 +1,4 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Locator;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;

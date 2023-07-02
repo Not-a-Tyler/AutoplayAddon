@@ -1,5 +1,10 @@
 package AutoplayAddon.modules;
 
+import AutoplayAddon.AutoPlay.Actions.CraftUtil;
+import AutoplayAddon.AutoPlay.Actions.ItemCollection;
+import AutoplayAddon.AutoPlay.Actions.PlaceUtil;
+import AutoplayAddon.AutoPlay.Controller.SmartMine;
+import AutoplayAddon.AutoPlay.Other.WaitUtil;
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
@@ -10,8 +15,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import AutoplayAddon.utils.*;
-import java.util.Arrays;
+
+import java.util.Collections;
 import java.util.List;
 import AutoplayAddon.AutoplayAddon;
 
@@ -73,7 +78,7 @@ public class Speedrun extends Module {
     public void onActivate() {
         mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
         Thread waitForTickEventThread = new Thread(() -> {
-            List<Item> targetBlocks = Arrays.asList(Items.OAK_LOG);
+            List<Item> targetBlocks = Collections.singletonList(Items.OAK_LOG);
             for (int i = 0; i < amount.get(); i++) {
                 SmartMine.mineBlocks(targetBlocks);
             }
@@ -90,22 +95,22 @@ public class Speedrun extends Module {
             WaitUtil.wait1sec();
             CraftUtil.craftItem(Items.WOODEN_PICKAXE, 1);
             WaitUtil.wait1sec();
-            List<Item> targetBlocks2 = Arrays.asList(Items.STONE);
+            List<Item> targetBlocks2 = Collections.singletonList(Items.STONE);
             for (int i = 0; i < amount2.get(); i++) {
                 SmartMine.mineBlocks(targetBlocks2);
             }
             WaitUtil.wait1sec();
-            List<Item> targetBlocks3 = Arrays.asList(Items.COBBLESTONE);
+            List<Item> targetBlocks3 = Collections.singletonList(Items.COBBLESTONE);
             ItemCollection.collect(targetBlocks3);
             WaitUtil.wait1sec();
             CraftUtil.craftItem(Items.STONE_PICKAXE, 1);
             WaitUtil.wait1sec();
-            List<Item> targetBlocks4 = Arrays.asList(Items.IRON_ORE);
+            List<Item> targetBlocks4 = Collections.singletonList(Items.IRON_ORE);
             for (int i = 0; i < amount2.get(); i++) {
                 SmartMine.mineBlocks(targetBlocks4);
             }
             WaitUtil.wait1sec();
-            List<Item> targetBlocks5 = Arrays.asList(Items.RAW_IRON);
+            List<Item> targetBlocks5 = Collections.singletonList(Items.RAW_IRON);
             ItemCollection.collect(targetBlocks5);
             WaitUtil.wait1sec();
             for (int i = 0; i < 9; i++) {
@@ -114,8 +119,8 @@ public class Speedrun extends Module {
             WaitUtil.wait1sec();
             ItemCollection.collect(targetBlocks3);
             WaitUtil.wait1sec();
-            List<Item> targetBlocks6 = Arrays.asList(Items.COAL_ORE);
-            List<Item> targetBlocks7 = Arrays.asList(Items.COAL);
+            List<Item> targetBlocks6 = Collections.singletonList(Items.COAL_ORE);
+            List<Item> targetBlocks7 = Collections.singletonList(Items.COAL);
             SmartMine.mineBlocks(targetBlocks6);
             WaitUtil.wait1sec();
             ItemCollection.collect(targetBlocks7);

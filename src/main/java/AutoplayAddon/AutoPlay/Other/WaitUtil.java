@@ -1,4 +1,4 @@
-package AutoplayAddon.utils;
+package AutoplayAddon.AutoPlay.Other;
 
 public class WaitUtil {
     public static void wait1sec() {

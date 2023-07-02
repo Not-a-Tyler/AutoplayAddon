@@ -1,21 +1,26 @@
 package AutoplayAddon.commands;
 
-import AutoplayAddon.AutoPlay.Actions.CraftUtil;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import meteordevelopment.meteorclient.commands.Command;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.Vec3d;
+import AutoplayAddon.AutoPlay.Locator.CanPickUpTest;
+import java.util.Collections;
+import java.util.List;
+
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
-public class Craft extends Command {
-    public Craft() {
-        super("craft", "Crafts Item");
+public class findcollectableblock extends Command {
+    public findcollectableblock() {
+        super("findcollectableblock", "Mines a Block");
     }
 
     @Override
@@ -26,10 +31,21 @@ public class Craft extends Command {
             ItemStack stack = ItemStackArgumentType.getItemStackArgument(context, "item").createStack(1, false);
 
             if (stack == null || stack.getItem() == Items.AIR) ChatUtils.info("e");
-            ChatUtils.info(stack.getItem().getName().getString());
-            new Thread(() -> {
-                CraftUtil.craftItem(stack.getItem(), 1);
-            }).start();
+            List<Block> blockslist = Collections.singletonList(Block.getBlockFromItem(stack.getItem()));
+            ChatUtils.info("testing " + blockslist.get(0).getName().getString());
+            long startTime = System.currentTimeMillis();
+            List<Vec3d> collectableBlock = CanPickUpTest.findCollectableBlock(blockslist);
+            long endTime = System.currentTimeMillis(); // Get the current time after calculating BlockPos
+            long timeTaken = endTime - startTime; // Calculate the time taken in milliseconds
+            ChatUtils.info("Time taken: " + timeTaken + " milliseconds");
+            if (collectableBlock == null) {
+                ChatUtils.info("Didn't find anything");
+                return;
+            }
+            Vec3d targetpos = collectableBlock.get(0);
+            Vec3d airGapPos = collectableBlock.get(1);
+            ChatUtils.info("Target: " + targetpos.toString());
+            ChatUtils.info("Air Gap: " + airGapPos.toString());
         })));
     }
 
