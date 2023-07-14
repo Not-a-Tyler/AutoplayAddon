@@ -13,14 +13,8 @@ public class MoveToUtil {
         Vec3d newPos = new Vec3d(xpos, ypos, zpos);
         double dist = PlayerUtils.distanceTo(newPos);
         int packetsRequired = (int) Math.ceil(dist / 10.0);
-        //int packetsRequired = 18;
-        ChatUtils.info("Moving to " + xpos + ", " + ypos + ", " + zpos + " with " + packetsRequired + " packets" + " preserve: " + preserve);
+        ChatUtils.info("Moving to " + xpos + ", " + ypos + ", " + zpos + " with " + packetsRequired + " packets preserve: " + preserve);
         sendpackets(packetsRequired, preserve, onground);
-        try {
-            Thread.sleep(20);
-        } catch (InterruptedException ee) {
-            ee.printStackTrace();
-        }
         moveplayer(xpos, ypos, zpos, preserve, onground);
     }
 

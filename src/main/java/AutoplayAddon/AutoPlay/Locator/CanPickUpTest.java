@@ -1,6 +1,7 @@
 package AutoplayAddon.AutoPlay.Locator;
 
 import AutoplayAddon.AutoplayAddon;
+import AutoplayAddon.Tracker.BlockCache;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

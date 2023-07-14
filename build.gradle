@@ -1,5 +1,5 @@
 plugins {
-    id "fabric-loom" version "1.2-SNAPSHOT"
+    id "fabric-loom" version "1.3-SNAPSHOT"
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
@@ -28,8 +28,6 @@ dependencies {
     //fabric api
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabricapi_version}+${project.minecraft_version}")
 
-    //baritone
-    modImplementation "baritone:fabric:${project.minecraft_version}-SNAPSHOT"
     // Meteor
     modImplementation "meteordevelopment:meteor-client:${project.meteor_version}"
 }

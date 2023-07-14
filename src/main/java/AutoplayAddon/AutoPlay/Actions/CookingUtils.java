@@ -48,11 +48,7 @@ public class CookingUtils {
                 if (!outputStack.isEmpty() && outputStack.getItem() != itemToCook) {
                     itemCooked = true;
                 } else {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ee) {
-                        ee.printStackTrace();
-                    }
+                    WaitUtil.wait1sec();
                 }
             }
         }

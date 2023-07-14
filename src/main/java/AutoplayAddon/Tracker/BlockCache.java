@@ -1,6 +1,5 @@
-package AutoplayAddon.AutoPlay.Locator;
+package AutoplayAddon.Tracker;
 
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -28,8 +27,6 @@ public class BlockCache {
                         BlockPos pos = new BlockPos(chunk.getPos().getStartX() + x, y, chunk.getPos().getStartZ() + z);
                         BlockState blockState = chunk.getBlockState(pos);
                         Block block = chunk.getBlockState(pos).getBlock();
-
-                        // Exclude non-solid blocks
                         if (!blockState.isSolid()) {
                             continue;
                         }
@@ -40,7 +37,6 @@ public class BlockCache {
                 }
             }
         });
-        ChatUtils.info("Added chunk");
     }
 
     public void removeChunk(Chunk chunk) {
@@ -51,7 +47,6 @@ public class BlockCache {
                 }
             }
         });
-        ChatUtils.info("removed chunk");
     }
 
     public BlockPos getNearestBlock(Block targetBlock) {

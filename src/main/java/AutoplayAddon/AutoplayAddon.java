@@ -1,5 +1,5 @@
 package AutoplayAddon;
-import AutoplayAddon.AutoPlay.Locator.BlockCache;
+import AutoplayAddon.Tracker.BlockCache;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.commands.Commands;
@@ -43,6 +43,7 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new Speedrun());
         Modules.get().add(new TeleportInfo());
         Modules.get().add(new BlockDebug());
+        Modules.get().add(new ClickTp());
 
         Commands.add(new Mine());
         Commands.add(new TP2cam());
