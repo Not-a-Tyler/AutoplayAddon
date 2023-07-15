@@ -38,6 +38,7 @@ public class SearchFor extends Command {
                 ChatUtils.info("Didn't find anything");
             }
         })));
+        return;
     }
 
     private int printItemName(PlayerConsumer consumer) throws CommandSyntaxException {

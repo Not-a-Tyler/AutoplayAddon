@@ -47,6 +47,7 @@ public class findcollectableblock extends Command {
             ChatUtils.info("Target: " + targetpos.toString());
             ChatUtils.info("Air Gap: " + airGapPos.toString());
         })));
+        return;
     }
 
     private int printItemName(PlayerConsumer consumer) throws CommandSyntaxException {

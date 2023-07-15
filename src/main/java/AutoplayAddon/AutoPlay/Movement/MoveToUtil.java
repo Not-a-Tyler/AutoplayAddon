@@ -5,6 +5,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
+import java.text.DecimalFormat;
 
 
 public class MoveToUtil {
@@ -13,7 +14,8 @@ public class MoveToUtil {
         Vec3d newPos = new Vec3d(xpos, ypos, zpos);
         double dist = PlayerUtils.distanceTo(newPos);
         int packetsRequired = (int) Math.ceil(dist / 10.0);
-        ChatUtils.info("Moving to " + xpos + ", " + ypos + ", " + zpos + " with " + packetsRequired + " packets preserve: " + preserve);
+        DecimalFormat decimalFormat = new DecimalFormat("#.00");
+        ChatUtils.info("Moving to " + decimalFormat.format(xpos) + ", " + decimalFormat.format(ypos) + ", " + decimalFormat.format(zpos));
         sendpackets(packetsRequired, preserve, onground);
         moveplayer(xpos, ypos, zpos, preserve, onground);
     }

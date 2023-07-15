@@ -4,6 +4,7 @@ import AutoplayAddon.AutoPlay.Actions.CraftUtil;
 import AutoplayAddon.AutoPlay.Actions.ItemCollection;
 import AutoplayAddon.AutoPlay.Actions.PlaceUtil;
 import AutoplayAddon.AutoPlay.Controller.SmartMine;
+import AutoplayAddon.AutoPlay.Inventory.LogToPlankTest;
 import AutoplayAddon.AutoPlay.Other.WaitUtil;
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
@@ -15,7 +16,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-
+import AutoplayAddon.AutoPlay.Inventory.Lists;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import AutoplayAddon.AutoplayAddon;
@@ -48,26 +50,6 @@ public class Speedrun extends Module {
     );
 
 
-    private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("How the shapes are rendered.")
-        .defaultValue(ShapeMode.Both)
-        .build()
-    );
-
-    private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color-solid-block")
-        .description("The color of the sides of the blocks being rendered.")
-        .defaultValue(new SettingColor(255, 0, 255, 15))
-        .build()
-    );
-
-    private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color-solid-block")
-        .description("The color of the lines of the blocks being rendered.")
-        .defaultValue(new SettingColor(255, 0, 255, 255))
-        .build()
-    );
 
 
     public Speedrun() {
@@ -78,14 +60,13 @@ public class Speedrun extends Module {
     public void onActivate() {
         mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
         Thread waitForTickEventThread = new Thread(() -> {
-            List<Item> targetBlocks = Collections.singletonList(Items.OAK_LOG);
-            for (int i = 0; i < amount.get(); i++) {
-                SmartMine.mineBlocks(targetBlocks);
+            for (int i = 0; i < 3; i++) {
+                SmartMine.mineBlocks(Arrays.asList(Lists.LOG));
             }
             WaitUtil.wait1sec();
-            ItemCollection.collect(targetBlocks);
+            ItemCollection.collect(Arrays.asList(Lists.LOG));
             WaitUtil.wait1sec();
-            CraftUtil.craftItem(Items.OAK_PLANKS, 3);
+            LogToPlankTest.Log2Plank();
             WaitUtil.wait1sec();
             CraftUtil.craftItem(Items.STICK, 1);
             WaitUtil.wait1sec();

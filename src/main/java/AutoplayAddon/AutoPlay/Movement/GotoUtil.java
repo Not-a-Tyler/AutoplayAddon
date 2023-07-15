@@ -20,12 +20,12 @@ public class GotoUtil {
         mc.player.setNoGravity(true);
         mc.player.setVelocity(Vec3d.ZERO);
         if (mc.player.getY() != this.y) {
-            ChatUtils.info("dosent equal y");
+            //ChatUtils.info("dosent equal y");
             MoveToUtil.moveTo(mc.player.getX(), this.y, mc.player.getZ(), false, true);
             return;
         }
         if ((mc.player.getX() != xpos) || (mc.player.getZ() != zpos) ) {
-            ChatUtils.info("dosent equal x/z");
+            //ChatUtils.info("dosent equal x/z");
             MoveToUtil.moveTo(xpos, y, zpos, false, true);
             return;
         }
@@ -56,8 +56,6 @@ public class GotoUtil {
             MoveToUtil.moveTo(xpos, ypos, zpos, false, true);
             return;
         }
-
-
 
         MeteorClient.EVENT_BUS.subscribe(this);
         tickEventFuture = new CompletableFuture<>();

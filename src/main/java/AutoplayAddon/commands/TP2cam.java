@@ -38,5 +38,6 @@ public class TP2cam extends Command {
             }
             return SINGLE_SUCCESS;
         });
+        return;
     }
 }

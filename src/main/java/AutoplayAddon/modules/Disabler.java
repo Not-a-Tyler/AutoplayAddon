@@ -9,7 +9,7 @@ import meteordevelopment.orbit.EventHandler;
 
 public class Disabler extends Module {
     public Disabler() {
-        super(AutoplayAddon.autoplay, "move-disabler", "any anticheat disabler real dosent work XD - Made by tyler. I don't know what the fuck this is meant to do or what it does.");
+        super(AutoplayAddon.autoplay, "move-disabler", "any anticheat disabler real dosent work XD");
     }
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 

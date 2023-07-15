@@ -37,6 +37,7 @@ public class ItemCollect extends Command {
                 ItemCollection.collect(itemslist);
             }).start();
         })));
+        return;
     }
 
     private int printItemName(PlayerConsumer consumer) throws CommandSyntaxException {

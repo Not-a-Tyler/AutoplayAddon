@@ -26,5 +26,6 @@ public class Teleport extends Command {
             waitForTickEventThread.start();
             return SINGLE_SUCCESS;
         }));
+        return;
     }
 }

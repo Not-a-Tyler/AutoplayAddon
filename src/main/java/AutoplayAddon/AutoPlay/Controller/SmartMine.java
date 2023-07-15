@@ -22,6 +22,7 @@ public class SmartMine {
             }
             ChatUtils.info("Mining target block at: " + targetpos.getX() + " " + targetpos.getY() + " " + targetpos.getZ());
             new MineUtil().mine(BlockPos.ofFloored(targetpos));
+            ChatUtils.info("done mining");
         } else {
             ChatUtils.info("No target blocks found within the search radius.");
         }
