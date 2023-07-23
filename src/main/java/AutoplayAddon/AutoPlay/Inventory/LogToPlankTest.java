@@ -1,7 +1,6 @@
 package AutoplayAddon.AutoPlay.Inventory;
 
 import AutoplayAddon.AutoPlay.Actions.CraftUtil;
-import AutoplayAddon.AutoPlay.Inventory.Lists;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;

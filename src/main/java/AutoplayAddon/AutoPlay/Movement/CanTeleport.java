@@ -1,5 +1,6 @@
 package AutoplayAddon.AutoPlay.Movement;
 import com.google.common.collect.ImmutableList;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -12,7 +13,6 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 import java.util.List;
 
 public class CanTeleport {
-
 
     public static double searchGoodYandTeleport(Vec3d from, Vec3d to) {
         if (Checkifcantteleport(from, to)) {
@@ -36,11 +36,11 @@ public class CanTeleport {
     }
 
     public static boolean Checkifcantteleport(Vec3d from, Vec3d to) {
-        Box box = new Box(from.x - mc.player.getWidth() / 2, from.y, from.z - mc.player.getWidth() / 2, from.x + mc.player.getWidth() / 2, from.y + mc.player.getHeight(), from.z + mc.player.getWidth() / 2);
+        Box oldBox = new Box(from.x - mc.player.getWidth() / 2, from.y, from.z - mc.player.getWidth() / 2, from.x + mc.player.getWidth() / 2, from.y + mc.player.getHeight(), from.z + mc.player.getWidth() / 2);
         double d6 = to.x - from.x;
         double d7 = to.y - from.y;
         double d8 = to.z - from.z;
-        Vec3d test = adjustMovementForCollisions(box, new Vec3d(d6, d7, d8));
+        Vec3d test = adjustMovementForCollisions(oldBox, new Vec3d(d6, d7, d8));
         Vec3d wentto = new Vec3d(from.x + test.x, from.y + test.y, from.z + test.z);
         d6 = to.x - wentto.x;
         d7 = to.y - wentto.y;
@@ -54,6 +54,9 @@ public class CanTeleport {
         }
         return false;
     }
+
+
+
 
     private static Vec3d adjustMovementForCollisions(Box box, Vec3d movement) {
         List<VoxelShape> list = mc.player.getWorld().getEntityCollisions(mc.player, box.stretch(movement));

@@ -1,13 +1,9 @@
 package AutoplayAddon.commands;
 
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
-import AutoplayAddon.AutoPlay.Other.ClientPosArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.Command;
 import net.minecraft.command.CommandSource;
-import net.minecraft.util.math.Vec3d;
 
-import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class disablegravity extends Command {

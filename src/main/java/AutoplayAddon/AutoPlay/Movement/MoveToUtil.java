@@ -15,7 +15,7 @@ public class MoveToUtil {
         double dist = PlayerUtils.distanceTo(newPos);
         int packetsRequired = (int) Math.ceil(dist / 10.0);
         DecimalFormat decimalFormat = new DecimalFormat("#.00");
-        ChatUtils.info("Moving to " + decimalFormat.format(xpos) + ", " + decimalFormat.format(ypos) + ", " + decimalFormat.format(zpos));
+        //ChatUtils.info("Moving to " + decimalFormat.format(xpos) + ", " + decimalFormat.format(ypos) + ", " + decimalFormat.format(zpos));
         sendpackets(packetsRequired, preserve, onground);
         moveplayer(xpos, ypos, zpos, preserve, onground);
     }

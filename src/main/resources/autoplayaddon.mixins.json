@@ -1,10 +1,13 @@
 {
-  "required": false,
+  "required": true,
   "package": "AutoplayAddon",
   "mixins": [
   ],
   "compatibilityLevel": "JAVA_17",
   "client": [
+  ],
+  "mixins": [
+    "Mixins.ClientCommandC2SPacketMixin"
   ],
   "injectors": {
     "defaultRequire": 1

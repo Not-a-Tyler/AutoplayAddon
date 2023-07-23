@@ -1,6 +1,5 @@
 package AutoplayAddon.modules;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
-import AutoplayAddon.AutoPlay.Other.WaitUtil;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.settings.EntityTypeListSetting;
 import meteordevelopment.meteorclient.settings.KeybindSetting;
@@ -8,22 +7,13 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 
-import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 public class InfiniteAura  extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -48,29 +38,29 @@ public class InfiniteAura  extends Module {
             ClientPlayerEntity player = mc.player;
             if (player != null) {
                 double closestAngle = Double.MAX_VALUE;
-                Entity closestPlayer = null;
+                Entity closestEntity = null;
                 Vec3d viewVec = player.getRotationVec(1.0F);
 
                 for (Entity entity : mc.world.getEntities()) {
                     if (entities.get().contains(entity.getType()) && entity != player) {
-                        PlayerEntity otherPlayer = (PlayerEntity) entity;
-                        Vec3d toOther = otherPlayer.getPos().subtract(player.getPos()).normalize();
+                        Entity otherEntity = entity;
+                        Vec3d toOther = otherEntity.getPos().subtract(player.getPos()).normalize();
                         double angle = Math.acos(viewVec.dotProduct(toOther));
 
                         if (angle < closestAngle) {
                             closestAngle = angle;
-                            closestPlayer = otherPlayer;
+                            closestEntity = otherEntity;
                         }
                     }
                 }
 
-                if (closestPlayer != null) {
-                    Entity finalClosestPlayer = closestPlayer;
+                if (closestEntity != null) {
+                    Entity finalClosestEntity = closestEntity;
                     Thread waitForTickEventThread1 = new Thread(() -> {
                         Vec3d startingpos = mc.player.getPos();
-                        Vec3d pos = finalClosestPlayer.getPos();
+                        Vec3d pos = finalClosestEntity.getPos();
                         new GotoUtil().moveto(pos.x, pos.y, pos.z);
-                        mc.interactionManager.attackEntity(mc.player, finalClosestPlayer);
+                        mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
                         mc.player.swingHand(Hand.MAIN_HAND);
                         new GotoUtil().moveto(startingpos.x, startingpos.y, startingpos.z);
                     });
@@ -80,6 +70,5 @@ public class InfiniteAura  extends Module {
         })
         .build()
     );
-
 
 }

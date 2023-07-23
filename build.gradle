@@ -27,7 +27,7 @@ dependencies {
 
     //fabric api
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabricapi_version}+${project.minecraft_version}")
-
+    //modImplementation(files("libs/meteor-client-0.5.4.jar"))
     // Meteor
     modImplementation "meteordevelopment:meteor-client:${project.meteor_version}"
 }

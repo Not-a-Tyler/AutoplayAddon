@@ -1,7 +1,6 @@
 package AutoplayAddon.modules;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoplayAddon;
-import com.google.common.collect.ImmutableList;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
@@ -14,9 +13,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
-
-
-import static AutoplayAddon.AutoPlay.Movement.CanTeleport.searchGoodYandTeleport;
 
 
 public class ClickTp extends Module {

@@ -1,5 +1,7 @@
 package AutoplayAddon;
 import AutoplayAddon.Tracker.BlockCache;
+import AutoplayAddon.Tracker.ServerSideValues;
+import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.commands.Commands;
@@ -13,9 +15,6 @@ import AutoplayAddon.modules.*;
 import net.minecraft.item.*;
 
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
-
-
 public class AutoplayAddon extends MeteorAddon {
     public static final Logger LOG = LoggerFactory.getLogger("AutoplayAddon starting");
     public static final Category autoplay = new Category("Autoplay", Items.TNT.getDefaultStack());
@@ -26,18 +25,9 @@ public class AutoplayAddon extends MeteorAddon {
     @Override
     public void onInitialize() {
 
-
-        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
-            blockCache.addChunk(chunk);
-        });
-
-        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
-            blockCache.removeChunk(chunk);
-        });
-
+        MeteorClient.EVENT_BUS.subscribe(ServerSideValues.class);
 
         LOG.info("Initializing AutoplayAddon");
-
 
         Modules.get().add(new Disabler());
         Modules.get().add(new Speedrun());
@@ -45,8 +35,11 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new BlockDebug());
         Modules.get().add(new ClickTp());
         Modules.get().add(new InfiniteAura());
+        Modules.get().add(new Follower());
+        Modules.get().add(new StacisBotTest());
 
-
+        Commands.add(new Stop());
+        Commands.add(new TpTo());
         Commands.add(new TestCommand());
         Commands.add(new Mine());
         Commands.add(new TP2cam());
