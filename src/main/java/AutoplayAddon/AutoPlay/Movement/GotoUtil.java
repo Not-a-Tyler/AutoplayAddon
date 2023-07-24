@@ -3,78 +3,83 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import AutoplayAddon.AutoplayAddon;
+import AutoplayAddon.Tracker.ServerSideValues;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.orbit.EventHandler;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
+
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.util.math.Vec3d;
 
 public class GotoUtil {
     private static List<GotoUtil> activeInstances = new ArrayList<>();
     private double y;
+    int stage = 1;
 
-    @EventHandler
+    private Vec3d getStage(Vec3d from, Vec3d to, int stage) {
+        if (stage == 1) return new Vec3d(from.getX(), this.y, from.getZ());
+        if (stage == 2) return new Vec3d(to.getX(), this.y, to.getZ());
+        if (stage == 3) return new Vec3d(to.getX(), to.getY(), to.getZ());
+        return new Vec3d(from.getX(), from.getY(), from.getZ());
+    }
+
+    @EventHandler()
     private void onTick(TickEvent.Pre event) {
         if (mc.player == null) {
             System.out.println("borked");
-            MeteorClient.EVENT_BUS.unsubscribe(this);
-            stopAllInstances();
+            tickEventFuture.complete(null);
             return;
         }
-
-        if (mc.player.getY() != this.y) {
-            MoveToUtil.moveTo(mc.player.getX(), this.y, mc.player.getZ(), false, true);
-            return;
+        while (true) {
+            if (stage == 4) {
+                tickEventFuture.complete(null);
+                break;
+            }
+            Vec3d newPos = getStage(mc.player.getPos(), this.to, stage);
+            ChatUtils.info(ServerSideValues.delta() + " > " + ((int) Math.ceil(PlayerUtils.distanceTo(this.to) / 10.0)));
+            if(!AutoplayAddon.values.moveable) {
+                if (ServerSideValues.delta() < ((int) Math.ceil(PlayerUtils.distanceTo(this.to) / 10.0))){
+                    ChatUtils.sendPlayerMsg("Not enough charge, waiting 1 tick");
+                    return;
+                }
+            }
+            MoveToUtil.moveTo(newPos);
+            ChatUtils.info(("Increased Stage"));
+            stage++;
         }
-
-        if ((mc.player.getX() != xpos) || (mc.player.getZ() != zpos)) {
-            MoveToUtil.moveTo(xpos, y, zpos, false, true);
-            return;
-        }
-
-        if (mc.player.getY() != ypos) {
-            MoveToUtil.moveTo(xpos, ypos, zpos, false, true);
-        }
-
-        tickEventFuture.complete(null);
     }
 
     private static CompletableFuture<Void> tickEventFuture;
-    private double xpos;
-    private double ypos;
-    private double zpos;
+    private Vec3d to;
+
 
     public void moveto(double xpos, double ypos, double zpos) {
         stopAllInstances();
         activeInstances.add(this);
-
-        this.xpos = xpos;
-        this.ypos = ypos;
-        this.zpos = zpos;
-        Vec3d goto1 = new Vec3d(xpos, ypos, zpos);
+        Vec3d to = new Vec3d(xpos, ypos, zpos);
+        this.to = to;
         ChatUtils.info("Going to " + xpos + " " + ypos + " " + zpos);
-        this.y = CanTeleport.searchGoodYandTeleport(mc.player.getPos(), goto1);
-
-        if (this.y == mc.player.getY()) {
-            MoveToUtil.moveTo(xpos, ypos, zpos, false, true);
-            return;
-        }
-
-        MeteorClient.EVENT_BUS.subscribe(this);
+        ChatUtils.sendPlayerMsg("Going to " + xpos + " " + ypos + " " + zpos);
+        this.y = CanTeleport.searchGoodYandTeleport(mc.player.getPos(), to);
         tickEventFuture = new CompletableFuture<>();
-
         mc.player.setNoGravity(true);
         mc.player.setVelocity(Vec3d.ZERO);
-
+        MeteorClient.EVENT_BUS.subscribe(this);
         try {
             tickEventFuture.get();
         } catch (InterruptedException | ExecutionException e) {
             ChatUtils.error("Movement interrupted: " + e.getMessage());
             return;
         }
-        mc.player.setNoGravity(false);
         MeteorClient.EVENT_BUS.unsubscribe(this);
+        if (mc.player != null) {
+            mc.player.setNoGravity(false);
+        }
         activeInstances.remove(this);
     }
 

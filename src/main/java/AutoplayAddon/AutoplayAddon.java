@@ -18,15 +18,14 @@ import net.minecraft.item.*;
 public class AutoplayAddon extends MeteorAddon {
     public static final Logger LOG = LoggerFactory.getLogger("AutoplayAddon starting");
     public static final Category autoplay = new Category("Autoplay", Items.TNT.getDefaultStack());
+    public static ServerSideValues values = new ServerSideValues();
 
 
     public static BlockCache blockCache = new BlockCache();
 
     @Override
     public void onInitialize() {
-
-        MeteorClient.EVENT_BUS.subscribe(ServerSideValues.class);
-
+        values.init();
         LOG.info("Initializing AutoplayAddon");
 
         Modules.get().add(new Disabler());
@@ -41,6 +40,7 @@ public class AutoplayAddon extends MeteorAddon {
         Commands.add(new Stop());
         Commands.add(new TpTo());
         Commands.add(new TestCommand());
+        Commands.add(new TestCommand2());
         Commands.add(new Mine());
         Commands.add(new TP2cam());
         Commands.add(new Teleport());
