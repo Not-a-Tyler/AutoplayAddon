@@ -7,12 +7,15 @@ import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.math.Vec3d;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class ServerSideValues {
+    public boolean hasMoved = false;
     public boolean moveable = true;
-    double prevx, prevy, prevz, tickx, ticky, tickz = 0;
+    double prevx, prevy, prevz= 0;
+    public Vec3d tickpos = new Vec3d(0,0,0);
     public int i, allowedPlayerTicks = 0;
     private int receivedMovePacketCount, knownMovePacketCount, lasttick = 0;
 
@@ -23,14 +26,33 @@ public class ServerSideValues {
     public static int delta() {
         return AutoplayAddon.values.allowedPlayerTicks - AutoplayAddon.values.i;
     }
+
+
     @EventHandler(priority = EventPriority.HIGHEST + 3)
-    private void onTick(TickEvent.Post event) {
+    private void onTick(TickEvent.Pre event) {
+        hasMoved = false;
         moveable = true;
         if (mc.player == null) return;
-        tickx = mc.player.getX();
-        ticky = mc.player.getY();
-        tickz = mc.player.getZ();
+        tickpos = mc.player.getPos();
         knownMovePacketCount = receivedMovePacketCount;
+    }
+
+    public static double findFarthestDistance(Vec3d newPos) {
+        Vec3d tickpos = AutoplayAddon.values.tickpos;
+        Vec3d currPos = mc.player.getPos();
+        return findFarthestDistanceArray(newPos, tickpos, currPos);
+    }
+
+    private static double findFarthestDistanceArray(Vec3d newPos, Vec3d... vec3dArray) {
+        double maxDistance = Double.MIN_VALUE;
+
+        for (Vec3d vec3d : vec3dArray) {
+            double distance = newPos.distanceTo(vec3d);
+            if (distance > maxDistance) {
+                maxDistance = distance;
+            }
+        }
+        return maxDistance;
     }
 
     @EventHandler(priority = EventPriority.LOWEST - 3)
@@ -41,19 +63,23 @@ public class ServerSideValues {
             double d0 = packet.getX(prevx);
             double d1 = packet.getY(prevy);
             double d2 = packet.getZ(prevz);
-            if (event.packet instanceof PlayerMoveC2SPacket.Full || event.packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) {
-                moveable = false;
+            boolean hasPos = (event.packet instanceof PlayerMoveC2SPacket.Full || event.packet instanceof PlayerMoveC2SPacket.PositionAndOnGround);
+            boolean hasRot = (event.packet instanceof PlayerMoveC2SPacket.LookAndOnGround || event.packet instanceof PlayerMoveC2SPacket.Full);
+            if (hasPos) {
                 double currDeltaX = d0 - prevx;
                 double currDeltaY = d1 - prevy;
                 double currDeltaZ = d2 - prevz;
                 d10 = (currDeltaX * currDeltaX + currDeltaY * currDeltaY + currDeltaZ * currDeltaZ);
             }
 
-            double d6 = d0 - tickx;
-            double d7 = d1 - ticky;
-            double d8 = d2 - tickz;
+            double d6 = d0 - tickpos.x;
+            double d7 = d1 - tickpos.y;
+            double d8 = d2 - tickpos.z;
 
             d10 = Math.max((d6 * d6 + d7 * d7 + d8 * d8), d10);
+            if (d10 > 0) {
+                hasMoved = true;
+            }
 
             ++receivedMovePacketCount;
             i = receivedMovePacketCount - knownMovePacketCount;
@@ -64,14 +90,18 @@ public class ServerSideValues {
                 i = 1;
             }
 
-            if (packet.changesLook() || d10 > 0) {
+            if (hasRot || d10 > 0) {
                 allowedPlayerTicks -= 1;
             } else {
                 allowedPlayerTicks = 20;
             }
 
-            //ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
-            if (event.packet instanceof PlayerMoveC2SPacket.Full || event.packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) {
+            if (d10 > 0) {
+                ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED");
+            } else {
+                ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
+            }
+            if (hasPos) {
                 prevx = packet.getX(prevx);
                 prevy = packet.getY(prevy);
                 prevz = packet.getZ(prevz);
