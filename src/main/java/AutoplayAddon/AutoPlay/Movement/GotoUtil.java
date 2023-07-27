@@ -91,23 +91,23 @@ public class GotoUtil {
         Vec3d to = new Vec3d(xpos, ypos, zpos);
         this.to = to;
         this.y = CanTeleport.searchGoodYandTeleport(mc.player.getPos(), to);
+        ChatUtils.info("Going to " + xpos + " " + ypos + " " + zpos + " with Y: " + this.y);
         ChatUtils.sendPlayerMsg("Going to " + xpos + " " + ypos + " " + zpos + " with Y: " + this.y);
         tickEventFuture = new CompletableFuture<>();
         mc.player.setNoGravity(true);
         mc.player.setVelocity(Vec3d.ZERO);
-        if (!stage()) {
-            MeteorClient.EVENT_BUS.subscribe(this);
-            try {
-                tickEventFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
-                ChatUtils.error("Movement interrupted: " + e.getMessage());
-                return;
-            }
-            MeteorClient.EVENT_BUS.unsubscribe(this);
+        MeteorClient.EVENT_BUS.subscribe(this);
+        try {
+            tickEventFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            ChatUtils.error("Movement interrupted: " + e.getMessage());
+            return;
         }
+        MeteorClient.EVENT_BUS.unsubscribe(this);
         if (mc.player != null) {
             mc.player.setNoGravity(false);
         }
+        ChatUtils.info("Finished");
         ChatUtils.sendPlayerMsg("Finished");
         activeInstances.remove(this);
     }

@@ -10,7 +10,10 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class CanTeleport {
 
@@ -37,23 +40,41 @@ public class CanTeleport {
 
     public static boolean Checkifcantteleport(Vec3d from, Vec3d to) {
         Box oldBox = new Box(from.x - mc.player.getWidth() / 2, from.y, from.z - mc.player.getWidth() / 2, from.x + mc.player.getWidth() / 2, from.y + mc.player.getHeight(), from.z + mc.player.getWidth() / 2);
+        Box newBox = new Box(to.x - mc.player.getWidth() / 2, to.y, to.z - mc.player.getWidth() / 2, to.x + mc.player.getWidth() / 2, to.y + mc.player.getHeight(), to.z + mc.player.getWidth() / 2);
+
+        Iterable<VoxelShape> collisionShapes = mc.world.getBlockCollisions(mc.player, newBox);
+
+        for (VoxelShape shape : collisionShapes) {
+            if (!shape.isEmpty()) {
+                return true;
+            }
+        }
+
         double d6 = to.x - from.x;
         double d7 = to.y - from.y;
         double d8 = to.z - from.z;
+
         Vec3d test = adjustMovementForCollisions(oldBox, new Vec3d(d6, d7, d8));
+
         Vec3d wentto = new Vec3d(from.x + test.x, from.y + test.y, from.z + test.z);
+
         d6 = to.x - wentto.x;
         d7 = to.y - wentto.y;
+
         if (d7 > -0.5D || d7 < 0.5D) {
             d7 = 0.0D;
         }
+
         d8 = to.z - wentto.z;
         double d10 = d6 * d6 + d7 * d7 + d8 * d8;
-        if (d10 > 0.0625 && !mc.player.isSleeping() && !mc.player.isCreative()) {
+
+        if (d10 > 0.0625) {
             return true;
         }
+
         return false;
     }
+
 
 
 

@@ -97,7 +97,7 @@ public class ServerSideValues {
             }
 
             if (d10 > 0) {
-                ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED");
+                ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED D10: " + d10);
             } else {
                 ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
             }
