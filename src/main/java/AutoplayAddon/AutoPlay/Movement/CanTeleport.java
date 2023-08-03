@@ -65,8 +65,6 @@ public class CanTeleport {
 
 
 
-
-
     private static Vec3d adjustMovementForCollisions(Box box, Vec3d movement) {
         List<VoxelShape> list = mc.player.getWorld().getEntityCollisions(mc.player, box.stretch(movement));
         Vec3d vec3d = movement.lengthSquared() == 0.0 ? movement : adjustMovementForCollisions(mc.player, movement, box, mc.player.getWorld(), list);

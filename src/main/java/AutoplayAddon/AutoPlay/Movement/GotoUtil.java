@@ -18,11 +18,11 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 
 public class GotoUtil {
-    private static CompletableFuture<Void> tickEventFuture;
-    private Vec3d to;
+    static CompletableFuture<Void> tickEventFuture;
+    Vec3d to;
     private static List<GotoUtil> activeInstances = new ArrayList<>();
-    private double y;
-    private boolean postTickFlag = false;
+    double y;
+    boolean postTickFlag = true;
 
     int stage = 1;
 
@@ -39,19 +39,15 @@ public class GotoUtil {
                 ChatUtils.info("Finished via stage 4");
                 return true;
             }
-            if (CanTeleport.check(mc.player.getPos(), this.to)) {
-                if (MovementUtils.predictifPossible(this.to)) {
-                    MoveToUtil.moveTo(this.to);
-                    ChatUtils.info("Directly teleported");
-                    return true;
-                }
+            if (CanTeleport.check(mc.player.getPos(), this.to) && MovementUtils.predictifPossible(this.to)) {
+                MoveToUtil.moveTo(this.to);
+                ChatUtils.info("Directly teleported");
+                return true;
             }
             Vec3d newPos = getStage(mc.player.getPos(), this.to, this.stage);
-            if (AutoplayAddon.values.hasMoved) {
-                if (!MovementUtils.predictifPossible(newPos)) {
-                    ChatUtils.info("Not enough charge, waiting 1 tick Allowed: " + AutoplayAddon.values.allowedPlayerTicks + " i: " + AutoplayAddon.values.allowedPlayerTicks + " Delta: " + ServerSideValues.delta());
-                    return false;
-                }
+            if (!MovementUtils.predictifPossible(newPos)) {
+                ChatUtils.info("Not enough charge, waiting 1 tick Allowed: " + AutoplayAddon.values.allowedPlayerTicks + " i: " + AutoplayAddon.values.allowedPlayerTicks + " Delta: " + ServerSideValues.delta());
+                return false;
             }
             MoveToUtil.moveTo(newPos);
             this.stage++;
@@ -75,11 +71,6 @@ public class GotoUtil {
         if (postTickFlag) {
             postTickFlag = false; // Reset the flag for the next post tick
             ChatUtils.info("Tick started");
-            if (mc.player == null) {
-                System.out.println("borked");
-                tickEventFuture.complete(null);
-                return;
-            }
             if (stage()) {
                 tickEventFuture.complete(null);
                 ChatUtils.info("stage complete");

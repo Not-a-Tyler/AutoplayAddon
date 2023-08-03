@@ -11,16 +11,18 @@ public class MovementUtils {
 
     public static boolean predictifPossible(Vec3d newPos) {
         int predict;
-        double base = MovementUtils.findFarthestDistance(newPos);
+        double base = findFarthestDistance(newPos);
         int packetsRequired = (int) Math.floor(Math.abs(base / 10.0));
+        double delta = ServerSideValues.delta();
+        if (!AutoplayAddon.values.hasMoved) delta = 19;
         if (AutoplayAddon.values.hasMoved) {
             predict = ((packetsRequired + 1) * 2);
-            ChatUtils.info("Predicted " + (ServerSideValues.delta() - predict) + " since player has moved");
+            ChatUtils.info("Predicted " + (delta - predict) + " since player has moved");
         } else {
             predict = (packetsRequired + 2);
-            ChatUtils.info("Predicted " + (ServerSideValues.delta() - predict) + " since player has not moved");
+            ChatUtils.info("Predicted " + (delta - predict) + " since player has not moved");
         }
-        if (ServerSideValues.delta() < predict) {
+        if (delta < predict) {
             return false;
         } else {
             return true;
