@@ -13,7 +13,6 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class ServerSideValues {
     public boolean hasMoved = false;
-    public boolean moveable = true;
     double prevx, prevy, prevz= 0;
     public Vec3d tickpos = new Vec3d(0,0,0);
     public int i, allowedPlayerTicks = 0;
@@ -28,34 +27,17 @@ public class ServerSideValues {
     }
 
 
-    @EventHandler(priority = EventPriority.HIGHEST + 3)
+    @EventHandler(priority = EventPriority.LOWEST)
     private void onTick(TickEvent.Pre event) {
         hasMoved = false;
-        moveable = true;
         if (mc.player == null) return;
         tickpos = mc.player.getPos();
         knownMovePacketCount = receivedMovePacketCount;
     }
 
-    public static double findFarthestDistance(Vec3d newPos) {
-        Vec3d tickpos = AutoplayAddon.values.tickpos;
-        Vec3d currPos = mc.player.getPos();
-        return findFarthestDistanceArray(newPos, tickpos, currPos);
-    }
 
-    private static double findFarthestDistanceArray(Vec3d newPos, Vec3d... vec3dArray) {
-        double maxDistance = Double.MIN_VALUE;
 
-        for (Vec3d vec3d : vec3dArray) {
-            double distance = newPos.distanceTo(vec3d);
-            if (distance > maxDistance) {
-                maxDistance = distance;
-            }
-        }
-        return maxDistance;
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST - 3)
+    @EventHandler(priority = EventPriority.LOWEST - 2)
     private void onSendPacket(PacketEvent.Send event) {
         if (event.packet instanceof PlayerMoveC2SPacket) {
             PlayerMoveC2SPacket packet = (PlayerMoveC2SPacket) event.packet;
@@ -65,6 +47,7 @@ public class ServerSideValues {
             double d2 = packet.getZ(prevz);
             boolean hasPos = (event.packet instanceof PlayerMoveC2SPacket.Full || event.packet instanceof PlayerMoveC2SPacket.PositionAndOnGround);
             boolean hasRot = (event.packet instanceof PlayerMoveC2SPacket.LookAndOnGround || event.packet instanceof PlayerMoveC2SPacket.Full);
+
             if (hasPos) {
                 double currDeltaX = d0 - prevx;
                 double currDeltaY = d1 - prevy;
@@ -95,16 +78,15 @@ public class ServerSideValues {
             } else {
                 allowedPlayerTicks = 20;
             }
-
             if (d10 > 0) {
                 ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED D10: " + d10);
             } else {
                 ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
             }
             if (hasPos) {
-                prevx = packet.getX(prevx);
-                prevy = packet.getY(prevy);
-                prevz = packet.getZ(prevz);
+                prevx = packet.getX(0);
+                prevy = packet.getY(0);
+                prevz = packet.getZ(0);
             }
         }
     }

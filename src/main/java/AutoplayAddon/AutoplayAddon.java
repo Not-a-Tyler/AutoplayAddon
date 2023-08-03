@@ -36,6 +36,7 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new InfiniteAura());
         Modules.get().add(new Follower());
         Modules.get().add(new StacisBotTest());
+        Modules.get().add(new LOTEST());
         Modules.get().add(new SimpleClickTp());
 
         Commands.add(new Stop());

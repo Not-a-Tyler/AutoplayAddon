@@ -6,6 +6,7 @@ import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.render.Camera;
@@ -55,19 +56,27 @@ public class ClickTp extends Module {
         .description("Cancels sending packets and sends you back to your original position.")
         .defaultValue(Keybind.none())
         .action(() -> {
-            Camera camera = mc.gameRenderer.getCamera();
-            Vec3d cameraPos = camera.getPos();
-            float pitch = camera.getPitch();
-            float yaw = camera.getYaw();
-            Vec3d rotationVec = Vec3d.fromPolar(pitch, yaw);
-            Vec3d raycastEnd = cameraPos.add(rotationVec.multiply(300.0));
-            BlockPos blockpos = mc.world.raycast(new RaycastContext(cameraPos, raycastEnd, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos().up();
-            Vec3d pos = new Vec3d((blockpos.getX() + .5), blockpos.getY(), (blockpos.getZ() + .5));
-            Thread waitForTickEventThread = new Thread(() -> {
-                new GotoUtil().moveto(pos.x, pos.y, pos.z);
-            });
-            waitForTickEventThread.start();
+            new Thread(() -> {
+                Camera camera = mc.gameRenderer.getCamera();
+                Vec3d cameraPos = camera.getPos();
+                BlockPos pos = mc.world.raycast(new RaycastContext(cameraPos, cameraPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw()).multiply(300.0)), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos();
+                int maxSearchHeight = 256; // Maximum height to search for a valid 2-block gap.
+                BlockPos validPos = null;
+                for (int y = pos.getY(); y < pos.getY() + maxSearchHeight; y++) {
+                    BlockPos temppos = new BlockPos(pos.getX(), y, pos.getZ());
+                    if (mc.world.isAir(temppos) && mc.world.isAir(temppos.up())) {
+                        validPos = temppos;
+                        break;
+                    }
+                }
+                if (validPos != null) {
+                        new GotoUtil().moveto(validPos.getX() + 0.5, validPos.getY(), validPos.getZ() + 0.5);
+                } else {
+                    ChatUtils.error("No valid position found.");
+                }
+            }).start();
         })
+
         .build()
     );
 
@@ -79,15 +88,20 @@ public class ClickTp extends Module {
     private void onRender(Render3DEvent event) {
         Camera camera = mc.gameRenderer.getCamera();
         Vec3d cameraPos = camera.getPos();
-        float pitch = camera.getPitch();
-        float yaw = camera.getYaw();
-        Vec3d rotationVec = Vec3d.fromPolar(pitch, yaw);
-        Vec3d raycastEnd = cameraPos.add(rotationVec.multiply(300.0));
-        BlockHitResult pos1 = mc.world.raycast(new RaycastContext(cameraPos, raycastEnd, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
-        BlockPos location = pos1.getBlockPos();
-        double x1 = location.getX();
-        double y1 = location.getY() + 1;
-        double z1 = location.getZ();
+        BlockPos pos = mc.world.raycast(new RaycastContext(cameraPos, cameraPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw()).multiply(300.0)), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos();
+        int maxSearchHeight = 256; // Maximum height to search for a valid 2-block gap.
+        BlockPos validPos = null;
+        for (int y = pos.getY(); y < pos.getY() + maxSearchHeight; y++) {
+            BlockPos temppos = new BlockPos(pos.getX(), y, pos.getZ());
+            if (mc.world.isAir(temppos) && mc.world.isAir(temppos.up())) {
+                validPos = temppos;
+                break;
+            }
+        }
+        if (validPos == null) return;
+        double x1 = validPos.getX();
+        double y1 = validPos.getY();
+        double z1 = validPos.getZ();
         double x2 = x1 + 1;
         double y2 = y1 + 1;
         double z2 = z1 + 1;

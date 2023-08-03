@@ -1,6 +1,5 @@
 package AutoplayAddon.AutoPlay.Movement;
 import com.google.common.collect.ImmutableList;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -9,45 +8,34 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import static meteordevelopment.meteorclient.MeteorClient.mc;
-
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
-
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class CanTeleport {
 
-    public static double searchGoodYandTeleport(Vec3d from, Vec3d to) {
-        if (Checkifcantteleport(from, to)) {
-            double fromy = from.y;
-            double ytotest = 0;
-            boolean validTeleportFound = false;
-            int searchOffset = 0;
-            while (!validTeleportFound) {
-                ytotest = (fromy + searchOffset);
-                Vec3d fromWithOffset = new Vec3d(from.x, ytotest, from.z);
-                Vec3d toWithOffset = new Vec3d(to.x, ytotest, to.z);
-                validTeleportFound = !Checkifcantteleport(fromWithOffset, toWithOffset);
-                if (!validTeleportFound) {
-                    searchOffset = (searchOffset <= 0) ? 1 - searchOffset : -searchOffset;
-                }
+    public static double searchY(Vec3d from, Vec3d to) {
+        double fromy = from.y;
+        double ytotest = 0;
+        boolean validTeleportFound = false;
+        int searchOffset = 0;
+        while (!validTeleportFound) {
+            ytotest = (fromy + searchOffset);
+            Vec3d fromWithOffset = new Vec3d(from.x, ytotest, from.z);
+            Vec3d toWithOffset = new Vec3d(to.x, ytotest, to.z);
+            Box box = new Box(fromWithOffset.x - mc.player.getWidth() / 2, fromWithOffset.y, fromWithOffset.z - mc.player.getWidth() / 2, fromWithOffset.x + mc.player.getWidth() / 2, fromWithOffset.y + mc.player.getHeight(), fromWithOffset.z + mc.player.getWidth() / 2);
+            if (mc.world.isSpaceEmpty(box) && check(fromWithOffset, toWithOffset)) {
+                validTeleportFound = true;
+            } else {
+                searchOffset = (searchOffset <= 0) ? 1 - searchOffset : -searchOffset;
             }
-            return ytotest;
-        } else {
-            return from.y;
         }
+        return ytotest;
     }
 
-    public static boolean Checkifcantteleport(Vec3d from, Vec3d to) {
+    public static boolean check(Vec3d from, Vec3d to) {
         Box oldBox = new Box(from.x - mc.player.getWidth() / 2, from.y, from.z - mc.player.getWidth() / 2, from.x + mc.player.getWidth() / 2, from.y + mc.player.getHeight(), from.z + mc.player.getWidth() / 2);
         Box newBox = new Box(to.x - mc.player.getWidth() / 2, to.y, to.z - mc.player.getWidth() / 2, to.x + mc.player.getWidth() / 2, to.y + mc.player.getHeight(), to.z + mc.player.getWidth() / 2);
-
-        Iterable<VoxelShape> collisionShapes = mc.world.getBlockCollisions(mc.player, newBox);
-
-        for (VoxelShape shape : collisionShapes) {
-            if (!shape.isEmpty()) {
-                return true;
-            }
+        if (!mc.world.isSpaceEmpty(newBox)) {
+            return false;
         }
 
         double d6 = to.x - from.x;
@@ -69,10 +57,10 @@ public class CanTeleport {
         double d10 = d6 * d6 + d7 * d7 + d8 * d8;
 
         if (d10 > 0.0625) {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 
 

@@ -8,6 +8,7 @@
   ],
   "mixins": [
     "Mixins.ClientCommandC2SPacketMixin"
+    "Mixins.PlayerMoveC2SPacketMixin"
   ],
   "injectors": {
     "defaultRequire": 1

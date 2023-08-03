@@ -1,18 +1,22 @@
 package AutoplayAddon.AutoPlay.Movement;
+import meteordevelopment.meteorclient.mixininterface.IPlayerMoveC2SPacket;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import AutoplayAddon.AutoplayAddon;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
-import AutoplayAddon.Tracker.ServerSideValues;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 import java.text.DecimalFormat;
 
 
 public class MoveToUtil {
-    static DecimalFormat e = new DecimalFormat("#.##");
+    private static void sendpacket(PlayerMoveC2SPacket packet) {
+        ((IPlayerMoveC2SPacket) packet).setTag(13377);
+        mc.player.networkHandler.sendPacket(packet);
+    }
+    static DecimalFormat e = new DecimalFormat("#.##");;
     public static void moveTo(Vec3d newPos) {
-        double base = ServerSideValues.findFarthestDistance(newPos);
+        double base = MovementUtils.findFarthestDistance(newPos);
         int packetsRequired = (int) Math.floor(Math.abs(base / 10.0));
         sendpackets(packetsRequired);
         moveplayer(newPos);
@@ -26,11 +30,11 @@ public class MoveToUtil {
             }
         } else {
             for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
-                //if (AutoplayAddon.values.allowedPlayerTicks < 20) {
-                //    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), mc.player.getPitch(), true));
-                //} else {
-                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
-                //}
+                if (AutoplayAddon.values.allowedPlayerTicks > 20) {
+                    sendpacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), true));
+                } else {
+                    sendpacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
+                }
             }
         }
     }
@@ -40,14 +44,13 @@ public class MoveToUtil {
             mc.player.getVehicle().setPosition(newPos.x, newPos.y, newPos.z);
             mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
         } else {
-            //if (AutoplayAddon.values.allowedPlayerTicks < 20) {
-            //    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, mc.player.getYaw(), mc.player.getPitch(), true));
-            //} else {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
-            //}
+            if (AutoplayAddon.values.allowedPlayerTicks > 20) {
+                sendpacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, mc.player.getYaw(), mc.player.getPitch(), true));
+            } else {
+                sendpacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
+            }
             mc.player.setPos(newPos.x, newPos.y, newPos.z);
         }
     }
-
 
 }
