@@ -78,11 +78,11 @@ public class ServerSideValues {
             } else {
                 allowedPlayerTicks = 20;
             }
-            if (d10 > 0) {
-                ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED D10: " + d10);
-            } else {
-                ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
-            }
+            //if (d10 > 0) {
+            //    ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED D10: " + d10);
+            //} else {
+            //    ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
+            //}
             if (hasPos) {
                 prevx = packet.getX(0);
                 prevy = packet.getY(0);

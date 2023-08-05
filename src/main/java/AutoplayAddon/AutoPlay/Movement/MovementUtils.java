@@ -17,10 +17,10 @@ public class MovementUtils {
         if (!AutoplayAddon.values.hasMoved) delta = 19;
         if (AutoplayAddon.values.hasMoved) {
             predict = ((packetsRequired + 1) * 2);
-            ChatUtils.info("Predicted " + (delta - predict) + " since player has moved");
+           // ChatUtils.info("Predicted " + (delta - predict) + " since player has moved");
         } else {
             predict = (packetsRequired + 2);
-            ChatUtils.info("Predicted " + (delta - predict) + " since player has not moved");
+            //ChatUtils.info("Predicted " + (delta - predict) + " since player has not moved");
         }
         if (delta < predict) {
             return false;
