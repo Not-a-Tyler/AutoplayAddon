@@ -32,6 +32,9 @@ public class CanTeleport {
     }
 
     public static boolean check(Vec3d from, Vec3d to) {
+        if (to == null) {
+            return false;
+        }
         Box oldBox = new Box(from.x - mc.player.getWidth() / 2, from.y, from.z - mc.player.getWidth() / 2, from.x + mc.player.getWidth() / 2, from.y + mc.player.getHeight(), from.z + mc.player.getWidth() / 2);
         Box newBox = new Box(to.x - mc.player.getWidth() / 2, to.y, to.z - mc.player.getWidth() / 2, to.x + mc.player.getWidth() / 2, to.y + mc.player.getHeight(), to.z + mc.player.getWidth() / 2);
         if (!mc.world.isSpaceEmpty(newBox)) {

@@ -2,11 +2,11 @@ package AutoplayAddon.AutoPlay.Movement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.util.math.Vec3d;
@@ -22,7 +22,8 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class GotoUtil {
     static CompletableFuture<Void>  tickEventFuture;
     Vec3d to;
-    private static List<GotoUtil> activeInstances = new ArrayList<>();
+    private static List<GotoUtil> activeInstances = new CopyOnWriteArrayList<>();
+
     double y;
     boolean postTickFlag = true;
 
@@ -36,6 +37,9 @@ public class GotoUtil {
     }
 
     private boolean stage() {
+        if (this.to == null) {
+            return false;
+        }
         while (mc.player != null) {
             if (this.stage == 4) {
               //  ChatUtils.info("Finished via stage 4");
@@ -95,6 +99,9 @@ public class GotoUtil {
         activeInstances.add(this);
         Vec3d to = new Vec3d(xpos, ypos, zpos);
         this.to = to;
+        if (to == null) {
+            return;
+        }
         this.y = CanTeleport.searchY(mc.player.getPos(), to);
         //ChatUtils.info("Going to " + xpos + " " + ypos + " " + zpos + " with Y: " + this.y);
         //ChatUtils.sendPlayerMsg("Going to " + xpos + " " + ypos + " " + zpos + " with Y: " + this.y);
@@ -123,11 +130,13 @@ public class GotoUtil {
     }
 
     public static void stopAllInstances() {
-        for (GotoUtil instance : activeInstances) {
+        List<GotoUtil> instancesCopy = new ArrayList<>(activeInstances);
+        for (GotoUtil instance : instancesCopy) {
             MeteorClient.EVENT_BUS.unsubscribe(instance);
             instance.stop();
         }
         activeInstances.clear();
     }
+
 
 }
