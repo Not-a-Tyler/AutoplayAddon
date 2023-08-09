@@ -56,7 +56,7 @@ public class ClickTp extends Module {
         .description("Cancels sending packets and sends you back to your original position.")
         .defaultValue(Keybind.none())
         .action(() -> {
-            new Thread(() -> {
+           // new Thread(() -> {
                 Camera camera = mc.gameRenderer.getCamera();
                 Vec3d cameraPos = camera.getPos();
                 BlockPos pos = mc.world.raycast(new RaycastContext(cameraPos, cameraPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw()).multiply(300.0)), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos();
@@ -70,11 +70,11 @@ public class ClickTp extends Module {
                     }
                 }
                 if (validPos != null) {
-                        new GotoUtil().moveto(validPos.getX() + 0.5, validPos.getY(), validPos.getZ() + 0.5);
+                    GotoUtil.moveto(validPos.getX() + 0.5, validPos.getY(), validPos.getZ() + 0.5);
                 } else {
                     ChatUtils.error("No valid position found.");
                 }
-            }).start();
+           // }).start();
         })
 
         .build()

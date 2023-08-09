@@ -23,7 +23,7 @@ public class MoveToUtil {
     }
 
     public static void sendpackets(int packetsRequired) {
-       // ChatUtils.info(" Started moving, sending " + packetsRequired + " packets");
+        ChatUtils.info(" Started moving, sending " + packetsRequired + " packets");
         if (mc.player.hasVehicle()) {
             for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
                 mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
@@ -49,7 +49,7 @@ public class MoveToUtil {
             } else {
                 sendpacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
             }
-            mc.player.setPos(newPos.x, newPos.y, newPos.z);
+            mc.player.setPosition(newPos.x, newPos.y, newPos.z);
         }
     }
 

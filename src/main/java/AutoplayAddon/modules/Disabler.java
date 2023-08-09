@@ -1,40 +1,26 @@
 package AutoplayAddon.modules;
 import AutoplayAddon.AutoplayAddon;
-import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import meteordevelopment.orbit.EventHandler;
+
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Disabler extends Module {
     public Disabler() {
-        super(AutoplayAddon.autoplay, "move-disabler", "any anticheat disabler real dosent work XD");
+        super(AutoplayAddon.autoplay, "disabler", "any anticheat disabler real dosent work XD");
     }
-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
-
-    private final Setting<Integer> amount = sgGeneral.add(new IntSetting.Builder()
-        .name("disable packets per tick")
-        .description("How much distance in each teleport?")
-        .defaultValue(20)
-        .min(0)
-        .sliderMax(300)
-        .build());
 
 
-    @EventHandler
-    private void onTick(TickEvent.Post event) {
-        if (mc.player.hasVehicle()) {
-            for (int i = 0; i < amount.get(); i++) {
-                mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
-            }
-        } else {
-            for (int i = 0; i < amount.get(); i++) {
-                //mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(false));
-                //mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(1, 1, true));
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), 1, 1, true));
-            }
+    @EventHandler(priority = EventPriority.HIGHEST + 3)
+    private void onSendPacket(PacketEvent.Send event) {
+        if (event.packet instanceof PlayerMoveC2SPacket.OnGroundOnly || event.packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) {
+            event.cancel();
+            event.setCancelled(true);
+            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
         }
     }
-
 }

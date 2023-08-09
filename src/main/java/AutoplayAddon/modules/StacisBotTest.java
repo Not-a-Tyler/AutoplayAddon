@@ -92,7 +92,7 @@ public class StacisBotTest extends Module {
                     followCommand.processFollowCommand(playerName, parts.length > 1 ? parts[1] : null);
                     break;
                 case "!stop":
-                    GotoUtil.stopAllInstances();
+                    //GotoUtil.stopAllInstances();
                     twerkCommand.twerk = false;
                     if(sneak) {
                         mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY, 2367));

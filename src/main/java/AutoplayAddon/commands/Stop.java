@@ -16,7 +16,7 @@ public class Stop extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            GotoUtil.stopAllInstances();
+            //GotoUtil.stopAllInstances();
             return SINGLE_SUCCESS;
         });
         return;
