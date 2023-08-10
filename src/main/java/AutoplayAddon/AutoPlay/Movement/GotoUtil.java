@@ -106,6 +106,7 @@ public class GotoUtil {
                 //ChatUtils.error("Movement interrupted: " + e.getMessage());
                 return;
             }
+            //MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
             if (mc.player != null) mc.player.setNoGravity(false);
             //ChatUtils.info("Finished");
             //ChatUtils.sendPlayerMsg("Finished");

@@ -23,7 +23,7 @@ public class MoveToUtil {
     }
 
     public static void sendpackets(int packetsRequired) {
-        ChatUtils.info(" Started moving, sending " + packetsRequired + " packets");
+        //ChatUtils.info(" Started moving, sending " + packetsRequired + " packets");
         if (mc.player.hasVehicle()) {
             for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
                 mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
