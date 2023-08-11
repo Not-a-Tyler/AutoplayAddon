@@ -95,7 +95,7 @@ public class Follower extends Module {
         }
 
         if (desiredPos != null) {
-            GotoUtil.moveto(desiredPos.x, desiredPos.y, desiredPos.z);
+            GotoUtil.moveto(desiredPos.x, desiredPos.y, desiredPos.z, false);
         }
     }
 

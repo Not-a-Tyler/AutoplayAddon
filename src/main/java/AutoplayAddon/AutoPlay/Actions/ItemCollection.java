@@ -25,7 +25,7 @@ public class ItemCollection {
                 ChatUtils.info("No Valid Pickup Point found");
             } else {
                 ChatUtils.info("Valid Pickup Point: " + test);
-                new GotoUtil().moveto(test.getX(), test.getY(), test.getZ());
+                GotoUtil.moveto(test.getX(), test.getY(), test.getZ(), true);
             }
         }
     }

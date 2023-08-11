@@ -70,7 +70,7 @@ public class ClickTp extends Module {
                     }
                 }
                 if (validPos != null) {
-                    GotoUtil.moveto(validPos.getX() + 0.5, validPos.getY(), validPos.getZ() + 0.5);
+                    GotoUtil.moveto(validPos.getX() + 0.5, validPos.getY(), validPos.getZ() + 0.5, false);
                 } else {
                     ChatUtils.error("No valid position found.");
                 }

@@ -85,7 +85,7 @@ public class GotoUtil {
         postTickFlag = true;
     }
 
-    public static void moveto(double xpos, double ypos, double zpos) {
+    public static void moveto(double xpos, double ypos, double zpos, Boolean wait) {
         if (currentMovementThread != null && currentMovementThread.isAlive()) {
             currentMovementThread.interrupt();
         }
@@ -112,5 +112,12 @@ public class GotoUtil {
             //ChatUtils.sendPlayerMsg("Finished");
         });
         currentMovementThread.start();
+        if (wait) {
+            try {
+                currentMovementThread.join();
+            } catch (InterruptedException e) {
+                //ChatUtils.error("Movement interrupted: " + e.getMessage());
+            }
+        }
     }
 }

@@ -5,6 +5,9 @@ import AutoplayAddon.AutoplayAddon;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
+
+import javax.annotation.Nullable;
+
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 import java.text.DecimalFormat;
 
@@ -39,18 +42,24 @@ public class MoveToUtil {
         }
     }
     public static void moveplayer(Vec3d newPos) {
-        //ChatUtils.info("Finished moving to " + e.format(newPos.x) + ", " + e.format(newPos.y) + ", " + e.format(newPos.z));
-        if (mc.player.hasVehicle()) {
-            mc.player.getVehicle().setPosition(newPos.x, newPos.y, newPos.z);
-            mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
-        } else {
-            if (AutoplayAddon.values.allowedPlayerTicks > 20) {
-                sendpacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, mc.player.getYaw(), mc.player.getPitch(), true));
+        try {
+            //ChatUtils.info("Finished moving to " + e.format(newPos.x) + ", " + e.format(newPos.y) + ", " + e.format(newPos.z));
+            if (mc.player.hasVehicle()) {
+                mc.player.getVehicle().setPosition(newPos.x, newPos.y, newPos.z);
+                mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
             } else {
-                sendpacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
+                if (AutoplayAddon.values.allowedPlayerTicks > 20) {
+                    sendpacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, mc.player.getYaw(), mc.player.getPitch(), true));
+                } else {
+                    sendpacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
+                }
+                if (mc.player != null) {
+                    mc.player.setPosition(newPos.x, newPos.y, newPos.z);
+                }
+
             }
-            mc.player.setPosition(newPos.x, newPos.y, newPos.z);
+        } catch (Exception e) {
+            ChatUtils.error("Error moving player: " + e);
         }
     }
-
 }

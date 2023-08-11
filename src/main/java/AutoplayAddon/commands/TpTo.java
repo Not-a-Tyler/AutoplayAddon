@@ -17,9 +17,7 @@ public class TpTo extends Command {
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(argument("player", PlayerArgumentType.create()).executes(context -> {
             PlayerEntity e = PlayerArgumentType.get(context);
-            new Thread(() -> {
-                new GotoUtil().moveto(e.getX(), e.getY(), e.getZ());
-            }).start();
+            GotoUtil.moveto(e.getX(), e.getY(), e.getZ(), false);
             return SINGLE_SUCCESS;
         }));
     }

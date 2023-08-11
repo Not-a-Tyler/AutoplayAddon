@@ -59,10 +59,10 @@ public class InfiniteAura  extends Module {
                     Thread waitForTickEventThread1 = new Thread(() -> {
                         Vec3d startingpos = mc.player.getPos();
                         Vec3d pos = finalClosestEntity.getPos();
-                        new GotoUtil().moveto(pos.x, pos.y, pos.z);
+                        new GotoUtil().moveto(pos.x, pos.y, pos.z, true);
                         mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
                         mc.player.swingHand(Hand.MAIN_HAND);
-                        new GotoUtil().moveto(startingpos.x, startingpos.y, startingpos.z);
+                        new GotoUtil().moveto(startingpos.x, startingpos.y, startingpos.z, true);
                     });
                     waitForTickEventThread1.start();
                 }

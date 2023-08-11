@@ -48,9 +48,7 @@ public class FollowCommand {
                         Vec3d currentPosRounded = roundToDecimal(mc.player.getPos(), 3);
                         Vec3d lastTargetPosRounded = roundToDecimal(lastPlayerPos, 3);
                         if (!lastTargetPosRounded.equals(currentPosRounded)) {
-                            new Thread(() -> {
-                                new GotoUtil().moveto(targetPlayer.getX(), targetPlayer.getY(), targetPlayer.getZ());
-                            }).start();
+                            GotoUtil.moveto(targetPlayer.getX(), targetPlayer.getY(), targetPlayer.getZ(), false);
                         }
                     }
                     lastPlayerPos = targetPos; // Update the last known player position

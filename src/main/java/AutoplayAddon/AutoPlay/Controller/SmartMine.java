@@ -18,7 +18,7 @@ public class SmartMine {
             Vec3d targetpos = collectableBlock.get(0);
             Vec3d airGapPos = collectableBlock.get(1);
             if (PlayerUtils.distanceTo(targetpos) > 5) {
-                new GotoUtil().moveto(airGapPos.getX(), airGapPos.getY(), airGapPos.getZ());
+                GotoUtil.moveto(airGapPos.getX(), airGapPos.getY(), airGapPos.getZ(), true);
             }
             ChatUtils.info("Mining target block at: " + targetpos.getX() + " " + targetpos.getY() + " " + targetpos.getZ());
             new MineUtil().mine(BlockPos.ofFloored(targetpos));

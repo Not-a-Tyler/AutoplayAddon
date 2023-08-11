@@ -71,14 +71,12 @@ public class LongDistanceTest extends Module {
 
         BlockPos finalLastLoadedPos = lastLoadedPos;
         ChatUtils.info("Teleporting to " + finalLastLoadedPos.getX() + " " + finalLastLoadedPos.getY() + " " + finalLastLoadedPos.getZ());
-        new Thread(() -> {
-            new GotoUtil().moveto(finalLastLoadedPos.getX() + 0.5, ypos, finalLastLoadedPos.getZ() + 0.5);
+            GotoUtil.moveto(finalLastLoadedPos.getX() + 0.5, ypos, finalLastLoadedPos.getZ() + 0.5, false);
             // If destination is reached, teleport directly to it and disable the module
             if (finalLastLoadedPos.equals(destination)) {
-                new GotoUtil().moveto(destination.x, destination.y, destination.z);
+                GotoUtil.moveto(destination.x, destination.y, destination.z, false);
                 toggle();
             }
-        }).start();
     }
 
 

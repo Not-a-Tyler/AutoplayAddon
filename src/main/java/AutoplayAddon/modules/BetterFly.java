@@ -122,10 +122,8 @@ public class BetterFly extends Module {
                 );
 
                 if (mc.world.isSpaceEmpty(box)) {
-                    new Thread(() -> {
                         //ChatUtils.info("Sending packet");
-                        new GotoUtil().moveto(packetPos.x, packetPos.y, packetPos.z);
-                    }).start();
+                        GotoUtil.moveto(packetPos.x, packetPos.y, packetPos.z, false);
                 }
             }
         }

@@ -18,12 +18,9 @@ public class Teleport extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(argument("pos", ClientPosArgumentType.pos()).executes(ctx -> {
-            Thread waitForTickEventThread = new Thread(() -> {
-                Vec3d pos = ClientPosArgumentType.getPos(ctx, "pos");
-                info("pos: " + pos);
-                new GotoUtil().moveto(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-            });
-            waitForTickEventThread.start();
+            Vec3d pos = ClientPosArgumentType.getPos(ctx, "pos");
+            info("pos: " + pos);
+            GotoUtil.moveto(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, false);
             return SINGLE_SUCCESS;
         }));
         return;

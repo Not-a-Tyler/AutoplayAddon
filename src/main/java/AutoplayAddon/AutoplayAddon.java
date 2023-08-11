@@ -28,18 +28,18 @@ public class AutoplayAddon extends MeteorAddon {
         values.init();
         LOG.info("Initializing AutoplayAddon");
 
-        Modules.get().add(new Disabler());
+        //Modules.get().add(new Disabler());
         Modules.get().add(new Speedrun());
-        Modules.get().add(new TeleportInfo());
-        Modules.get().add(new BlockDebug());
+        //Modules.get().add(new TeleportInfo());
+        //Modules.get().add(new BlockDebug());
         Modules.get().add(new ClickTp());
         Modules.get().add(new InfiniteAura());
         Modules.get().add(new Follower());
-        Modules.get().add(new StacisBotTest());
-        Modules.get().add(new LOTEST());
-        Modules.get().add(new SimpleClickTp());
-        Modules.get().add(new LongDistanceTest());
-        Modules.get().add(new BetterFly());
+        //Modules.get().add(new StacisBotTest());
+        //Modules.get().add(new LOTEST());
+        //Modules.get().add(new SimpleClickTp());
+        //Modules.get().add(new LongDistanceTest());
+        //Modules.get().add(new BetterFly());
 
         Commands.add(new Stop());
         Commands.add(new TpTo());
