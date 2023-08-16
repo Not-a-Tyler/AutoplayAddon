@@ -7,6 +7,7 @@ import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.commands.Commands;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,16 @@ public class AutoplayAddon extends MeteorAddon {
         values.init();
         LOG.info("Initializing AutoplayAddon");
 
+
+        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
+            blockCache.addChunk(chunk);
+        });
+
+        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
+            blockCache.removeChunk(chunk);
+        });
+
+
         //Modules.get().add(new Disabler());
         Modules.get().add(new Speedrun());
         //Modules.get().add(new TeleportInfo());
@@ -35,12 +46,16 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new ClickTp());
         Modules.get().add(new InfiniteAura());
         Modules.get().add(new Follower());
+        Modules.get().add(new MultiSpinbot());
+        Modules.get().add(new AutoSteal());
         //Modules.get().add(new StacisBotTest());
         //Modules.get().add(new LOTEST());
         //Modules.get().add(new SimpleClickTp());
         //Modules.get().add(new LongDistanceTest());
         //Modules.get().add(new BetterFly());
 
+        Commands.add(new AIDSon());
+        Commands.add(new AIDSoff());
         Commands.add(new Stop());
         Commands.add(new TpTo());
         Commands.add(new TestCommand());

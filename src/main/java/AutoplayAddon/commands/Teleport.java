@@ -1,6 +1,7 @@
 package AutoplayAddon.commands;
 
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoPlay.Other.ClientPosArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.Command;
@@ -20,7 +21,7 @@ public class Teleport extends Command {
         builder.then(argument("pos", ClientPosArgumentType.pos()).executes(ctx -> {
             Vec3d pos = ClientPosArgumentType.getPos(ctx, "pos");
             info("pos: " + pos);
-            GotoUtil.moveto(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, false);
+            Movement.moveTo(new Vec3d(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5));
             return SINGLE_SUCCESS;
         }));
         return;

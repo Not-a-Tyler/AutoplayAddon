@@ -1,5 +1,6 @@
 package AutoplayAddon.AutoPlay.Controller;
 import AutoplayAddon.AutoPlay.Locator.GetLocUtil;
+import AutoplayAddon.AutoPlay.Movement.AIDS;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.Block;
@@ -23,7 +24,7 @@ public class SmartGoto {
         Vec3d airGapPos = collectableBlock.get(1);
         ChatUtils.info("Found air gap at: " + airGapPos.toString());
         if (airGapPos != null) {
-            GotoUtil.moveto(airGapPos.getX(), airGapPos.getY(), airGapPos.getZ(), true);
+            AIDS.setPos(airGapPos);
             return currentPos;
         } else {
             ChatUtils.info("No target blocks found within the search radius.");

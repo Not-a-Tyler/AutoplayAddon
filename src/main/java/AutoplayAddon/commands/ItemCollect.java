@@ -1,6 +1,7 @@
 package AutoplayAddon.commands;
 
 import AutoplayAddon.AutoPlay.Actions.ItemCollection;
+import AutoplayAddon.AutoPlay.Movement.AIDS;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import meteordevelopment.meteorclient.commands.Command;
@@ -33,9 +34,11 @@ public class ItemCollect extends Command {
             if (stack == null || stack.getItem() == Items.AIR) ChatUtils.info("e");
             ChatUtils.info(stack.getItem().getName().getString());
             List<Item> itemslist = Collections.singletonList(stack.getItem());
+            AIDS.init();
             new Thread(() -> {
                 ItemCollection.collect(itemslist);
             }).start();
+            AIDS.disable();
         })));
         return;
     }

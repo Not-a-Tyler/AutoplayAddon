@@ -12,14 +12,14 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 import java.text.DecimalFormat;
 
 
-public class MoveToUtil {
+public class MoveToUtil extends Movement {
     private static void sendpacket(PlayerMoveC2SPacket packet) {
         ((IPlayerMoveC2SPacket) packet).setTag(13377);
         mc.player.networkHandler.sendPacket(packet);
     }
     static DecimalFormat e = new DecimalFormat("#.##");;
     public static void moveTo(Vec3d newPos) {
-        double base = MovementUtils.findFarthestDistance(newPos);
+        double base = findFarthestDistance(newPos);
         int packetsRequired = (int) Math.floor(Math.abs(base / 10.0));
         sendpackets(packetsRequired);
         moveplayer(newPos);
@@ -34,7 +34,7 @@ public class MoveToUtil {
         } else {
             for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
                 if (AutoplayAddon.values.allowedPlayerTicks > 20) {
-                    sendpacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), true));
+                    sendpacket(new PlayerMoveC2SPacket.Full(currentPosition.x, currentPosition.y, currentPosition.z, mc.player.getYaw(), mc.player.getPitch(), true));
                 } else {
                     sendpacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
                 }
@@ -53,11 +53,8 @@ public class MoveToUtil {
                 } else {
                     sendpacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
                 }
-                if (mc.player != null) {
-                    mc.player.setPosition(newPos.x, newPos.y, newPos.z);
-                }
-
             }
+            currentPosition = newPos;
         } catch (Exception e) {
             ChatUtils.error("Error moving player: " + e);
         }

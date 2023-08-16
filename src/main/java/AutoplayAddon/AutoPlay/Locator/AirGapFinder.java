@@ -43,19 +43,23 @@ public class AirGapFinder {
         return null;
     }
 
-
-        public static Vec3d findAirGapNearBlock(BlockPos targetPos, double maxAirGapDistance) {
-        World world = mc.player.getEntityWorld();
+    public static Vec3d findAirGapNearBlock(BlockPos targetPos, double maxAirGapDistance) {
         BlockPos closestValidPos = null;
-        double minDistance = Double.MAX_VALUE;
+        double minSquaredDistance = maxAirGapDistance * maxAirGapDistance; // Use squared distances to avoid sqrt
 
         for (BlockPos pos : BlockPos.iterate(targetPos.add((int) -maxAirGapDistance, (int) -maxAirGapDistance, (int) -maxAirGapDistance),
             targetPos.add((int) maxAirGapDistance, (int) maxAirGapDistance, (int) maxAirGapDistance))) {
-            if (world.isAir(pos) && world.isAir(pos.up())) {
-                double distance = distanceBetweenBlockPos(targetPos, pos);
-                if (distance <= maxAirGapDistance && distance < minDistance) {
+
+            double squaredDistance = squaredDistanceBetweenBlockPos(targetPos, pos);
+
+            if (squaredDistance > minSquaredDistance) {
+                continue; // Skip if already beyond current closest distance
+            }
+
+            if (CanPickUpTest.isAirOrNonSolid(pos) && CanPickUpTest.isAirOrNonSolid(pos.add(0, 1, 0))) {
+                if (squaredDistance < minSquaredDistance) {
                     closestValidPos = pos.toImmutable();
-                    minDistance = distance;
+                    minSquaredDistance = squaredDistance;
                 }
             }
         }
@@ -70,10 +74,11 @@ public class AirGapFinder {
         return new Vec3d(closestValidPos.getX() + offsetX, closestValidPos.getY(), closestValidPos.getZ() + offsetZ);
     }
 
-    private static double distanceBetweenBlockPos(BlockPos pos1, BlockPos pos2) {
+    private static double squaredDistanceBetweenBlockPos(BlockPos pos1, BlockPos pos2) {
         double dx = pos1.getX() - pos2.getX();
         double dy = pos1.getY() - pos2.getY();
         double dz = pos1.getZ() - pos2.getZ();
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        return dx * dx + dy * dy + dz * dz;
     }
+
 }

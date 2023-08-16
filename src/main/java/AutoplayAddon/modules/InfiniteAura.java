@@ -1,15 +1,18 @@
 package AutoplayAddon.modules;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.settings.EntityTypeListSetting;
 import meteordevelopment.meteorclient.settings.KeybindSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 
@@ -43,6 +46,8 @@ public class InfiniteAura  extends Module {
 
                 for (Entity entity : mc.world.getEntities()) {
                     if (entities.get().contains(entity.getType()) && entity != player) {
+                        PlayerEntity playerEntity = (PlayerEntity) entity;
+                        if (Friends.get().shouldAttack(playerEntity)) continue;
                         Entity otherEntity = entity;
                         Vec3d toOther = otherEntity.getPos().subtract(player.getPos()).normalize();
                         double angle = Math.acos(viewVec.dotProduct(toOther));
@@ -59,10 +64,10 @@ public class InfiniteAura  extends Module {
                     Thread waitForTickEventThread1 = new Thread(() -> {
                         Vec3d startingpos = mc.player.getPos();
                         Vec3d pos = finalClosestEntity.getPos();
-                        new GotoUtil().moveto(pos.x, pos.y, pos.z, true);
+                        Movement.moveTo(pos);
                         mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
                         mc.player.swingHand(Hand.MAIN_HAND);
-                        new GotoUtil().moveto(startingpos.x, startingpos.y, startingpos.z, true);
+                        Movement.moveTo(startingpos);
                     });
                     waitForTickEventThread1.start();
                 }

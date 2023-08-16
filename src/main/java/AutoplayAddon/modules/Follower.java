@@ -1,7 +1,10 @@
 package AutoplayAddon.modules;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
+import AutoplayAddon.AutoPlay.Movement.AIDS;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
@@ -9,7 +12,9 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.starscript.compiler.Expr;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
@@ -63,6 +68,14 @@ public class Follower extends Module {
         RandomSphere
     }
 
+    @Override
+    public void onActivate() {
+        AIDS.init();
+    }
+    @Override
+    public void onDeactivate() {
+        AIDS.disable();
+    }
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
@@ -70,15 +83,18 @@ public class Follower extends Module {
 
         String targetName = stringtype.get();
         if (targetName.isEmpty()) return;
-
-        for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof PlayerEntity) {
-                PlayerEntity targetPlayer = (PlayerEntity) entity;
-                if (targetName.equals(targetPlayer.getGameProfile().getName())) {
-                    handlePlayerMovement(targetPlayer);
-                    break;
+        try {
+            for (Entity entity : mc.world.getEntities()) {
+                if (entity instanceof PlayerEntity) {
+                    PlayerEntity targetPlayer = (PlayerEntity) entity;
+                    if (targetName.equals(targetPlayer.getGameProfile().getName())) {
+                        handlePlayerMovement(targetPlayer);
+                        break;
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -95,7 +111,7 @@ public class Follower extends Module {
         }
 
         if (desiredPos != null) {
-            GotoUtil.moveto(desiredPos.x, desiredPos.y, desiredPos.z, false);
+            Movement.moveTo(desiredPos);
         }
     }
 
@@ -103,8 +119,7 @@ public class Follower extends Module {
         Vec3d lookDirection = targetPlayer.getRotationVector();
         for (int i = distance.get(); i >= 0; i--) {
             Vec3d tempPos = centerPos.add(lookDirection.multiply(i));
-            Box box = getBoundingBox(tempPos);
-            if (mc.world.isSpaceEmpty(box)) return tempPos;
+            if (isBoxEmpty(tempPos)) return tempPos;
         }
         return null;
     }
@@ -113,31 +128,33 @@ public class Follower extends Module {
         double incrementInRadians = spinsppeed.get() * 0.00175;
         lastAngle = (lastAngle + incrementInRadians) % (2 * Math.PI);
 
-
         Vec3d tempPos = getPositionBasedOnAngleAndMode(centerPos, lastAngle);
-        Box box = getBoundingBox(tempPos);
-        if (mc.world.isSpaceEmpty(box)) {
+        if (isBoxEmpty(tempPos)) {
             return tempPos;
         }
 
         // Fallback: If the new position isn't safe, try to find a safe one by iterating over angles
         double initialAngle = lastAngle;
         double angle = initialAngle;
-        do {
+        int maxIterations = 36;  // This is equivalent to trying every 10 degrees.
+        int iterationCount = 0;
+
+        while (iterationCount < maxIterations) {
             tempPos = getPositionBasedOnAngleAndMode(centerPos, angle);
-            box = getBoundingBox(tempPos);
-            if (mc.world.isSpaceEmpty(box)) {
+            if (isBoxEmpty(tempPos)) {
                 // Update lastAngle with the current angle before returning
                 lastAngle = angle;
                 return tempPos;
             }
 
-            // Increment angle and loop if necessary
+            // Increment angle
             angle = (angle + Math.PI / 36) % (2 * Math.PI);
-        } while (angle != initialAngle);
+            iterationCount++;
+        }
 
-        return null;
+        return null;  // Return null if no safe position is found after trying all possible angles
     }
+
 
 
     private Vec3d getPositionBasedOnAngleAndMode(Vec3d centerPos, double angle) {
@@ -167,8 +184,8 @@ public class Follower extends Module {
         return centerPos;
     }
 
-    private Box getBoundingBox(Vec3d pos) {
-        return new Box(
+    private Boolean isBoxEmpty(Vec3d pos) {
+        Box box = new Box(
             pos.x - mc.player.getWidth() / 2,
             pos.y,
             pos.z - mc.player.getWidth() / 2,
@@ -176,6 +193,7 @@ public class Follower extends Module {
             pos.y + mc.player.getHeight(),
             pos.z + mc.player.getWidth() / 2
         );
+        return mc.world.isSpaceEmpty(box);
     }
 
     private Vec3d roundToDecimal(Vec3d vector, int decimalPlaces) {

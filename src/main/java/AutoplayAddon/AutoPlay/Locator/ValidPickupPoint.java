@@ -40,17 +40,22 @@ public class ValidPickupPoint {
     }
 
     public static BlockPos[] getSurroundingBlocks(BlockPos originalPos) {
+        int x = originalPos.getX();
+        int y = originalPos.getY();
+        int z = originalPos.getZ();
+
         return new BlockPos[]{
-            originalPos.north(),
-            originalPos.south(),
-            originalPos.east(),
-            originalPos.west(),
-            originalPos.north().east(),
-            originalPos.north().west(),
-            originalPos.south().east(),
-            originalPos.south().west()
+            new BlockPos(x, y, z + 1), // North
+            new BlockPos(x, y, z - 1), // South
+            new BlockPos(x + 1, y, z), // East
+            new BlockPos(x - 1, y, z), // West
+            new BlockPos(x + 1, y, z + 1), // North-East
+            new BlockPos(x - 1, y, z + 1), // North-West
+            new BlockPos(x + 1, y, z - 1), // South-East
+            new BlockPos(x - 1, y, z - 1)  // South-West
         };
     }
+
 
     private static Vec3d checkFit(World world, BlockPos pos, BlockPos originalPos, double offset) {
         if (isAir(world, pos) && isAir(world, pos.up())) {
@@ -61,7 +66,5 @@ public class ValidPickupPoint {
         return null;
     }
 
-    private static boolean isAir(World world, BlockPos pos) {
-        return world.isAir(pos);
-    }
+    private static boolean isAir(World world, BlockPos pos) {return world.isAir(pos);}
 }

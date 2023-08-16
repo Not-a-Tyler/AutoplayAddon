@@ -12,7 +12,7 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class BlockCache {
     public BlockPos lastBlockPos = null; // Added field to store the last block position
-
+    public Set<BlockPos> solidBlocks = new HashSet<>();
     public final Map<Block, List<BlockData>> blockMap = new HashMap<>();
     public ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -26,12 +26,14 @@ public class BlockCache {
                     for (int z = 0; z < 16; z++) {
                         BlockPos pos = new BlockPos(chunk.getPos().getStartX() + x, y, chunk.getPos().getStartZ() + z);
                         BlockState blockState = chunk.getBlockState(pos);
-                        Block block = chunk.getBlockState(pos).getBlock();
-                        if (!blockState.isSolid()) {
-                            continue;
-                        }
-                        synchronized (blockMap) {
-                            blockMap.computeIfAbsent(block, k -> new ArrayList<>()).add(new BlockData(pos, block));
+                        Block block = blockState.getBlock();
+                        if (blockState.isSolid()) {
+                            synchronized (solidBlocks) {
+                                solidBlocks.add(pos);
+                            }
+                            synchronized (blockMap) {
+                                blockMap.computeIfAbsent(block, k -> new ArrayList<>()).add(new BlockData(pos, block));
+                            }
                         }
                     }
                 }
@@ -39,11 +41,25 @@ public class BlockCache {
         });
     }
 
+
     public void removeChunk(Chunk chunk) {
         executorService.submit(() -> {
+            synchronized (solidBlocks) {
+                solidBlocks.removeIf(pos ->
+                    pos.getX() >= chunk.getPos().getStartX() &&
+                        pos.getX() < chunk.getPos().getStartX() + 16 &&
+                        pos.getZ() >= chunk.getPos().getStartZ() &&
+                        pos.getZ() < chunk.getPos().getStartZ() + 16
+                );
+            }
             synchronized (blockMap) {
                 for (Block block : blockMap.keySet()) {
-                    blockMap.get(block).removeIf(data -> data.getPos().getX() >= chunk.getPos().getStartX() && data.getPos().getX() < chunk.getPos().getStartX() + 16 && data.getPos().getZ() >= chunk.getPos().getStartZ() && data.getPos().getZ() < chunk.getPos().getStartZ() + 16);
+                    blockMap.get(block).removeIf(data ->
+                        data.getPos().getX() >= chunk.getPos().getStartX() &&
+                            data.getPos().getX() < chunk.getPos().getStartX() + 16 &&
+                            data.getPos().getZ() >= chunk.getPos().getStartZ() &&
+                            data.getPos().getZ() < chunk.getPos().getStartZ() + 16
+                    );
                 }
             }
         });
@@ -59,7 +75,6 @@ public class BlockCache {
             return lastBlockPos;
         }
     }
-
 
 
     public static class BlockData {

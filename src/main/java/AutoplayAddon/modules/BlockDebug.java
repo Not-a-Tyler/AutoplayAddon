@@ -1,4 +1,5 @@
 package AutoplayAddon.modules;
+import AutoplayAddon.Tracker.BlockCache;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
@@ -54,7 +55,7 @@ public class BlockDebug extends Module {
             if (hitResult.getType() == HitResult.Type.BLOCK) {
                 BlockPos pos = ((BlockHitResult) hitResult).getBlockPos();
                 boolean hasAirBlockAboveOrBelow = world.getBlockState(pos.up()).getBlock() == Blocks.AIR || world.getBlockState(pos.down()).getBlock() == Blocks.AIR;
-                boolean hasAirAdjacent = CanPickUpTest.hasAirAdjacent(world, pos);
+                boolean hasAirAdjacent = CanPickUpTest.hasAirAdjacent(pos);
                 Vec3d airGapPos = AirGapFinder.findAirGapNearBlock(pos, 5);
                 if (airGapPos != null) {
                     List<Vec3d> result = new ArrayList<>();

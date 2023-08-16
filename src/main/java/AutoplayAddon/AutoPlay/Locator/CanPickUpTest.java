@@ -10,10 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
@@ -37,57 +34,45 @@ public class CanPickUpTest {
     }
 
 
-
-
     public static List<Vec3d> findCollectableBlock(List<Block> targetBlocks) {
-        World world = mc.player.getEntityWorld();
         BlockPos playerPos = mc.player.getBlockPos();
+        BlockCache blockCache = AutoplayAddon.blockCache;
 
-        BlockCache blockCache = AutoplayAddon.blockCache; // Initialize the BlockCache. This could be also passed as an argument if it's being used elsewhere.
-
-        // Filter cached blocks to only include target blocks
-        List<BlockCache.BlockData> filteredBlocks = targetBlocks.stream()
-            .flatMap(block -> blockCache.blockMap.getOrDefault(block, new ArrayList<>()).stream())
-            .collect(Collectors.toList());
-
-        // Sort filtered blocks from nearest to furthest
-        Collections.sort(filteredBlocks, Comparator.comparingInt(blockData -> blockData.getPos().getManhattanDistance(playerPos)));
-
-        // Iterate through the sorted list of blocks
-        for (BlockCache.BlockData blockData : filteredBlocks) {
-            BlockPos currentPos = blockData.getPos();
-
-            boolean hasAirAdjacent = hasAirAdjacent(world, currentPos);
-            boolean hasAirBlockAboveOrBelow = world.getBlockState(currentPos.up()).getBlock() == Blocks.AIR || world.getBlockState(currentPos.down()).getBlock() == Blocks.AIR;
-            if (hasAirAdjacent || hasAirBlockAboveOrBelow) {
-                Vec3d airGapPos = AirGapFinder.findAirGapNearBlock(currentPos, 5);
+        List<BlockCache.BlockData> collectableBlocks = new ArrayList<>();
+        for (Block block : targetBlocks) {
+            if (blockCache.blockMap.containsKey(block)) {
+                collectableBlocks.addAll(blockCache.blockMap.get(block));
+            }
+        }
+        ChatUtils.info(String.valueOf(System.currentTimeMillis()));
+        collectableBlocks.sort(Comparator.comparingInt(blockData -> blockData.getPos().getManhattanDistance(playerPos)));
+        ChatUtils.info(String.valueOf(System.currentTimeMillis()));
+        for (BlockCache.BlockData blockData : collectableBlocks) {
+            BlockPos pos = blockData.getPos();
+            if (isAirOrNonSolid(pos.add(0, 1, 0)) || isAirOrNonSolid(pos.add(0, -1, 0)) || hasAirAdjacent(pos)) {
+                Vec3d airGapPos = AirGapFinder.findAirGapNearBlock(pos, 5);
                 if (airGapPos != null) {
-                    List<Vec3d> result = new ArrayList<>();
-                    ChatUtils.info("AirGapPos: " + airGapPos);
-                    result.add(new Vec3d(currentPos.getX(), currentPos.getY(), currentPos.getZ())); // Convert BlockPos to Vec3d
-                    result.add(airGapPos);
-                    return result;
+                    return List.of(new Vec3d(pos.getX(), pos.getY(), pos.getZ()), airGapPos);
                 }
             }
         }
+        ChatUtils.info(String.valueOf(System.currentTimeMillis()));
         return null;
     }
 
-
-
-
-
-
-
-    public static boolean hasAirAdjacent(World world, BlockPos pos) {
+    public static boolean hasAirAdjacent(BlockPos pos) {
+        // use blockpos.add because its faster than blockpos.up or blockpos.down etc
         for (BlockPos blockPos : ValidPickupPoint.getSurroundingBlocks(pos)) {
-            if ((world.getBlockState(blockPos).getBlock() == Blocks.AIR && world.getBlockState(blockPos.up()).getBlock() == Blocks.AIR) ||
-                (world.getBlockState(blockPos.down()).getBlock() == Blocks.AIR && world.getBlockState(blockPos.down(2)).getBlock() == Blocks.AIR) ||
-                (world.getBlockState(blockPos.down()).getBlock() == Blocks.AIR && world.getBlockState(blockPos).getBlock() == Blocks.AIR)) {
+            if ((isAirOrNonSolid(blockPos.add(0, 1, 0)) && isAirOrNonSolid(blockPos)) ||
+                (isAirOrNonSolid(blockPos.add(0, -1, 0)) && isAirOrNonSolid(blockPos.add(0, -2, 0)))) {
                 return true;
             }
         }
         return false;
+    }
+
+    public static boolean isAirOrNonSolid(BlockPos pos) {
+        return !AutoplayAddon.blockCache.solidBlocks.contains(pos);
     }
 
 

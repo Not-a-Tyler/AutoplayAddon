@@ -33,11 +33,8 @@ public class findcollectableblock extends Command {
             if (stack == null || stack.getItem() == Items.AIR) ChatUtils.info("e");
             List<Block> blockslist = Collections.singletonList(Block.getBlockFromItem(stack.getItem()));
             ChatUtils.info("testing " + blockslist.get(0).getName().getString());
-            long startTime = System.currentTimeMillis();
+            ChatUtils.info(String.valueOf(System.currentTimeMillis()));
             List<Vec3d> collectableBlock = CanPickUpTest.findCollectableBlock(blockslist);
-            long endTime = System.currentTimeMillis(); // Get the current time after calculating BlockPos
-            long timeTaken = endTime - startTime; // Calculate the time taken in milliseconds
-            ChatUtils.info("Time taken: " + timeTaken + " milliseconds");
             if (collectableBlock == null) {
                 ChatUtils.info("Didn't find anything");
                 return;

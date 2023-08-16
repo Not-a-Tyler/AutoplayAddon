@@ -6,16 +6,22 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.block.BlockState;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class ServerSideValues {
-    public boolean hasMoved = false;
+
+
+
+    public boolean hasMoved, clientIsFloating = false;
     double prevx, prevy, prevz= 0;
     public Vec3d tickpos = new Vec3d(0,0,0);
-    public int i, allowedPlayerTicks = 0;
+    public int i, allowedPlayerTicks, aboveGroundTickCount = 0;
     private int receivedMovePacketCount, knownMovePacketCount, lasttick = 0;
 
     public void init() {
@@ -29,13 +35,19 @@ public class ServerSideValues {
 
     @EventHandler(priority = EventPriority.LOWEST)
     private void onTick(TickEvent.Pre event) {
+        if (clientIsFloating) {
+            if (++aboveGroundTickCount > 80) {
+                //ChatUtils.info("Client is floatin");
+            }
+        } else {
+            clientIsFloating = false;
+            aboveGroundTickCount = 0;
+        }
         hasMoved = false;
         if (mc.player == null) return;
         tickpos = mc.player.getPos();
         knownMovePacketCount = receivedMovePacketCount;
     }
-
-
 
     @EventHandler(priority = EventPriority.LOWEST - 2)
     private void onSendPacket(PacketEvent.Send event) {
@@ -78,17 +90,51 @@ public class ServerSideValues {
             } else {
                 allowedPlayerTicks = 20;
             }
-            //if (d10 > 0) {
-            //    ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED D10: " + d10);
-            //} else {
-            //    ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
-            //}
+//            if (d10 > 0) {
+//                ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED D10: " + d10);
+//            } else {
+//                ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
+//            }
             if (hasPos) {
                 prevx = packet.getX(0);
                 prevy = packet.getY(0);
                 prevz = packet.getZ(0);
             }
+            boolean test = mc.player.verticalCollision && d7 < 0.0D;
+
+            clientIsFloating = d7 >= -0.03125D && noBlocksAround() && !test;
+
         }
+    }
+
+    public static int floor(double value) {
+        int i = (int)value;
+        return value < (double)i ? i - 1 : i;
+    }
+
+    private boolean noBlocksAround() {
+        // Paper start - stop using streams, this is already a known fixed problem in Entity#move
+        Box box = mc.player.getBoundingBox().expand(0.0625D).expand(0.0D, -0.55D, 0.0D);
+        int minX = floor(box.minX);
+        int minY = floor(box.minY);
+        int minZ = floor(box.minZ);
+        int maxX = floor(box.maxX);
+        int maxY = floor(box.maxY);
+        int maxZ = floor(box.maxZ);
+        BlockPos pos;
+
+        for (int y = minY; y <= maxY; ++y) {
+            for (int z = minZ; z <= maxZ; ++z) {
+                for (int x = minX; x <= maxX; ++x) {
+                    pos = new BlockPos(x, y, z);
+                    BlockState type = mc.world.getBlockState(pos);
+                    if (type != null && !type.isAir()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
 }

@@ -1,6 +1,7 @@
 package AutoplayAddon.BotTest.Commands;
 
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.BotTest.ArgumentType;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -48,7 +49,7 @@ public class FollowCommand {
                         Vec3d currentPosRounded = roundToDecimal(mc.player.getPos(), 3);
                         Vec3d lastTargetPosRounded = roundToDecimal(lastPlayerPos, 3);
                         if (!lastTargetPosRounded.equals(currentPosRounded)) {
-                            GotoUtil.moveto(targetPlayer.getX(), targetPlayer.getY(), targetPlayer.getZ(), false);
+                            Movement.moveTo(targetPos);
                         }
                     }
                     lastPlayerPos = targetPos; // Update the last known player position

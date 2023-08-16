@@ -1,5 +1,7 @@
 package AutoplayAddon.modules;
+import AutoplayAddon.AutoPlay.Movement.AIDS;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
@@ -51,15 +53,15 @@ public class ClickTp extends Module {
         .build()
     );
 
-    private final Setting<Keybind> cancelBlink = sgGeneral.add(new KeybindSetting.Builder()
+    private final Setting<Keybind> cliclTP = sgGeneral.add(new KeybindSetting.Builder()
         .name("Keybind to tp")
         .description("Cancels sending packets and sends you back to your original position.")
         .defaultValue(Keybind.none())
         .action(() -> {
-           // new Thread(() -> {
+            try {
                 Camera camera = mc.gameRenderer.getCamera();
                 Vec3d cameraPos = camera.getPos();
-                BlockPos pos = mc.world.raycast(new RaycastContext(cameraPos, cameraPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw()).multiply(300.0)), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos();
+                BlockPos pos = mc.world.raycast(new RaycastContext(cameraPos, cameraPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw()).multiply(197.0)), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos();
                 int maxSearchHeight = 256; // Maximum height to search for a valid 2-block gap.
                 BlockPos validPos = null;
                 for (int y = pos.getY(); y < pos.getY() + maxSearchHeight; y++) {
@@ -69,12 +71,15 @@ public class ClickTp extends Module {
                         break;
                     }
                 }
-                if (validPos != null) {
-                    GotoUtil.moveto(validPos.getX() + 0.5, validPos.getY(), validPos.getZ() + 0.5, false);
+                if (validPos != null && isChunkLoaded(validPos)) {
+                    Vec3d toPos = new Vec3d(validPos.getX() + 0.5, validPos.getY(), validPos.getZ() + 0.5);
+                    Movement.moveTo(toPos);
                 } else {
                     ChatUtils.error("No valid position found.");
                 }
-           // }).start();
+            } catch (Exception e) {
+                ChatUtils.error("No valid position found.");
+            }
         })
 
         .build()
@@ -84,34 +89,36 @@ public class ClickTp extends Module {
     public ClickTp() {
         super(AutoplayAddon.autoplay, "click-tp", "its clicktp");
     }
-    @EventHandler
-    private void onRender(Render3DEvent event) {
-        Camera camera = mc.gameRenderer.getCamera();
-        Vec3d cameraPos = camera.getPos();
-        BlockPos pos = mc.world.raycast(new RaycastContext(cameraPos, cameraPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw()).multiply(300.0)), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos();
-        int maxSearchHeight = 256; // Maximum height to search for a valid 2-block gap.
-        BlockPos validPos = null;
-        for (int y = pos.getY(); y < pos.getY() + maxSearchHeight; y++) {
-            BlockPos temppos = new BlockPos(pos.getX(), y, pos.getZ());
-            if (mc.world.isAir(temppos) && mc.world.isAir(temppos.up())) {
-                validPos = temppos;
-                break;
-            }
-        }
-        if (validPos == null) return;
-        double x1 = validPos.getX();
-        double y1 = validPos.getY();
-        double z1 = validPos.getZ();
-        double x2 = x1 + 1;
-        double y2 = y1 + 1;
-        double z2 = z1 + 1;
+//    @EventHandler
+//    private void onRender(Render3DEvent event) {
+//        Camera camera = mc.gameRenderer.getCamera();
+//        Vec3d cameraPos = camera.getPos();
+//        BlockPos pos = mc.world.raycast(new RaycastContext(cameraPos, cameraPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw()).multiply(300.0)), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos();
+//        int maxSearchHeight = 256; // Maximum height to search for a valid 2-block gap.
+//        BlockPos validPos = null;
+//        for (int y = pos.getY(); y < pos.getY() + maxSearchHeight; y++) {
+//            BlockPos temppos = new BlockPos(pos.getX(), y, pos.getZ());
+//            if (mc.world.isAir(temppos) && mc.world.isAir(temppos.up())) {
+//                validPos = temppos;
+//                break;
+//            }
+//        }
+//        if (validPos == null) return;
+//        double x1 = validPos.getX();
+//        double y1 = validPos.getY();
+//        double z1 = validPos.getZ();
+//        double x2 = x1 + 1;
+//        double y2 = y1 + 1;
+//        double z2 = z1 + 1;
+//
+//        if (render.get()) {
+//            event.renderer.box(x1, y1, z1, x2, y2, z2, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
+//        }
+//    }
 
-        if (render.get()) {
-            event.renderer.box(x1, y1, z1, x2, y2, z2, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
-        }
+    private boolean isChunkLoaded(BlockPos pos) {
+        return mc.world.isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4);
     }
-
-
 
 }
 

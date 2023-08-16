@@ -14,21 +14,33 @@ public class CanTeleport {
 
     public static double searchY(Vec3d from, Vec3d to) {
         double fromy = from.y;
+        if (tryY(from, to, fromy)) {
+            // id if current player y works
+            return -1337;
+        }
         double ytotest = 0;
         boolean validTeleportFound = false;
         int searchOffset = 0;
         while (!validTeleportFound) {
             ytotest = (fromy + searchOffset);
-            Vec3d fromWithOffset = new Vec3d(from.x, ytotest, from.z);
-            Vec3d toWithOffset = new Vec3d(to.x, ytotest, to.z);
-            Box box = new Box(fromWithOffset.x - mc.player.getWidth() / 2, fromWithOffset.y, fromWithOffset.z - mc.player.getWidth() / 2, fromWithOffset.x + mc.player.getWidth() / 2, fromWithOffset.y + mc.player.getHeight(), fromWithOffset.z + mc.player.getWidth() / 2);
-            if (mc.world.isSpaceEmpty(box) && check(fromWithOffset, toWithOffset)) {
+            if (tryY(from, to, ytotest)) {
                 validTeleportFound = true;
             } else {
                 searchOffset = (searchOffset <= 0) ? 1 - searchOffset : -searchOffset;
             }
         }
         return ytotest;
+    }
+
+    public static boolean tryY(Vec3d from, Vec3d to, double ytotest) {
+        Vec3d fromWithOffset = new Vec3d(from.x, ytotest, from.z);
+        Vec3d toWithOffset = new Vec3d(to.x, ytotest, to.z);
+        Box box = new Box(fromWithOffset.x - mc.player.getWidth() / 2, fromWithOffset.y, fromWithOffset.z - mc.player.getWidth() / 2, fromWithOffset.x + mc.player.getWidth() / 2, fromWithOffset.y + mc.player.getHeight(), fromWithOffset.z + mc.player.getWidth() / 2);
+        if (mc.world.isSpaceEmpty(box) && check(fromWithOffset, toWithOffset)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static boolean check(Vec3d from, Vec3d to) {
