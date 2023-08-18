@@ -20,7 +20,7 @@ public class FreecamFly extends Module {
 
     @Override
     public void onActivate() {
-        AIDS.init();
+        AIDS.init(false);
         Module freecam = Modules.get().get(Freecam.class);
         if (!freecam.isActive()) {
             freecam.toggle();
@@ -41,16 +41,14 @@ public class FreecamFly extends Module {
 
     @EventHandler(priority = EventPriority.HIGHEST + 3)
     private void onTick(TickEvent.Pre event) {
-
+        if (!Movement.AIDSboolean) {
+            AIDS.disable();
+            toggle();
+        }
         Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
-        double playerEyeHeight = mc.player.getEyeHeight(mc.player.getPose()); // Assuming there's a method for this, you can adjust accordingly.
-
-        Vec3d playerPos = new Vec3d(
-            cameraPos.x,
-            cameraPos.y - playerEyeHeight,
-            cameraPos.z
-        );
-
+        double playerEyeHeight = mc.player.getEyeHeight(mc.player.getPose());
+        mc.player.setPosition(new Vec3d(cameraPos.x, -66, cameraPos.z));
+        Vec3d playerPos = new Vec3d(cameraPos.x, cameraPos.y - mc.player.getEyeHeight(mc.player.getPose()), cameraPos.z);
         Box box = new Box(
             playerPos.x - mc.player.getWidth() / 2,
             playerPos.y,

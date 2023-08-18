@@ -34,7 +34,7 @@ public class ItemCollect extends Command {
             if (stack == null || stack.getItem() == Items.AIR) ChatUtils.info("e");
             ChatUtils.info(stack.getItem().getName().getString());
             List<Item> itemslist = Collections.singletonList(stack.getItem());
-            AIDS.init();
+            AIDS.init(true);
             new Thread(() -> {
                 ItemCollection.collect(itemslist);
             }).start();

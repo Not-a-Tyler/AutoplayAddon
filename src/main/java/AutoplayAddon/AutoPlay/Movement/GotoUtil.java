@@ -23,7 +23,6 @@ public class GotoUtil extends Movement {
 
     private static boolean stage() {
         while (mc.player != null) {
-            //ChatUtils.info("Stage: " + stage);
             if (stage == 4) {
                // ChatUtils.info("Finished via stage 4");
                 return true;
@@ -35,12 +34,11 @@ public class GotoUtil extends Movement {
             }
             Vec3d newPos = getStage(currentPosition, to, stage);
             if (!predictifPossible(newPos)) {
-                //ChatUtils.info("Not enough charge, waiting 1 tick Allowed: " + AutoplayAddon.values.allowedPlayerTicks + " i: " + AutoplayAddon.values.allowedPlayerTicks + " Delta: " + ServerSideValues.delta());
+                ChatUtils.info("Not enough charge, waiting 1 tick");
                 return false;
             }
             MoveToUtil.moveTo(newPos);
             stage++;
-            //ChatUtils.info("Increased Stage to " + stage);
         }
         MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
         return true;
@@ -54,7 +52,6 @@ public class GotoUtil extends Movement {
             if (stage()) {
                 MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
                 tickEventFuture.complete(null);
-                //ChatUtils.info("stage complete");
             }
         }
     }
@@ -66,6 +63,7 @@ public class GotoUtil extends Movement {
 
 
     public static void shortGoTo() {
+        ChatUtils.info("moving");
         postTickFlag = true;
         y = CanTeleport.searchY(currentPosition, to);
         if (y == -1337) {
@@ -74,16 +72,13 @@ public class GotoUtil extends Movement {
         } else {
             stage = 1;
         }
-        //ChatUtils.info("Going to " + xpos + " " + ypos + " " + zpos + " with Y: " + y);
-        //ChatUtils.sendPlayerMsg("Going to " + xpos + " " + ypos + " " + zpos + " with Y: " + y);
         tickEventFuture = new CompletableFuture<>();
         if (!stage()) {
             MeteorClient.EVENT_BUS.subscribe(GotoUtil.class);
             try {
                 tickEventFuture.get();
             } catch (InterruptedException | ExecutionException e) {
-                ChatUtils.error("GotoUtil shortGoTo Movement interrupted: " + e.getMessage());
-                return;
+                //ChatUtils.error("GotoUtil shortGoTo Movement interrupted: " + e.getMessage());
             }
         }
     }

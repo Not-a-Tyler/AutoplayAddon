@@ -13,9 +13,8 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class AIDS extends Movement {
     public static Thread currentAIDSmoveToThread;
     static CompletableFuture<Void>  tickEventFuture;
-
-    private static int tickCounter = 0;
-    public static void init() {
+    static boolean AutoSetPosition;
+    public static void init(Boolean automaticallySetPosition) {
         currentPosition = mc.player.getPos();
         MeteorClient.EVENT_BUS.subscribe(AIDS.class);
         MeteorClient.EVENT_BUS.subscribe(Movement.class);
@@ -23,6 +22,7 @@ public class AIDS extends Movement {
         mc.player.setVelocity(Vec3d.ZERO);
         to = mc.player.getPos();
         AIDSboolean = true;
+        AutoSetPosition = automaticallySetPosition;
     }
     public static void disable() {
         MeteorClient.EVENT_BUS.unsubscribe(AIDS.class);
@@ -42,7 +42,7 @@ public class AIDS extends Movement {
             tickEventFuture.get();
         //    ChatUtils.info("Finished moving to " + to.toString());
         } catch (InterruptedException | ExecutionException e) {
-            ChatUtils.error("AIDSmoveTo Movement interrupted: " + e.getMessage());
+            //ChatUtils.error("AIDSmoveTo Movement interrupted: " + e.getMessage());
         }
     }
 
@@ -54,30 +54,12 @@ public class AIDS extends Movement {
             return;
         }
         Boolean setPos = false;
-//        if (AutoplayAddon.values.aboveGroundTickCount > 60) {
-//            ChatUtils.info("Bypassing Kick");
-//            offset = 1;
-//            AIDSmoveTo();;
-//            setPos = true;
-//            tickCounter = 1;
-//        }
-//
-//        // This part waits 2 ticks and then resets the values.
-//        if (tickCounter > 0) {
-//            tickCounter++;
-//            if (tickCounter == 4) { // Check if 2 ticks have passed.
-//                offset = 0;
-//                AIDSmoveTo();
-//                setPos = true;
-//                tickCounter = 0;
-//            }
-//        }
-
-        if (!setPos && (!closeBy(currentPosition, to)) && !(currentAIDSmoveToThread != null) && !currentAIDSmoveToThread.isAlive()) {
+        if (!setPos && !closeBy(currentPosition, to) && (currentAIDSmoveToThread == null || !currentAIDSmoveToThread.isAlive())) {
+            ChatUtils.info("moving due to not being there");
             AIDSmoveTo();
         }
 
-        if (!closeBy(mc.player.getPos(), to)) {
+        if (!closeBy(mc.player.getPos(), to) && AutoSetPosition) {
             mc.player.setPosition(to);
         }
     }
@@ -92,15 +74,16 @@ public class AIDS extends Movement {
 
 
     public static void AIDSmoveTo() {
-        if (currentAIDSmoveToThread != null && currentAIDSmoveToThread.isAlive()) {
-            currentAIDSmoveToThread.interrupt();
-            ChatUtils.error("Interrupted previous AIDSmoveTo thread");
+        if (!closeBy(currentPosition, to)) {
+            if (currentAIDSmoveToThread != null && currentAIDSmoveToThread.isAlive()) {
+                currentAIDSmoveToThread.interrupt();
+                //ChatUtils.error("Interrupted previous AIDSmoveTo thread");
+            }
+            currentAIDSmoveToThread = new Thread(() -> {
+                GotoUtil.shortGoTo();
+                tickEventFuture.complete(null);
+            });
+            currentAIDSmoveToThread.start();
         }
-        currentAIDSmoveToThread = new Thread(() -> {
-            GotoUtil.shortGoTo();
-            mc.player.setPosition(to);
-            tickEventFuture.complete(null);
-        });
-        currentAIDSmoveToThread.start();
     }
 }

@@ -70,7 +70,7 @@ public class Follower extends Module {
 
     @Override
     public void onActivate() {
-        AIDS.init();
+        AIDS.init(true);
     }
     @Override
     public void onDeactivate() {

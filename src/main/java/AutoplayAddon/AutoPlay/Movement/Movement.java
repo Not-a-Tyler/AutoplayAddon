@@ -82,7 +82,7 @@ public class Movement {
     public static void moveTo(Vec3d pos) {
         if (currentMovementThread != null && currentMovementThread.isAlive()) {
             currentMovementThread.interrupt();
-            ChatUtils.info("Interrupted previous movement thread");
+            //ChatUtils.info("Interrupted previous movement thread");
         }
         currentMovementThread = new Thread(() -> {
             if (AIDSboolean) {
@@ -91,7 +91,7 @@ public class Movement {
                 //ChatUtils.info("Finished Moving");
                 return;
             }
-            ChatUtils.info("Started going to " + pos.toString() + "via normal method");
+            //ChatUtils.info("Started going to " + pos.toString() + "via normal method");
             to = pos;
             mc.player.setNoGravity(true);
             mc.player.setVelocity(Vec3d.ZERO);
@@ -101,7 +101,7 @@ public class Movement {
             mc.player.setPosition(to);
             MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
             mc.player.setNoGravity(false);
-            ChatUtils.info("Finished going to " + to.toString());
+           // ChatUtils.info("Finished going to " + to.toString());
         });
         currentMovementThread.start();
     }
