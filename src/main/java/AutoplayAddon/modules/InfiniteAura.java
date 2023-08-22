@@ -1,7 +1,10 @@
 package AutoplayAddon.modules;
+import AutoplayAddon.AutoPlay.Movement.AIDS;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.MoveToUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
+import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.settings.EntityTypeListSetting;
 import meteordevelopment.meteorclient.settings.KeybindSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -9,13 +12,20 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 
+import java.lang.reflect.Field;
 import java.util.Set;
 
 public class InfiniteAura  extends Module {
@@ -33,23 +43,24 @@ public class InfiniteAura  extends Module {
         .build()
     );
 
-    private final Setting<Keybind> cancelBlink = sgGeneral.add(new KeybindSetting.Builder()
-        .name("Keybind to tp")
+
+
+
+    private final Setting<Keybind> test = sgGeneral.add(new KeybindSetting.Builder()
+        .name("100 dollars")
         .description("Teleports you to the closest player to your crosshair.")
         .defaultValue(Keybind.none())
         .action(() -> {
-            ClientPlayerEntity player = mc.player;
-            if (player != null) {
+            Thread waitForTickEventThread1 = new Thread(() -> {
                 double closestAngle = Double.MAX_VALUE;
                 Entity closestEntity = null;
-                Vec3d viewVec = player.getRotationVec(1.0F);
-
+                Vec3d viewVec = mc.player.getRotationVec(1.0F);
                 for (Entity entity : mc.world.getEntities()) {
-                    if (entities.get().contains(entity.getType()) && entity != player) {
+                    if (entities.get().contains(entity.getType()) && entity != mc.player) {
                         PlayerEntity playerEntity = (PlayerEntity) entity;
                         if (Friends.get().shouldAttack(playerEntity)) continue;
                         Entity otherEntity = entity;
-                        Vec3d toOther = otherEntity.getPos().subtract(player.getPos()).normalize();
+                        Vec3d toOther = otherEntity.getPos().subtract(mc.player.getPos()).normalize();
                         double angle = Math.acos(viewVec.dotProduct(toOther));
 
                         if (angle < closestAngle) {
@@ -58,20 +69,15 @@ public class InfiniteAura  extends Module {
                         }
                     }
                 }
-
-                if (closestEntity != null) {
-                    Entity finalClosestEntity = closestEntity;
-                    Thread waitForTickEventThread1 = new Thread(() -> {
-                        Vec3d startingpos = mc.player.getPos();
-                        Vec3d pos = finalClosestEntity.getPos();
-                        Movement.moveTo(pos);
-                        mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
-                        mc.player.swingHand(Hand.MAIN_HAND);
-                        Movement.moveTo(startingpos);
-                    });
-                    waitForTickEventThread1.start();
-                }
-            }
+                if (closestEntity == null) return;
+                Vec3d startingPos = mc.player.getPos();
+                AIDS.init(false);
+                AIDS.moveTo(closestEntity.getPos());
+                mc.interactionManager.attackEntity(mc.player, closestEntity);
+                AIDS.moveTo(startingPos);
+                AIDS.disable();
+            });
+            waitForTickEventThread1.start();
         })
         .build()
     );

@@ -5,7 +5,8 @@
   "client": [
   ],
   "mixins": [
-    "PlayerMoveC2SPacketMixin"
+    "PlayerMoveC2SPacketMixin",
+    "ClientConnectionInvokerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

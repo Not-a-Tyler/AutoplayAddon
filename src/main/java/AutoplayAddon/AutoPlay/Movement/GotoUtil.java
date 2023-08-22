@@ -63,7 +63,6 @@ public class GotoUtil extends Movement {
 
 
     public static void shortGoTo() {
-        ChatUtils.info("moving");
         postTickFlag = true;
         y = CanTeleport.searchY(currentPosition, to);
         if (y == -1337) {
@@ -78,10 +77,8 @@ public class GotoUtil extends Movement {
             try {
                 tickEventFuture.get();
             } catch (InterruptedException | ExecutionException e) {
-                //ChatUtils.error("GotoUtil shortGoTo Movement interrupted: " + e.getMessage());
+                //
             }
         }
     }
-
-
 }

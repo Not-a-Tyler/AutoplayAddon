@@ -20,7 +20,7 @@ public class Movement {
     public static Vec3d currentPosition, to;
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    private static void onReceivePacket(PacketEvent.Receive event) {
+    private static void onServerPosUpdate(PacketEvent.Receive event) {
         if (event.packet instanceof PlayerPositionLookS2CPacket packet) {
             currentPosition = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
             ChatUtils.info("Received packet and set current position to " + currentPosition);
@@ -28,21 +28,9 @@ public class Movement {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST + 1)
-    private static void onSendPacket(PacketEvent.Send event) {
+    private static void onSendMovePacket(PacketEvent.Send event) {
         if (event.packet instanceof PlayerMoveC2SPacket) {
-            IPlayerMoveC2SPacket iPacket = (IPlayerMoveC2SPacket) event.packet;
-            if (iPacket.getTag() != 13377) {
-                event.cancel();
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    private static void onSendPacketLowest(PacketEvent.Send event) {
-        if (event.packet instanceof PlayerMoveC2SPacket.Full || event.packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) {
-            PlayerMoveC2SPacket packet = (PlayerMoveC2SPacket) event.packet;
-            PlayerMoveC2SPacketMixin accessor = (PlayerMoveC2SPacketMixin) event.packet;
-            accessor.setY(packet.getY(currentPosition.y) - offset);
+            event.cancel();
         }
     }
 
@@ -52,13 +40,11 @@ public class Movement {
         double base = findFarthestDistance(newPos);
         int packetsRequired = (int) Math.floor(Math.abs(base / 10.0));
         double delta = ServerSideValues.delta();
-        if (!AutoplayAddon.values.hasMoved) delta = 19;
-        if (AutoplayAddon.values.hasMoved) {
+        if (!ServerSideValues.hasMoved) delta = 19;
+        if (ServerSideValues.hasMoved) {
             predict = ((packetsRequired + 1) * 2);
-            // ChatUtils.info("Predicted " + (delta - predict) + " since player has moved");
         } else {
             predict = (packetsRequired + 2);
-            //ChatUtils.info("Predicted " + (delta - predict) + " since player has not moved");
         }
         if (delta < predict) {
             return false;
@@ -68,10 +54,10 @@ public class Movement {
     }
 
     public static double findFarthestDistance(Vec3d newPos) {
-        Vec3d tickpos = AutoplayAddon.values.tickpos;
+        Vec3d tickpos = ServerSideValues.tickpos;
         double maxDistance = Double.MIN_VALUE;
         for (Vec3d vec3d : new Vec3d[] { tickpos, currentPosition }) {
-            double distance = newPos.distanceTo(vec3d);
+            double distance = calculateDistance(newPos, vec3d);
             if (distance > maxDistance) {
                 maxDistance = distance;
             }
@@ -79,19 +65,25 @@ public class Movement {
         return maxDistance;
     }
 
+    private static double calculateDistance(Vec3d pos1, Vec3d pos2) {
+        double dx = pos2.x - pos1.x;
+        double dy = pos2.y - pos1.y;
+        double dz = pos2.z - pos1.z;
+
+        return Math.sqrt(dx*dx + dy*dy + dz*dz);
+    }
+
+
     public static void moveTo(Vec3d pos) {
         if (currentMovementThread != null && currentMovementThread.isAlive()) {
             currentMovementThread.interrupt();
-            //ChatUtils.info("Interrupted previous movement thread");
+            ChatUtils.info("Interrupted previous movement thread");
         }
         currentMovementThread = new Thread(() -> {
             if (AIDSboolean) {
-               // ChatUtils.info("Started going to " + pos.toString() + "via AIDS");
                 AIDS.setPos(pos);
-                //ChatUtils.info("Finished Moving");
                 return;
             }
-            //ChatUtils.info("Started going to " + pos.toString() + "via normal method");
             to = pos;
             mc.player.setNoGravity(true);
             mc.player.setVelocity(Vec3d.ZERO);
@@ -101,7 +93,6 @@ public class Movement {
             mc.player.setPosition(to);
             MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
             mc.player.setNoGravity(false);
-           // ChatUtils.info("Finished going to " + to.toString());
         });
         currentMovementThread.start();
     }

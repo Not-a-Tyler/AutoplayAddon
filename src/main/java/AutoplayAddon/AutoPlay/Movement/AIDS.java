@@ -15,11 +15,13 @@ public class AIDS extends Movement {
     static CompletableFuture<Void>  tickEventFuture;
     static boolean AutoSetPosition;
     public static void init(Boolean automaticallySetPosition) {
+        if (mc.player == null) return;
+        MeteorClient.EVENT_BUS.unsubscribe(AIDS.class);
+        MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
         currentPosition = mc.player.getPos();
         MeteorClient.EVENT_BUS.subscribe(AIDS.class);
-        MeteorClient.EVENT_BUS.subscribe(Movement.class);
         mc.player.setNoGravity(true);
-        mc.player.setVelocity(Vec3d.ZERO);
+        //mc.player.setVelocity(Vec3d.ZERO);
         to = mc.player.getPos();
         AIDSboolean = true;
         AutoSetPosition = automaticallySetPosition;
@@ -40,9 +42,8 @@ public class AIDS extends Movement {
         AIDSmoveTo();
         try {
             tickEventFuture.get();
-        //    ChatUtils.info("Finished moving to " + to.toString());
         } catch (InterruptedException | ExecutionException e) {
-            //ChatUtils.error("AIDSmoveTo Movement interrupted: " + e.getMessage());
+            ChatUtils.error("AIDSmoveTo Movement interrupted: " + e.getMessage());
         }
     }
 
@@ -55,7 +56,7 @@ public class AIDS extends Movement {
         }
         Boolean setPos = false;
         if (!setPos && !closeBy(currentPosition, to) && (currentAIDSmoveToThread == null || !currentAIDSmoveToThread.isAlive())) {
-            ChatUtils.info("moving due to not being there");
+            ChatUtils.info("teleported because not at desaired position");
             AIDSmoveTo();
         }
 
@@ -77,13 +78,15 @@ public class AIDS extends Movement {
         if (!closeBy(currentPosition, to)) {
             if (currentAIDSmoveToThread != null && currentAIDSmoveToThread.isAlive()) {
                 currentAIDSmoveToThread.interrupt();
-                //ChatUtils.error("Interrupted previous AIDSmoveTo thread");
+                ChatUtils.error("Interrupted previous AIDSmoveTo thread");
             }
             currentAIDSmoveToThread = new Thread(() -> {
                 GotoUtil.shortGoTo();
                 tickEventFuture.complete(null);
             });
             currentAIDSmoveToThread.start();
+        } else {
+            tickEventFuture.complete(null);
         }
     }
 }

@@ -80,14 +80,15 @@ public class CanTeleport {
 
 
 
-    private static Vec3d adjustMovementForCollisions(Box box, Vec3d movement) {
+
+    public static Vec3d adjustMovementForCollisions(Box box, Vec3d movement) {
         List<VoxelShape> list = mc.player.getWorld().getEntityCollisions(mc.player, box.stretch(movement));
         Vec3d vec3d = movement.lengthSquared() == 0.0 ? movement : adjustMovementForCollisions(mc.player, movement, box, mc.player.getWorld(), list);
         return vec3d;
     }
 
 
-    private static Vec3d adjustMovementForCollisions(@Nullable Entity entity, Vec3d movement, Box entityBoundingBox, World world, List<VoxelShape> collisions) {
+    public static Vec3d adjustMovementForCollisions(@Nullable Entity entity, Vec3d movement, Box entityBoundingBox, World world, List<VoxelShape> collisions) {
         ImmutableList.Builder<VoxelShape> builder = ImmutableList.builderWithExpectedSize(collisions.size() + 1);
         if (!collisions.isEmpty()) {
             builder.addAll(collisions);
@@ -96,7 +97,7 @@ public class CanTeleport {
         return adjustMovementForCollisions(movement, entityBoundingBox, builder.build());
     }
 
-    private static Vec3d adjustMovementForCollisions(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions) {
+    public static Vec3d adjustMovementForCollisions(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions) {
         if (collisions.isEmpty()) {
             return movement;
         } else {

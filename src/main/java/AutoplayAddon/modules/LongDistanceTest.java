@@ -1,11 +1,11 @@
 package AutoplayAddon.modules;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.MoveToUtil;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.util.math.BlockPos;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.math.Vec3d;
@@ -34,10 +34,25 @@ public class LongDistanceTest extends Module {
     public LongDistanceTest() {
         super(AutoplayAddon.autoplay, "long-tp", "Goes to somewhere");
     }
-    int ypos = 129;
     int tickCounter = 0;
     @EventHandler
     private void onTick(TickEvent.Post event) {
+        double playerY = mc.player.getY();
+        if ((playerY != -66) || (playerY != 322)) {
+            double targetValue1 = -66;
+            double targetValue2 = 322;
+
+            double differenceToValue1 = Math.abs(playerY - targetValue1);
+            double differenceToValue2 = Math.abs(playerY - targetValue2);
+            Vec3d pos;
+            if (differenceToValue1 < differenceToValue2) {
+                pos = new Vec3d(mc.player.getX(), -66, mc.player.getZ());
+            } else {
+                pos = new Vec3d(mc.player.getX(), 322, mc.player.getZ());
+            }
+            Movement.moveTo(pos);
+            return;
+        }
         tickCounter++;
         if (tickCounter < ticksToSkip.get()) {
             return;
@@ -69,14 +84,8 @@ public class LongDistanceTest extends Module {
             return;
         }
 
-        BlockPos finalLastLoadedPos = lastLoadedPos;
-        ChatUtils.info("Teleporting to " + finalLastLoadedPos.getX() + " " + finalLastLoadedPos.getY() + " " + finalLastLoadedPos.getZ());
-            //GotoUtil.moveto(finalLastLoadedPos.getX() + 0.5, ypos, finalLastLoadedPos.getZ() + 0.5, false);
-            // If destination is reached, teleport directly to it and disable the module
-            if (finalLastLoadedPos.equals(destination)) {
-               // GotoUtil.moveto(destination.x, destination.y, destination.z, false);
-                toggle();
-            }
+        ChatUtils.info("Teleporting to " + lastLoadedPos.getX() + " " + lastLoadedPos.getY() + " " + lastLoadedPos.getZ());
+        Movement.moveTo(lastLoadedPos.toCenterPos());
     }
 
 

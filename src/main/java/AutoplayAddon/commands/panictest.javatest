@@ -1,0 +1,43 @@
+package AutoplayAddon.commands;
+
+import AutoplayAddon.AutoPlay.Controller.SmartMine;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.ItemStackArgumentType;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.math.Vec3d;
+
+import java.util.Collections;
+import java.util.List;
+
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static meteordevelopment.meteorclient.MeteorClient.mc;
+
+public class panictest {
+    final double MAX_DELTA = 10;
+    public panictest() {
+        super("panictest","Sends a packet to the server with new position. Allows to teleport small distances.");
+    }
+    @Override
+    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+        builder.executes(context -> {
+            for (int i = 0; i < 1000/MAX_DELTA; i++) {
+                Vec3d pos = mc.player.getPos().add(0, MAX_DELTA, 0);  // Max 10 blocks per packet
+
+                if (client.player.getVehicle() != null) {  // If in boat
+                    moveVehicleTo(client.player.getVehicle(), pos);
+                } else {
+                    client.player.setPosition(pos);
+                    packetQueue.add(new PlayerMoveC2SPacket.PositionAndOnGround(pos.x, pos.y, pos.z, true));
+                }
+            }
+
+            return SINGLE_SUCCESS;
+        });
+        return;
+    }
+}

@@ -1,39 +1,43 @@
 package AutoplayAddon.AutoPlay.Movement;
-import meteordevelopment.meteorclient.mixininterface.IPlayerMoveC2SPacket;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import AutoplayAddon.AutoplayAddon;
+import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
+import AutoplayAddon.Tracker.ServerSideValues;
+import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.systems.modules.Modules;
+import meteordevelopment.meteorclient.systems.modules.movement.Flight;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
-
-import javax.annotation.Nullable;
-
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 import java.text.DecimalFormat;
 
 
 public class MoveToUtil extends Movement {
     private static void sendpacket(PlayerMoveC2SPacket packet) {
-        ((IPlayerMoveC2SPacket) packet).setTag(13377);
-        mc.player.networkHandler.sendPacket(packet);
+        ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
+        ServerSideValues.HandleMovepacket(packet);
     }
     static DecimalFormat e = new DecimalFormat("#.##");;
     public static void moveTo(Vec3d newPos) {
+        Module flight = Modules.get().get(Flight.class);
+        if (flight.isActive()) {
+            flight.toggle();
+        }
+
         double base = findFarthestDistance(newPos);
         int packetsRequired = (int) Math.floor(Math.abs(base / 10.0));
         sendpackets(packetsRequired);
         moveplayer(newPos);
     }
 
+
     public static void sendpackets(int packetsRequired) {
-        //ChatUtils.info(" Started moving, sending " + packetsRequired + " packets");
         if (mc.player.hasVehicle()) {
             for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
                 mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
             }
         } else {
             for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
-                if (AutoplayAddon.values.allowedPlayerTicks > 20) {
+                if (ServerSideValues.allowedPlayerTicks > 20) {
                     sendpacket(new PlayerMoveC2SPacket.Full(currentPosition.x, currentPosition.y, currentPosition.z, mc.player.getYaw(), mc.player.getPitch(), true));
                 } else {
                     sendpacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
@@ -41,22 +45,18 @@ public class MoveToUtil extends Movement {
             }
         }
     }
+
     public static void moveplayer(Vec3d newPos) {
-        try {
-            //ChatUtils.info("Finished moving to " + e.format(newPos.x) + ", " + e.format(newPos.y) + ", " + e.format(newPos.z));
-            if (mc.player.hasVehicle()) {
-                mc.player.getVehicle().setPosition(newPos.x, newPos.y, newPos.z);
-                mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
+        if (mc.player.hasVehicle()) {
+            mc.player.getVehicle().setPosition(newPos.x, newPos.y, newPos.z);
+            mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
+        } else {
+            if (ServerSideValues.allowedPlayerTicks > 20) {
+                sendpacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, mc.player.getYaw(), mc.player.getPitch(), true));
             } else {
-                if (AutoplayAddon.values.allowedPlayerTicks > 20) {
-                    sendpacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, mc.player.getYaw(), mc.player.getPitch(), true));
-                } else {
-                    sendpacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
-                }
+                sendpacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
             }
-            currentPosition = newPos;
-        } catch (Exception e) {
-            ChatUtils.error("Error moving player: " + e);
         }
+        currentPosition = newPos;
     }
 }

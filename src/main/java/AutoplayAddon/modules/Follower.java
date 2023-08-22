@@ -77,6 +77,9 @@ public class Follower extends Module {
         AIDS.disable();
     }
 
+
+
+
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         if (mc.player == null) return;

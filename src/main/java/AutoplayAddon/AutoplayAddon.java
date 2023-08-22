@@ -1,14 +1,21 @@
 package AutoplayAddon;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.Tracker.BlockCache;
 import AutoplayAddon.Tracker.ServerSideValues;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.commands.Commands;
+import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import AutoplayAddon.commands.*;
@@ -26,23 +33,25 @@ public class AutoplayAddon extends MeteorAddon {
 
     @Override
     public void onInitialize() {
-        values.init();
+        MeteorClient.EVENT_BUS.subscribe(ServerSideValues.class);
         LOG.info("Initializing AutoplayAddon");
 
 
-        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
-            blockCache.addChunk(chunk);
-        });
+//        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
+//            blockCache.addChunk(chunk);
+//        });
 
-        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
-            blockCache.removeChunk(chunk);
-        });
+
+//
+//        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
+//            blockCache.removeChunk(chunk);
+//        });
 
 
         //Modules.get().add(new Disabler());
         Modules.get().add(new Speedrun());
         //Modules.get().add(new TeleportInfo());
-        //Modules.get().add(new BlockDebug());
+        Modules.get().add(new BlockDebug());
         Modules.get().add(new ClickTp());
         Modules.get().add(new InfiniteAura());
         Modules.get().add(new Follower());
@@ -50,9 +59,10 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new AutoSteal());
         Modules.get().add(new FreecamFly());
         //Modules.get().add(new StacisBotTest());
-        //Modules.get().add(new LOTEST());
+        Modules.get().add(new LOTEST());
+        Modules.get().add(new UpFly());
         //Modules.get().add(new SimpleClickTp());
-        //Modules.get().add(new LongDistanceTest());
+        Modules.get().add(new LongDistanceTest());
         //Modules.get().add(new BetterFly());
 
         Commands.add(new AIDSon());
