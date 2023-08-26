@@ -1,5 +1,4 @@
 package AutoplayAddon.modules;
-import AutoplayAddon.AutoPlay.Movement.MoveToUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;

@@ -1,10 +1,7 @@
 package AutoplayAddon.modules;
 
 import AutoplayAddon.AutoPlay.Actions.ItemCollection;
-import AutoplayAddon.AutoPlay.Movement.AIDS;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoplayAddon;
-import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.ItemListSetting;
 import meteordevelopment.meteorclient.settings.Setting;

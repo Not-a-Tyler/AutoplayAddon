@@ -40,7 +40,6 @@ public class ItemCollect extends Command {
             }).start();
             AIDS.disable();
         })));
-        return;
     }
 
     private int printItemName(PlayerConsumer consumer) throws CommandSyntaxException {

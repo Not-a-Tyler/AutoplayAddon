@@ -1,20 +1,17 @@
 package AutoplayAddon.modules;
 
 import AutoplayAddon.AutoPlay.Movement.AIDS;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Other.PlayerCopyEntity;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
-import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixininterface.IPlayerMoveC2SPacket;
 import meteordevelopment.meteorclient.settings.DoubleSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -107,8 +104,7 @@ public class BetterFly extends Module {
         if (event.packet instanceof ClientCommandC2SPacket) {
             event.cancel();
         }
-        if (event.packet instanceof PlayerMoveC2SPacket) {
-            PlayerMoveC2SPacket packet = (PlayerMoveC2SPacket) event.packet;
+        if (event.packet instanceof PlayerMoveC2SPacket packet) {
             if (((IPlayerMoveC2SPacket) event.packet).getTag() != 13377) {
                 event.setCancelled(true);
                 event.cancel();

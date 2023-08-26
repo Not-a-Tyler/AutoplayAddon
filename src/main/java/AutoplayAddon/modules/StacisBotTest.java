@@ -1,5 +1,4 @@
 package AutoplayAddon.modules;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoplayAddon;
 import AutoplayAddon.BotTest.Commands.FollowCommand;
 import AutoplayAddon.BotTest.Commands.SneakCommand;
@@ -68,9 +67,8 @@ public class StacisBotTest extends Module {
 
     @EventHandler(priority = EventPriority.HIGHEST + 1)
     private void onSendPacket(PacketEvent.Send event) {
-        if (event.packet instanceof ClientCommandC2SPacket) {
+        if (event.packet instanceof ClientCommandC2SPacket packet) {
             ClientCommandC2SPacketMixin accessor = (ClientCommandC2SPacketMixin) event.packet;
-            ClientCommandC2SPacket packet = (ClientCommandC2SPacket) event.packet;
             if(packet.getMode() == ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY && accessor.getMountJumpHeight() != 2367) {
                 event.cancel();
             }
@@ -87,28 +85,27 @@ public class StacisBotTest extends Module {
             String[] parts = command.split(" ", 2);
 
             switch (parts[0].toLowerCase()) {
-                case "!follow":
+                case "!follow" -> {
                     MeteorClient.EVENT_BUS.subscribe(followCommand);
                     followCommand.processFollowCommand(playerName, parts.length > 1 ? parts[1] : null);
-                    break;
-                case "!stop":
+                }
+                case "!stop" -> {
                     //GotoUtil.stopAllInstances();
-                    twerkCommand.twerk = false;
-                    if(sneak) {
+                    TwerkCommand.twerk = false;
+                    if (sneak) {
                         mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY, 2367));
                         sneak = false;
                     }
-                    break;
-                case "!sneak":
+                }
+                case "!sneak" -> {
                     MeteorClient.EVENT_BUS.subscribe(sneakCommand);
                     sneakCommand.processSneakCommand(playerName, parts.length > 1 ? parts[1] : null);
-                    break;
-                case "!twerk":
+                }
+                case "!twerk" -> {
                     MeteorClient.EVENT_BUS.subscribe(twerkCommand);
                     twerkCommand.processSneakCommand(playerName, parts.length > 1 ? parts[1] : null);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid command: " + parts[0]);
+                }
+                default -> throw new IllegalArgumentException("Invalid command: " + parts[0]);
             }
         }
     }

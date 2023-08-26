@@ -4,6 +4,7 @@ import AutoplayAddon.Tracker.ServerSideValues;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.movement.Flight;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
@@ -16,8 +17,10 @@ public class MoveToUtil extends Movement {
         ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
         ServerSideValues.HandleMovepacket(packet);
     }
-    static DecimalFormat e = new DecimalFormat("#.##");;
+    static DecimalFormat e = new DecimalFormat("#.##");
+
     public static void moveTo(Vec3d newPos) {
+        //ChatUtils.info("starting move to");
         Module flight = Modules.get().get(Flight.class);
         if (flight.isActive()) {
             flight.toggle();
@@ -27,6 +30,7 @@ public class MoveToUtil extends Movement {
         int packetsRequired = (int) Math.floor(Math.abs(base / 10.0));
         sendpackets(packetsRequired);
         moveplayer(newPos);
+        //ChatUtils.info("ending move to");
     }
 
 

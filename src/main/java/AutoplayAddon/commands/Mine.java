@@ -38,7 +38,6 @@ public class Mine extends Command {
 
             }).start();
         })));
-        return;
     }
 
     private int printItemName(PlayerConsumer consumer) throws CommandSyntaxException {

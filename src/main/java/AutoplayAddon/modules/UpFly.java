@@ -1,43 +1,14 @@
 package AutoplayAddon.modules;
 
-import AutoplayAddon.AutoPlay.Controller.SmartMine;
-import AutoplayAddon.AutoPlay.Inventory.Lists;
-import AutoplayAddon.AutoPlay.Movement.CanTeleport;
-import AutoplayAddon.AutoplayAddon;
-import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
-import meteordevelopment.meteorclient.events.packets.PacketEvent;
+
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.mixininterface.IPlayerMoveC2SPacket;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import meteordevelopment.orbit.EventHandler;
-import AutoplayAddon.AutoplayAddon;
-
-
-
-import AutoplayAddon.AutoPlay.Movement.AIDS;
-import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.settings.EnumSetting;
-import meteordevelopment.meteorclient.settings.IntSetting;
-import meteordevelopment.meteorclient.settings.Setting;
-import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoplayAddon;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 
 public class UpFly extends Module {
@@ -46,12 +17,26 @@ public class UpFly extends Module {
     }
     Vec3d currentPos;
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    public Setting<Integer> blocks = sgGeneral.add(new IntSetting.Builder()
+
+    private final Setting<Direction> mode = sgGeneral.add(new EnumSetting.Builder<Direction>()
+        .name("direction")
+        .description("The follow mode.")
+        .defaultValue(Direction.Up)
+        .build()
+    );
+
+    public enum Direction {
+        Up,
+        Down
+    }
+
+//    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+    public Setting<Double> blocks = sgGeneral.add(new DoubleSetting.Builder()
             .name("Amount of logs to mine")
             .description("test")
-            .defaultValue(3)
-            .min(0)
-            .sliderMax(100)
+            .defaultValue(199)
+            .min(-200)
+            .sliderMax(200)
             .build()
     );
 
@@ -68,7 +53,7 @@ public class UpFly extends Module {
         mc.player.setNoGravity(true);
       //  if (currentPos == null) currentPos = mc.player.getPos();
         int packetsRequired = (int) Math.ceil(Math.abs(blocks.get() / 10));
-
+        //if (mode.get() == Direction.Up)
         if (mc.player.hasVehicle()) {
             for (int packetNumber = 0; packetNumber < (packetsRequired - 1); packetNumber++) {
                 mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));

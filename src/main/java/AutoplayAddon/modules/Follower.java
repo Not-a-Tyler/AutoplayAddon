@@ -3,18 +3,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import AutoplayAddon.AutoPlay.Movement.AIDS;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.settings.IntSetting;
-import meteordevelopment.meteorclient.settings.Setting;
-import meteordevelopment.meteorclient.settings.SettingGroup;
-import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
-import meteordevelopment.starscript.compiler.Expr;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Box;
@@ -88,8 +81,7 @@ public class Follower extends Module {
         if (targetName.isEmpty()) return;
         try {
             for (Entity entity : mc.world.getEntities()) {
-                if (entity instanceof PlayerEntity) {
-                    PlayerEntity targetPlayer = (PlayerEntity) entity;
+                if (entity instanceof PlayerEntity targetPlayer) {
                     if (targetName.equals(targetPlayer.getGameProfile().getName())) {
                         handlePlayerMovement(targetPlayer);
                         break;

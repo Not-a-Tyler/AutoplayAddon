@@ -1,7 +1,6 @@
 package AutoplayAddon.AutoPlay.Controller;
 import AutoplayAddon.AutoPlay.Actions.MineUtil;
 import AutoplayAddon.AutoPlay.Movement.AIDS;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import AutoplayAddon.AutoPlay.Locator.CanPickUpTest;
 import net.minecraft.item.Item;

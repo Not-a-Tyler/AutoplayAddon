@@ -2,12 +2,9 @@ package AutoplayAddon.modules;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import meteordevelopment.orbit.EventHandler;
-
-import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Disabler extends Module {
     public Disabler() {

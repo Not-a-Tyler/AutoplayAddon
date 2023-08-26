@@ -1,6 +1,5 @@
 package AutoplayAddon.commands;
 
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.Command;
 import net.minecraft.command.CommandSource;
@@ -19,6 +18,5 @@ public class Stop extends Command {
             //GotoUtil.stopAllInstances();
             return SINGLE_SUCCESS;
         });
-        return;
     }
 }

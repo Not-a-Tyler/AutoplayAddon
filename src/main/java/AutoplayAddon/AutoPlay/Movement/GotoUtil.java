@@ -23,22 +23,26 @@ public class GotoUtil extends Movement {
 
     private static boolean stage() {
         while (mc.player != null) {
+          //  ChatUtils.info("stage starting" + System.currentTimeMillis());
+          //  ChatUtils.info("stage started");
             if (stage == 4) {
-               // ChatUtils.info("Finished via stage 4");
+              //  ChatUtils.info("Finished via stage 4");
                 return true;
             }
-            if (CanTeleport.check(currentPosition, to) && predictifPossible(to)) {
+            if (CanTeleport.oldCheck(currentPosition, to) && predictifPossible(to)) {
                 MoveToUtil.moveTo(to);
-               // ChatUtils.info("Directly teleported");
+             //   ChatUtils.info("Directly teleported");
                 return true;
             }
             Vec3d newPos = getStage(currentPosition, to, stage);
             if (!predictifPossible(newPos)) {
-                ChatUtils.info("Not enough charge, waiting 1 tick");
+              //  ChatUtils.info("stage ended: Not enough charge, waiting 1 tick");
                 return false;
             }
             MoveToUtil.moveTo(newPos);
+       //     ChatUtils.info("increasing stage");
             stage++;
+      //      ChatUtils.info("stage increasing" + System.currentTimeMillis());
         }
         MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
         return true;
@@ -72,13 +76,18 @@ public class GotoUtil extends Movement {
             stage = 1;
         }
         tickEventFuture = new CompletableFuture<>();
+       // ChatUtils.sendPlayerMsg("going to " + to);
+       // ChatUtils.info("going to " + to + " current time " + System.currentTimeMillis());
         if (!stage()) {
+          //  ChatUtils.info("subscribing");
             MeteorClient.EVENT_BUS.subscribe(GotoUtil.class);
             try {
                 tickEventFuture.get();
             } catch (InterruptedException | ExecutionException e) {
-                //
+                ChatUtils.info("goto utils interupped " + e);
             }
         }
+       // ChatUtils.info("goto util complete" + " current time " + System.currentTimeMillis());
+       // ChatUtils.sendPlayerMsg("goto util complete");
     }
 }

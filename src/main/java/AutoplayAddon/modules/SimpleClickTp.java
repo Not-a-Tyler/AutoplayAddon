@@ -1,12 +1,14 @@
 package AutoplayAddon.modules;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.CanTeleport;
 import AutoplayAddon.AutoPlay.Movement.MoveToUtil;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.render.Camera;
@@ -64,35 +66,15 @@ public class SimpleClickTp extends Module {
             Vec3d raycastEnd = cameraPos.add(rotationVec.multiply(300.0));
             BlockPos blockpos = mc.world.raycast(new RaycastContext(cameraPos, raycastEnd, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos().up();
             Vec3d pos = new Vec3d((blockpos.getX() + .5), blockpos.getY(), (blockpos.getZ() + .5));
-            MoveToUtil.moveTo(pos);
+            ChatUtils.info(String.valueOf(System.currentTimeMillis()));
+            ChatUtils.info(" lazyCheck: " + CanTeleport.lazyCheck(mc.player.getPos(), pos) + " slowCheck: " + CanTeleport.oldCheck(mc.player.getPos(), pos));
+            ChatUtils.info(String.valueOf(System.currentTimeMillis()));
         })
         .build()
     );
 
-
     public SimpleClickTp() {
         super(AutoplayAddon.autoplay, "simple-click-tp", "its clicktp");
-    }
-    @EventHandler
-    private void onRender(Render3DEvent event) {
-        Camera camera = mc.gameRenderer.getCamera();
-        Vec3d cameraPos = camera.getPos();
-        float pitch = camera.getPitch();
-        float yaw = camera.getYaw();
-        Vec3d rotationVec = Vec3d.fromPolar(pitch, yaw);
-        Vec3d raycastEnd = cameraPos.add(rotationVec.multiply(300.0));
-        BlockHitResult pos1 = mc.world.raycast(new RaycastContext(cameraPos, raycastEnd, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
-        BlockPos location = pos1.getBlockPos();
-        double x1 = location.getX();
-        double y1 = location.getY() + 1;
-        double z1 = location.getZ();
-        double x2 = x1 + 1;
-        double y2 = y1 + 1;
-        double z2 = z1 + 1;
-
-        if (render.get()) {
-            event.renderer.box(x1, y1, z1, x2, y2, z2, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
-        }
     }
 
 

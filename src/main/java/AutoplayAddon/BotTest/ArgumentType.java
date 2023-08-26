@@ -17,18 +17,11 @@ public class ArgumentType<T> {
 
         @Override
         public Boolean parse(String input) {
-            switch (input.toLowerCase()) {
-                case "on":
-                case "enabled":
-                case "true":
-                    return true;
-                case "off":
-                case "disabled":
-                case "false":
-                    return false;
-                default:
-                    throw new IllegalArgumentException("Invalid boolean value: " + input);
-            }
+            return switch (input.toLowerCase()) {
+                case "on", "enabled", "true" -> true;
+                case "off", "disabled", "false" -> false;
+                default -> throw new IllegalArgumentException("Invalid boolean value: " + input);
+            };
         }
     }
 

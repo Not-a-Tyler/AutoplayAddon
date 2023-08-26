@@ -9,26 +9,9 @@ import net.minecraft.item.Item;
 import java.util.ArrayList;
 import java.util.List;
 
-import AutoplayAddon.AutoPlay.Inventory.Lists;
-
 
 public class LogToPlankTest {
-    public static class ItemSlotPair {
-        private Item item;
-        private FindItemResult slot;
-
-        public ItemSlotPair(Item item, FindItemResult slot) {
-            this.item = item;
-            this.slot = slot;
-        }
-
-        public Item getItem() {
-            return item;
-        }
-
-        public FindItemResult getSlot() {
-            return slot;
-        }
+    public record ItemSlotPair(Item item, FindItemResult slot) {
     }
     public static void Log2Plank() {
         List<ItemSlotPair> itemSlotPairs = new ArrayList<>();
@@ -41,9 +24,9 @@ public class LogToPlankTest {
         }
 
         for (ItemSlotPair itemSlotPair : itemSlotPairs) {
-            Item currentItem = itemSlotPair.getItem();
+            Item currentItem = itemSlotPair.item();
             Item plank = Lists.logToPlanks(currentItem);
-            FindItemResult slot = itemSlotPair.getSlot();
+            FindItemResult slot = itemSlotPair.slot();
             CraftUtil.craftItem(plank, slot.count());
             ChatUtils.info("Item: "  + plank.getName().getString() + ", Slot: " + slot.slot());
         }

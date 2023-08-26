@@ -1,7 +1,6 @@
 package AutoplayAddon.modules;
 
 import AutoplayAddon.AutoplayAddon;
-import AutoplayAddon.Mixins.PlayerMoveC2SPacketMixin;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -13,14 +12,11 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 
 public class LOTEST extends Module {
     private long lastUpdateTick = 0;
@@ -59,8 +55,7 @@ public class LOTEST extends Module {
 
     @EventHandler(priority = EventPriority.LOWEST - 1)
     private void onReceiveVelocityPacket(PacketEvent.Receive event) {
-        if (!(event.packet instanceof EntityVelocityUpdateS2CPacket)) return;
-        EntityVelocityUpdateS2CPacket packet = (EntityVelocityUpdateS2CPacket) event.packet;
+        if (!(event.packet instanceof EntityVelocityUpdateS2CPacket packet)) return;
 
         if (trackPos == null || packet.getId() != getTargetId()) return;
 
@@ -74,8 +69,7 @@ public class LOTEST extends Module {
 
     @EventHandler(priority = EventPriority.LOWEST - 1)
     private void onReceivePacket(PacketEvent.Receive event) {
-        if (!(event.packet instanceof EntityPositionS2CPacket)) return;
-        EntityPositionS2CPacket packet = (EntityPositionS2CPacket) event.packet;
+        if (!(event.packet instanceof EntityPositionS2CPacket packet)) return;
 
         if (packet.getId() == getTargetId()) {
             trackPos = new Vec3d(packet.getX(), packet.getY(), packet.getZ());

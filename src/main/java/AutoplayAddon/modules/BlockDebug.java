@@ -48,7 +48,7 @@ public class BlockDebug extends Module {
 
             EntitySpawnS2CPacket packet = ((EntitySpawnS2CPacket) event.packet);
             Vec3d pos = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
-            ChatUtils.info("found via packet EntitySpawnS2CPacket id: " + packet.getId() + " type " + packet.getEntityType().getName() + " position " + pos.toString());
+            ChatUtils.info("found via packet EntitySpawnS2CPacket id: " + packet.getId() + " type " + packet.getEntityType().getName() + " position " + pos);
             PlayerInteractEntityC2SPacket packet1 = PlayerInteractEntityC2SPacket.attack(mc.player, false);
             try {
                 Field entityIdField = PlayerInteractEntityC2SPacket.class.getDeclaredField("entityId");

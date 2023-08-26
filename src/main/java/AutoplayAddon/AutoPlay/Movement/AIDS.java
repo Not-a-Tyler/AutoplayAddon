@@ -15,6 +15,8 @@ public class AIDS extends Movement {
     static CompletableFuture<Void>  tickEventFuture;
     static boolean AutoSetPosition;
     public static void init(Boolean automaticallySetPosition) {
+        //ChatUtils.info("AIDS enabled");
+       // ChatUtils.sendPlayerMsg("AIDS enabled");
         if (mc.player == null) return;
         MeteorClient.EVENT_BUS.unsubscribe(AIDS.class);
         MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
@@ -27,13 +29,16 @@ public class AIDS extends Movement {
         AutoSetPosition = automaticallySetPosition;
     }
     public static void disable() {
+        //ChatUtils.info("AIDS disabled");
         MeteorClient.EVENT_BUS.unsubscribe(AIDS.class);
         MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
         if (currentAIDSmoveToThread != null && currentAIDSmoveToThread.isAlive()) {
             currentAIDSmoveToThread.interrupt();
         }
-        if (mc.player != null) mc.player.setNoGravity(false);
         AIDSboolean = false;
+        if (mc.player == null) return;
+        mc.player.setNoGravity(false);
+       // ChatUtils.sendPlayerMsg("AIDS disabled");
     }
 
     public static void setPos(Vec3d pos) {
@@ -56,7 +61,7 @@ public class AIDS extends Movement {
         }
         Boolean setPos = false;
         if (!setPos && !closeBy(currentPosition, to) && (currentAIDSmoveToThread == null || !currentAIDSmoveToThread.isAlive())) {
-            ChatUtils.info("teleported because not at desaired position");
+            ChatUtils.info("teleported because not at desired position");
             AIDSmoveTo();
         }
 

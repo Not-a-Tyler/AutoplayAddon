@@ -9,7 +9,6 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.math.Vec3d;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoplayAddon;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -70,7 +69,7 @@ public class MultiSpinbot extends Module {
     }
 
     private MappedByteBuffer map;
-    private Map<Integer, Double> clientAngles = new HashMap<>();
+    private final Map<Integer, Double> clientAngles = new HashMap<>();
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {

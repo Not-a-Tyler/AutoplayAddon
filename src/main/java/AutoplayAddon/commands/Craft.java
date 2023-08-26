@@ -31,7 +31,6 @@ public class Craft extends Command {
                 CraftUtil.craftItem(stack.getItem(), 1);
             }).start();
         })));
-        return;
     }
 
     private int printItemName(PlayerConsumer consumer) throws CommandSyntaxException {

@@ -1,8 +1,12 @@
 package AutoplayAddon.Tracker;
-
+import AutoplayAddon.AutoplayAddon;
+import meteordevelopment.meteorclient.events.game.GameLeftEvent;
+import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.chunk.Chunk;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -11,12 +15,18 @@ import java.util.concurrent.Executors;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class BlockCache {
+
     public BlockPos lastBlockPos = null; // Added field to store the last block position
-    public Set<BlockPos> solidBlocks = new HashSet<>();
     public final Map<Block, List<BlockData>> blockMap = new HashMap<>();
     public ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public BlockCache() {
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST + 1)
+    private void onSendMovePacket(GameLeftEvent event) {
+        AutoplayAddon.LOG.info("removing all");
+        blockMap.clear();
     }
 
     public void addChunk(Chunk chunk) {
@@ -28,9 +38,6 @@ public class BlockCache {
                         BlockState blockState = chunk.getBlockState(pos);
                         Block block = blockState.getBlock();
                         if (blockState.isSolid()) {
-                            synchronized (solidBlocks) {
-                                solidBlocks.add(pos);
-                            }
                             synchronized (blockMap) {
                                 blockMap.computeIfAbsent(block, k -> new ArrayList<>()).add(new BlockData(pos, block));
                             }
@@ -44,14 +51,6 @@ public class BlockCache {
 
     public void removeChunk(Chunk chunk) {
         executorService.submit(() -> {
-            synchronized (solidBlocks) {
-                solidBlocks.removeIf(pos ->
-                    pos.getX() >= chunk.getPos().getStartX() &&
-                        pos.getX() < chunk.getPos().getStartX() + 16 &&
-                        pos.getZ() >= chunk.getPos().getStartZ() &&
-                        pos.getZ() < chunk.getPos().getStartZ() + 16
-                );
-            }
             synchronized (blockMap) {
                 for (Block block : blockMap.keySet()) {
                     blockMap.get(block).removeIf(data ->
@@ -64,6 +63,7 @@ public class BlockCache {
             }
         });
     }
+
 
     public BlockPos getNearestBlock(Block targetBlock) {
         synchronized (blockMap) {
@@ -90,4 +90,7 @@ public class BlockCache {
             return pos;
         }
     }
+
+
+
 }

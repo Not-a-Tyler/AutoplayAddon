@@ -4,10 +4,6 @@ import AutoplayAddon.AutoPlay.Movement.Movement;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.Command;
 import net.minecraft.command.CommandSource;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
-import net.minecraft.client.render.Camera;
-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import net.minecraft.util.math.Vec3d;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -25,6 +21,5 @@ public class TP2cam extends Command {
             Movement.moveTo(playerPos);
             return SINGLE_SUCCESS;
         });
-        return;
     }
 }

@@ -17,7 +17,6 @@ public class enablegravity extends Command {
         if (mc.player != null) {
             mc.player.setNoGravity(false);
         }
-        return;
     }
 }
 

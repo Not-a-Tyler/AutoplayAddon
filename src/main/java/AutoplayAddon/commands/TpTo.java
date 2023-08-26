@@ -2,13 +2,10 @@ package AutoplayAddon.commands;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.arguments.PlayerArgumentType;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.PlayerEntity;
 import meteordevelopment.meteorclient.commands.Command;
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
-import net.minecraft.util.math.Vec3d;
 
 
 public class TpTo extends Command {

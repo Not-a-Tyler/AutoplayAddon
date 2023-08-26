@@ -1,6 +1,5 @@
 package AutoplayAddon.commands;
 
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoPlay.Other.ClientPosArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -24,6 +23,5 @@ public class Teleport extends Command {
             Movement.moveTo(new Vec3d(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5));
             return SINGLE_SUCCESS;
         }));
-        return;
     }
 }

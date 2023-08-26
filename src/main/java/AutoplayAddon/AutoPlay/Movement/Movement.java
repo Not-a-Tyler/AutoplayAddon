@@ -1,10 +1,7 @@
 package AutoplayAddon.AutoPlay.Movement;
-import AutoplayAddon.AutoplayAddon;
-import AutoplayAddon.Mixins.PlayerMoveC2SPacketMixin;
 import AutoplayAddon.Tracker.ServerSideValues;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
-import meteordevelopment.meteorclient.mixininterface.IPlayerMoveC2SPacket;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
@@ -24,6 +21,7 @@ public class Movement {
         if (event.packet instanceof PlayerPositionLookS2CPacket packet) {
             currentPosition = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
             ChatUtils.info("Received packet and set current position to " + currentPosition);
+            AIDS.disable();
         }
     }
 
@@ -46,11 +44,7 @@ public class Movement {
         } else {
             predict = (packetsRequired + 2);
         }
-        if (delta < predict) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(delta < predict);
     }
 
     public static double findFarthestDistance(Vec3d newPos) {

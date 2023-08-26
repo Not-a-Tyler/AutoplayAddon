@@ -1,6 +1,5 @@
 package AutoplayAddon.BotTest.Commands;
 
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.BotTest.ArgumentType;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -17,15 +16,15 @@ public class FollowCommand {
     private boolean followMode = false;
     private String targetName = "";
     private Vec3d lastPlayerPos = null;
-    private static ArgumentType.BooleanType booleanArgumentType = new ArgumentType.BooleanType();
-    private ArgumentType.PlayerNameType playerNameType = new ArgumentType.PlayerNameType();
+    private static final ArgumentType.BooleanType booleanArgumentType = new ArgumentType.BooleanType();
+    private final ArgumentType.PlayerNameType playerNameType = new ArgumentType.PlayerNameType();
 
     public void processFollowCommand(String playerName, String argument) {
         if (argument == null || booleanArgumentType.parse(argument)) {
             followMode = true;
             targetName = playerName;
             ChatUtils.sendPlayerMsg("Following player " + targetName + ".");
-        } else if ( booleanArgumentType.parse(argument) == false) {
+        } else if (!booleanArgumentType.parse(argument)) {
             followMode = false;
             targetName = "";
             ChatUtils.sendPlayerMsg("Follow mode disabled.");
@@ -41,8 +40,7 @@ public class FollowCommand {
             return;
         }
         for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof PlayerEntity) {
-                PlayerEntity targetPlayer = (PlayerEntity) entity;
+            if (entity instanceof PlayerEntity targetPlayer) {
                 if (targetName.equals(targetPlayer.getGameProfile().getName())) {
                     Vec3d targetPos = roundToDecimal(targetPlayer.getPos(), 3);
                     if (lastPlayerPos != null) {

@@ -1,7 +1,6 @@
 package AutoplayAddon.AutoPlay.Controller;
 import AutoplayAddon.AutoPlay.Locator.GetLocUtil;
 import AutoplayAddon.AutoPlay.Movement.AIDS;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;

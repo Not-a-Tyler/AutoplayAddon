@@ -53,11 +53,11 @@ public class PlayerCopyEntity extends OtherClientPlayerEntity {
 
     @Override
     public boolean isInvisible() {
-        return ghost ? true : super.isInvisible();
+        return ghost || super.isInvisible();
     }
 
     @Override
     public boolean isInvisibleTo(PlayerEntity player) {
-        return ghost ? false : super.isInvisibleTo(player);
+        return !ghost && super.isInvisibleTo(player);
     }
 }

@@ -8,10 +8,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
@@ -72,7 +70,8 @@ public class CanPickUpTest {
     }
 
     public static boolean isAirOrNonSolid(BlockPos pos) {
-        return !AutoplayAddon.blockCache.solidBlocks.contains(pos);
+      //  return !AutoplayAddon.blockCache..contains(pos);
+        return true;
     }
 
 

@@ -1,5 +1,4 @@
 package AutoplayAddon.Tracker;
-import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -9,8 +8,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class ServerSideValues {
@@ -91,11 +90,11 @@ public class ServerSideValues {
 //            Boolean verticalCollisionBelow = verticalCollision && currDeltaY < 0.0D;
 
 
-        if (d10 > 0) {
-            ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED D10: " + d10);
-        } else {
-            ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
-        }
+//        if (d10 > 0) {
+//            ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta() + " MOVED D10: " + d10);
+//        } else {
+//            ChatUtils.info("allowed: " + allowedPlayerTicks + " i: " + i + " delta: " + delta());
+//        }
         if (hasPos) {
             prevx = packet.getX(0);
             prevy = packet.getY(0);
@@ -106,26 +105,20 @@ public class ServerSideValues {
 
     @EventHandler(priority = EventPriority.LOWEST - 2)
     private static void onSendPacket(PacketEvent.Send event) {
-        if (event.packet instanceof PlayerMoveC2SPacket) {
-            PlayerMoveC2SPacket packet = (PlayerMoveC2SPacket) event.packet;
+        if (event.packet instanceof PlayerMoveC2SPacket packet) {
             HandleMovepacket(packet);
         }
-    }
-
-    public static int floor(double value) {
-        int i = (int)value;
-        return value < (double)i ? i - 1 : i;
     }
 
     private static boolean noBlocksAround() {
         // Paper start - stop using streams, this is already a known fixed problem in Entity#move
         Box box = mc.player.getBoundingBox().expand(0.0625D).stretch(0.0D, -0.55D, 0.0D);
-        int minX = floor(box.minX);
-        int minY = floor(box.minY);
-        int minZ = floor(box.minZ);
-        int maxX = floor(box.maxX);
-        int maxY = floor(box.maxY);
-        int maxZ = floor(box.maxZ);
+        int minX = MathHelper.floor(box.minX);
+        int minY = MathHelper.floor(box.minY);
+        int minZ = MathHelper.floor(box.minZ);
+        int maxX = MathHelper.floor(box.maxX);
+        int maxY = MathHelper.floor(box.maxY);
+        int maxZ = MathHelper.floor(box.maxZ);
         //String sep = ", ";
         //ChatUtils.info(minX + sep +  minY + sep + minZ + sep + maxX + sep + maxY + sep + maxZ);
         BlockPos.Mutable pos = new BlockPos.Mutable();
