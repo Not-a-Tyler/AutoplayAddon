@@ -37,7 +37,7 @@ public class AutoplayAddon extends MeteorAddon {
         });
 
 
-        //Modules.get().add(new Disabler());
+        Modules.get().add(new Disabler());
         Modules.get().add(new Speedrun());
         //Modules.get().add(new TeleportInfo());
         Modules.get().add(new BlockDebug());

@@ -17,6 +17,8 @@ public class MoveToUtil extends Movement {
         ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
         ServerSideValues.HandleMovepacket(packet);
     }
+
+    private static float toYaw, toPitch;
     static DecimalFormat e = new DecimalFormat("#.##");
 
     public static void moveTo(Vec3d newPos) {
@@ -26,6 +28,13 @@ public class MoveToUtil extends Movement {
             flight.toggle();
         }
 
+        if (rotationControl) {
+            toPitch = pitch;
+            toYaw = yaw;
+        } else {
+            toPitch = mc.player.getPitch();
+            toYaw = mc.player.getYaw();
+        }
         double base = findFarthestDistance(newPos);
         int packetsRequired = (int) Math.floor(Math.abs(base / 10.0));
         sendpackets(packetsRequired);
@@ -42,7 +51,7 @@ public class MoveToUtil extends Movement {
         } else {
             for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
                 if (ServerSideValues.allowedPlayerTicks > 20) {
-                    sendpacket(new PlayerMoveC2SPacket.Full(currentPosition.x, currentPosition.y, currentPosition.z, mc.player.getYaw(), mc.player.getPitch(), true));
+                    sendpacket(new PlayerMoveC2SPacket.Full(currentPosition.x, currentPosition.y, currentPosition.z, toYaw, toPitch, true));
                 } else {
                     sendpacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
                 }
@@ -56,7 +65,7 @@ public class MoveToUtil extends Movement {
             mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
         } else {
             if (ServerSideValues.allowedPlayerTicks > 20) {
-                sendpacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, mc.player.getYaw(), mc.player.getPitch(), true));
+                sendpacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, toYaw, toPitch, true));
             } else {
                 sendpacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
             }

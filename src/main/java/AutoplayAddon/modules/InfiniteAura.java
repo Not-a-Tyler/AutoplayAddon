@@ -1,5 +1,6 @@
 package AutoplayAddon.modules;
 import AutoplayAddon.AutoPlay.Movement.AIDS;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.settings.EntityTypeListSetting;
 import meteordevelopment.meteorclient.settings.KeybindSetting;
@@ -12,6 +13,7 @@ import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Set;
@@ -55,19 +57,24 @@ public class InfiniteAura  extends Module {
                 }
             }
             if (closestEntity == null) return;
-
-
-            PlayerEntity entity = (PlayerEntity) closestEntity;
-            ChatUtils.info(String.valueOf(entity.getName()));
             Entity finalClosestEntity = closestEntity;
             Thread waitForTickEventThread1 = new Thread(() -> {
                 ChatUtils.info("hittinh");
                 Vec3d startingPos = mc.player.getPos();
-                AIDS.init(false);
+                Boolean ignore = false;
+                if (!Movement.AIDSboolean) {
+                    ChatUtils.info("starting");
+                    AIDS.init(false);
+                } else {
+                    ignore = true;
+                }
                 AIDS.setPos(finalClosestEntity.getPos());
                 mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
                 AIDS.setPos(startingPos);
-                AIDS.disable();
+                if (!ignore) {
+                    ChatUtils.info("ending");
+                    AIDS.disable();
+                }
             });
             waitForTickEventThread1.start();
         })

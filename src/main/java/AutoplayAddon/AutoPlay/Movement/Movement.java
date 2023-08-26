@@ -12,8 +12,10 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Movement {
     public static Boolean AIDSboolean = false;
+    public static Boolean rotationControl = false;
     public static Thread currentMovementThread;
     public static Vec3d currentPosition, to;
+    public static float pitch, yaw;
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onServerPosUpdate(PacketEvent.Receive event) {
