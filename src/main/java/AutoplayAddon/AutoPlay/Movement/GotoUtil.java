@@ -10,7 +10,6 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class GotoUtil extends Movement {
     static CompletableFuture<Void>  tickEventFuture;
     static double y;
-    static boolean postTickFlag;
 
     static int stage;
 
@@ -51,23 +50,14 @@ public class GotoUtil extends Movement {
 
     @EventHandler()
     private static void onPreTick(TickEvent.Pre event) {
-        if (postTickFlag) {
-            postTickFlag = false;
-            if (stage()) {
-                MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
-                tickEventFuture.complete(null);
-            }
+        if (stage()) {
+            MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
+            tickEventFuture.complete(null);
         }
-    }
-
-    @EventHandler()
-    private static void onPostTick(TickEvent.Pre event) {
-        postTickFlag = true;
     }
 
 
     public static void shortGoTo() {
-        postTickFlag = true;
         y = CanTeleport.searchY(currentPosition, to);
         if (y == -1337) {
             y = currentPosition.y;

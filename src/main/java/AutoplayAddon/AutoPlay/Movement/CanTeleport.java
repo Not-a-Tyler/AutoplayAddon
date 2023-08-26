@@ -1,14 +1,10 @@
 package AutoplayAddon.AutoPlay.Movement;
-import AutoplayAddon.AutoplayAddon;
-import AutoplayAddon.Tracker.BlockCache;
 import com.google.common.collect.ImmutableList;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import AutoplayAddon.AutoPlay.Other.FastBox;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class CanTeleport {
@@ -105,88 +101,6 @@ public class CanTeleport {
         return new Vec3d(d, e, f);
     }
 
-    public static double calculateMaxOffset(FastBox fastBox, Direction.Axis axis, double maxDist) {
-        double step = 0.3;  // the step to offset by
-        double currentOffset = 0.0; // starting offset
-        double lastValidOffset = 0.0;  // keeps track of the last offset that didn't cause collision
-
-        Vec3d direction = Vec3d.ZERO;  // the direction vector, initialized to zero
-        switch(axis) {  // set the direction based on the axis
-            case X:
-                direction = new Vec3d(1, 0, 0);
-                break;
-            case Y:
-                direction = new Vec3d(0, 1, 0);
-                break;
-            case Z:
-                direction = new Vec3d(0, 0, 1);
-                break;
-        }
-
-        FastBox tempBox = new FastBox(fastBox); // Create a temporary FastBox object using the copy constructor
-
-        while (Math.abs(currentOffset) < Math.abs(maxDist)) {
-            // Calculate how much to offset in this iteration
-            double offsetThisStep = step;
-
-            // If we're about to overshoot maxDist, reduce the step size for this iteration
-            if (Math.abs(currentOffset + step) > Math.abs(maxDist)) {
-                offsetThisStep = Math.abs(maxDist) - Math.abs(currentOffset);
-            }
-
-            tempBox.offset(direction.multiply(offsetThisStep));  // offset the temporary box by the direction multiplied by step
-
-            if (tempBox.isPlayerCollidingWithBlocks()) {
-                // if there's a collision, return the last valid offset
-                return lastValidOffset;
-            } else {
-                // update the last valid offset
-                lastValidOffset = currentOffset;
-            }
-
-            currentOffset += offsetThisStep;  // update the current offset
-        }
-
-        // if we didn't return before this point, it means no collision was detected
-        return maxDist;
-    }
-
-    public static boolean oldCheck(Vec3d from, Vec3d to) {
-
-        if (to == null) {
-            return false;
-        }
-        Box oldBox = new Box(from.x - mc.player.getWidth() / 2, from.y, from.z - mc.player.getWidth() / 2, from.x + mc.player.getWidth() / 2, from.y + mc.player.getHeight(), from.z + mc.player.getWidth() / 2);
-        Box newBox = new Box(to.x - mc.player.getWidth() / 2, to.y, to.z - mc.player.getWidth() / 2, to.x + mc.player.getWidth() / 2, to.y + mc.player.getHeight(), to.z + mc.player.getWidth() / 2);
-        if (!mc.world.isSpaceEmpty(newBox)) {
-            return false;
-        }
-
-        double d6 = to.x - from.x;
-        double d7 = to.y - from.y;
-        double d8 = to.z - from.z;
-
-        Vec3d test = adjustMovementForCollisionsold(oldBox, new Vec3d(d6, d7, d8));
-
-        Vec3d wentto = new Vec3d(from.x + test.x, from.y + test.y, from.z + test.z);
-
-        d6 = to.x - wentto.x;
-        d7 = to.y - wentto.y;
-
-        if (d7 > -0.5D || d7 < 0.5D) {
-            d7 = 0.0D;
-        }
-
-        d8 = to.z - wentto.z;
-        double d10 = d6 * d6 + d7 * d7 + d8 * d8;
-
-        if (d10 > 0.0625) {
-            return false;
-        }
-
-        return true;
-    }
-
     public static Vec3d adjustMovementForCollisionsold(Box box, Vec3d movement) {
         // ChatUtils.info("check starting " + System.currentTimeMillis());
         if (movement.lengthSquared() == 0.0) return movement;
@@ -229,5 +143,81 @@ public class CanTeleport {
         }
         return new Vec3d(d, e, f);
     }
+
+
+    public static double calculateMaxOffset(FastBox fastBox, Direction.Axis axis, double maxDist) {
+        double step = 0.3;
+        double currentOffset = 0.0;
+        double lastValidOffset = 0.0;
+
+        Vec3d direction = Vec3d.ZERO;
+        switch(axis) {
+            case X:
+                direction = new Vec3d(1, 0, 0);
+                break;
+            case Y:
+                direction = new Vec3d(0, 1, 0);
+                break;
+            case Z:
+                direction = new Vec3d(0, 0, 1);
+                break;
+        }
+
+        FastBox tempBox = new FastBox(fastBox);
+        while (Math.abs(currentOffset) < Math.abs(maxDist)) {
+            double offsetThisStep = step;
+
+            // Check if we are about to overshoot the maxDist
+            if (Math.abs(currentOffset + offsetThisStep) > Math.abs(maxDist)) {
+                offsetThisStep = maxDist - currentOffset;
+            }
+
+            tempBox.offset(direction.multiply(offsetThisStep));
+
+            if (tempBox.isPlayerCollidingWithBlocks()) {
+                return lastValidOffset;
+            } else {
+                lastValidOffset = currentOffset;
+            }
+
+            currentOffset += offsetThisStep;
+        }
+        return maxDist;
+    }
+
+
+    public static boolean oldCheck(Vec3d from, Vec3d to) {
+
+        if (to == null) {
+            return false;
+        }
+        Box oldBox = new Box(from.x - mc.player.getWidth() / 2, from.y, from.z - mc.player.getWidth() / 2, from.x + mc.player.getWidth() / 2, from.y + mc.player.getHeight(), from.z + mc.player.getWidth() / 2);
+        Box newBox = new Box(to.x - mc.player.getWidth() / 2, to.y, to.z - mc.player.getWidth() / 2, to.x + mc.player.getWidth() / 2, to.y + mc.player.getHeight(), to.z + mc.player.getWidth() / 2);
+        if (!mc.world.isSpaceEmpty(newBox)) {
+            return false;
+        }
+
+        double d6 = to.x - from.x;
+        double d7 = to.y - from.y;
+        double d8 = to.z - from.z;
+        Vec3d test = adjustMovementForCollisionsold(oldBox, new Vec3d(d6, d7, d8));
+        Vec3d wentto = new Vec3d(from.x + test.x, from.y + test.y, from.z + test.z);
+        d6 = to.x - wentto.x;
+        d7 = to.y - wentto.y;
+
+        if (d7 > -0.5D || d7 < 0.5D) {
+            d7 = 0.0D;
+        }
+
+        d8 = to.z - wentto.z;
+        double d10 = d6 * d6 + d7 * d7 + d8 * d8;
+
+        if (d10 > 0.0625) {
+            return false;
+        }
+
+        return true;
+    }
+
 
 }

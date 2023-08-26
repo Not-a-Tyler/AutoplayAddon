@@ -12,7 +12,6 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Movement {
     public static Boolean AIDSboolean = false;
-    public static double offset = 0;
     public static Thread currentMovementThread;
     public static Vec3d currentPosition, to;
 

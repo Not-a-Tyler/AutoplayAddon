@@ -41,13 +41,11 @@ public class InfiniteAura  extends Module {
         .action(() -> {
             double closestAngle = Double.MAX_VALUE;
             Entity closestEntity = null;
-            Vec3d viewVec = mc.player.getRotationVec(1.0F);
+            Vec3d viewVec = mc.cameraEntity.getRotationVec(1.0F);
             for (Entity entity : mc.world.getEntities()) {
                 if (entities.get().contains(entity.getType()) && entity != mc.player) {
-                    PlayerEntity playerEntity = (PlayerEntity) entity;
-                    if (Friends.get().shouldAttack(playerEntity)) continue;
                     Entity otherEntity = entity;
-                    Vec3d toOther = otherEntity.getPos().subtract(mc.player.getPos()).normalize();
+                    Vec3d toOther = otherEntity.getPos().subtract(mc.cameraEntity.getPos()).normalize();
                     double angle = Math.acos(viewVec.dotProduct(toOther));
 
                     if (angle < closestAngle) {
@@ -57,14 +55,18 @@ public class InfiniteAura  extends Module {
                 }
             }
             if (closestEntity == null) return;
+
+
+            PlayerEntity entity = (PlayerEntity) closestEntity;
+            ChatUtils.info(String.valueOf(entity.getName()));
             Entity finalClosestEntity = closestEntity;
             Thread waitForTickEventThread1 = new Thread(() -> {
                 ChatUtils.info("hittinh");
                 Vec3d startingPos = mc.player.getPos();
                 AIDS.init(false);
-                AIDS.moveTo(finalClosestEntity.getPos());
+                AIDS.setPos(finalClosestEntity.getPos());
                 mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
-                AIDS.moveTo(startingPos);
+                AIDS.setPos(startingPos);
                 AIDS.disable();
             });
             waitForTickEventThread1.start();

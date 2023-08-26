@@ -43,12 +43,12 @@ public class FastBox {
                 new Vec3d(maxX, minY, minZ),  // bottom front right
                 new Vec3d(minX, maxY, minZ),  // top front left
                 new Vec3d(maxX, maxY, minZ),  // top front right
+                new Vec3d(minX, midY, minZ),  // center front left
+                new Vec3d(maxX, midY, minZ),  // center front right
                 new Vec3d(minX, minY, maxZ),  // bottom back left
                 new Vec3d(maxX, minY, maxZ),  // bottom back right
                 new Vec3d(minX, maxY, maxZ),  // top back left
                 new Vec3d(maxX, maxY, maxZ),  // top back right
-                new Vec3d(minX, midY, minZ),  // center front left
-                new Vec3d(maxX, midY, minZ),  // center front right
                 new Vec3d(minX, midY, maxZ),  // center back left
                 new Vec3d(maxX, midY, maxZ)   // center back right
         );
