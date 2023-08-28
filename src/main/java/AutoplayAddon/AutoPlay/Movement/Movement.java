@@ -1,4 +1,5 @@
 package AutoplayAddon.AutoPlay.Movement;
+import AutoplayAddon.AutoPlay.Other.FastBox;
 import AutoplayAddon.Tracker.ServerSideValues;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
@@ -11,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Movement {
+    public static FastBox tempFastBox;
     public static Boolean AIDSboolean = false;
     public static Boolean rotationControl = false;
     public static Thread currentMovementThread;

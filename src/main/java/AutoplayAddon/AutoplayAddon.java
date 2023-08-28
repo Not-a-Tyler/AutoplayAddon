@@ -54,6 +54,12 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new LongDistanceTest());
         //Modules.get().add(new BetterFly());
 
+        Commands.add(new GetClosestVehicleId());
+        Commands.add(new Interact());
+        Commands.add(new SendFull());
+        Commands.add(new AcceptTp());
+        Commands.add(new Getid());
+        Commands.add(new Smack());
         Commands.add(new AIDSon());
         Commands.add(new AIDSoff());
         Commands.add(new Stop());
