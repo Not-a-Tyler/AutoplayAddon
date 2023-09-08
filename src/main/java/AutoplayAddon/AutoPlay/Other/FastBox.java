@@ -70,18 +70,15 @@ public class FastBox {
     }
 
     public boolean isPlayerCollidingWithBlocks() {
-        Movement.fastBoxList.add(new FastBox(this));
-        ChatUtils.info("checking");
         for (Vec3d corner : this.corners) {
             BlockPos blockPos = vecToBlockPos(corner);
-
             if (mc.world.getBlockState(blockPos).isSolid()) {
-
-                ChatUtils.info("collided");
+                Movement.fastBoxBadList.add(new FastBox(this));
+                ChatUtils.info("i say no");
                 return true;
             }
         }
-
+        Movement.fastBoxList.add(new FastBox(this));
         return false;
     }
 

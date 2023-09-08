@@ -16,6 +16,7 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Movement {
     public static ArrayList<FastBox> fastBoxList = new ArrayList<>();
+    public static ArrayList<FastBox> fastBoxBadList = new ArrayList<>();
 
     public static Boolean AIDSboolean = false;
     public static Boolean rotationControl = false;

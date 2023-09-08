@@ -53,6 +53,25 @@ public class SimpleClickTp extends Module {
         .build()
     );
 
+
+    private final Setting<Keybind> cancelBlink2 = sgGeneral.add(new KeybindSetting.Builder()
+        .name("Keybind to tp2")
+        .description("Cancels sending packets and sends you back to your original position.")
+        .defaultValue(Keybind.none())
+        .action(() -> {
+            Camera camera = mc.gameRenderer.getCamera();
+            Vec3d cameraPos = camera.getPos();
+            float pitch = camera.getPitch();
+            float yaw = camera.getYaw();
+            Vec3d rotationVec = Vec3d.fromPolar(pitch, yaw);
+            Vec3d raycastEnd = cameraPos.add(rotationVec.multiply(300.0));
+            BlockPos blockpos = mc.world.raycast(new RaycastContext(cameraPos, raycastEnd, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos().up();
+            Vec3d pos = new Vec3d((blockpos.getX() + .5), blockpos.getY(), (blockpos.getZ() + .5));
+            MoveToUtil.moveTo(pos);
+        })
+        .build()
+    );
+
     private final Setting<Keybind> cancelBlink = sgGeneral.add(new KeybindSetting.Builder()
         .name("Keybind to tp")
         .description("Cancels sending packets and sends you back to your original position.")
@@ -66,7 +85,7 @@ public class SimpleClickTp extends Module {
             Vec3d raycastEnd = cameraPos.add(rotationVec.multiply(300.0));
             BlockPos blockpos = mc.world.raycast(new RaycastContext(cameraPos, raycastEnd, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos().up();
             Vec3d pos = new Vec3d((blockpos.getX() + .5), blockpos.getY(), (blockpos.getZ() + .5));
-            ChatUtils.info(String.valueOf(System.currentTimeMillis()));
+
             ChatUtils.info(" lazyCheck: " + CanTeleport.lazyCheck(mc.player.getPos(), pos) + " slowCheck: " + CanTeleport.oldCheck(mc.player.getPos(), pos));
             ChatUtils.info(String.valueOf(System.currentTimeMillis()));
         })
