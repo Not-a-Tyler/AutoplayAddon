@@ -1,5 +1,6 @@
 package AutoplayAddon.AutoPlay.Other;
 import AutoplayAddon.AutoPlay.Movement.Movement;
+import AutoplayAddon.modules.CollisionRender;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -68,13 +69,14 @@ public class FastBox {
         return this;
     }
 
-
     public boolean isPlayerCollidingWithBlocks() {
+        Movement.fastBoxList.add(new FastBox(this));
+        ChatUtils.info("checking");
         for (Vec3d corner : this.corners) {
             BlockPos blockPos = vecToBlockPos(corner);
 
             if (mc.world.getBlockState(blockPos).isSolid()) {
-                Movement.tempFastBox = this;
+
                 ChatUtils.info("collided");
                 return true;
             }

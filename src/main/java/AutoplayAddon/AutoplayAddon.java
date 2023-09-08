@@ -24,19 +24,20 @@ public class AutoplayAddon extends MeteorAddon {
     @Override
     public void onInitialize() {
         MeteorClient.EVENT_BUS.subscribe(ServerSideValues.class);
-        MeteorClient.EVENT_BUS.subscribe(blockCache);
+        //eteorClient.EVENT_BUS.subscribe(blockCache);
         LOG.info("Initializing AutoplayAddon");
+//
+//        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
+//            blockCache.addChunk(chunk);
+//        });
+//
+//
+//        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
+//            blockCache.removeChunk(chunk);
+//        });
 
-        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
-            blockCache.addChunk(chunk);
-        });
-
-
-        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
-            blockCache.removeChunk(chunk);
-        });
-
-
+        Modules.get().add(new TimedTpAway());
+        Modules.get().add(new AntiKick());
         Modules.get().add(new Disabler());
         Modules.get().add(new Speedrun());
         //Modules.get().add(new TeleportInfo());
@@ -52,8 +53,10 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new UpFly());
         Modules.get().add(new SimpleClickTp());
         Modules.get().add(new LongDistanceTest());
+        Modules.get().add(new CollisionRender());
         //Modules.get().add(new BetterFly());
 
+        Commands.add(new StopSleeping());
         Commands.add(new GetClosestVehicleId());
         Commands.add(new Interact());
         Commands.add(new SendFull());

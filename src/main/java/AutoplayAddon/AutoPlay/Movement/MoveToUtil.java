@@ -13,15 +13,22 @@ import java.text.DecimalFormat;
 
 
 public class MoveToUtil extends Movement {
-    private static void sendpacket(PlayerMoveC2SPacket packet) {
+    private static void sendPacket(PlayerMoveC2SPacket packet) {
         ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
         ServerSideValues.HandleMovepacket(packet);
     }
 
+    private static void sendVehiclePacket(VehicleMoveC2SPacket packet) {
+        ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
+       // ServerSideValues.HandleMovepacket(packet);
+    }
     private static float toYaw, toPitch;
     static DecimalFormat e = new DecimalFormat("#.##");
 
     public static void moveTo(Vec3d newPos) {
+        if (currentPosition == null) {
+            currentPosition = mc.player.getPos();
+        }
         //ChatUtils.info("starting move to");
         Module flight = Modules.get().get(Flight.class);
         if (flight.isActive()) {
@@ -46,14 +53,14 @@ public class MoveToUtil extends Movement {
     public static void sendpackets(int packetsRequired) {
         if (mc.player.hasVehicle()) {
             for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
-                mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
+                sendVehiclePacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
             }
         } else {
             for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
                 if (ServerSideValues.allowedPlayerTicks > 20) {
-                    sendpacket(new PlayerMoveC2SPacket.Full(currentPosition.x, currentPosition.y, currentPosition.z, toYaw, toPitch, true));
+                    sendPacket(new PlayerMoveC2SPacket.Full(currentPosition.x, currentPosition.y, currentPosition.z, toYaw, toPitch, true));
                 } else {
-                    sendpacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
+                    sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
                 }
             }
         }
@@ -62,12 +69,12 @@ public class MoveToUtil extends Movement {
     public static void moveplayer(Vec3d newPos) {
         if (mc.player.hasVehicle()) {
             mc.player.getVehicle().setPosition(newPos.x, newPos.y, newPos.z);
-            mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
+            sendVehiclePacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
         } else {
             if (ServerSideValues.allowedPlayerTicks > 20) {
-                sendpacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, toYaw, toPitch, true));
+                sendPacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, toYaw, toPitch, true));
             } else {
-                sendpacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
             }
         }
         currentPosition = newPos;

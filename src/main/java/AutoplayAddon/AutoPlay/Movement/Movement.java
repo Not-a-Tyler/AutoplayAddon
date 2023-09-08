@@ -9,10 +9,14 @@ import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.ArrayList;
+
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Movement {
-    public static FastBox tempFastBox;
+    public static ArrayList<FastBox> fastBoxList = new ArrayList<>();
+
     public static Boolean AIDSboolean = false;
     public static Boolean rotationControl = false;
     public static Thread currentMovementThread;

@@ -41,10 +41,6 @@ public class LOTEST extends Module {
         if (event.packet instanceof EntityPositionS2CPacket) {
             ChatUtils.info(" entity position updated " + ((EntityPositionS2CPacket) event.packet).getId());
         }
-
-//        if (event.packet instanceof EntityAnimationS2CPacket) {
-//            ChatUtils.info(" entity animation " + ((EntityAnimationS2CPacket) event.packet).getId() + " animation id " + ((EntityAnimationS2CPacket) event.packet).getAnimationId());
-//        }
     }
 
 
