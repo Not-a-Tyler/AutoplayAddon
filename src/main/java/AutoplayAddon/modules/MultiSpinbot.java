@@ -1,6 +1,6 @@
 package AutoplayAddon.modules;
 
-import AutoplayAddon.AutoPlay.Movement.AIDS;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -81,7 +81,7 @@ public class MultiSpinbot extends Module {
     @Override
     public void onDeactivate() {
         Movement.rotationControl = true;
-        AIDS.disable();
+        GotoUtil.disable();
     }
 
     public void init() {
@@ -125,13 +125,13 @@ public class MultiSpinbot extends Module {
             }
         } else if (type.get() == Type.Client) {
             if (!Movement.AIDSboolean) {
-                AIDS.init(true);
+                GotoUtil.init(true);
             }
             ClientData clientData = readFromMemoryMappedFile(clientNumber.get());
             if (clientData != null) {
                 Movement.yaw = clientData.yaw;
                 Movement.pitch = clientData.pitch;
-                AIDS.setPos(clientData.pos);
+                GotoUtil.setPos(clientData.pos);
                 mc.player.setSneaking(clientData.isSneaking);
             }
         }

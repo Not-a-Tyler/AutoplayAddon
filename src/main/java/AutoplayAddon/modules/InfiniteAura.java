@@ -1,19 +1,16 @@
 package AutoplayAddon.modules;
-import AutoplayAddon.AutoPlay.Movement.AIDS;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.settings.EntityTypeListSetting;
 import meteordevelopment.meteorclient.settings.KeybindSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
-import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Set;
@@ -59,22 +56,13 @@ public class InfiniteAura  extends Module {
             if (closestEntity == null) return;
             Entity finalClosestEntity = closestEntity;
             Thread waitForTickEventThread1 = new Thread(() -> {
-                ChatUtils.info("hittinh");
+                ChatUtils.info("hitting " + finalClosestEntity.getName());
                 Vec3d startingPos = mc.player.getPos();
-                Boolean ignore = false;
-                if (!Movement.AIDSboolean) {
-                    ChatUtils.info("starting");
-                    AIDS.init(false);
-                } else {
-                    ignore = true;
-                }
-                AIDS.setPos(finalClosestEntity.getPos());
+                GotoUtil.init(false);
+                GotoUtil.setPos(finalClosestEntity.getPos());
                 mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
-                AIDS.setPos(startingPos);
-                if (!ignore) {
-                    ChatUtils.info("ending");
-                    AIDS.disable();
-                }
+                GotoUtil.setPos(startingPos);
+                GotoUtil.disable();
             });
             waitForTickEventThread1.start();
         })

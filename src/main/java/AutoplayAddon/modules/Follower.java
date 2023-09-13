@@ -2,7 +2,7 @@ package AutoplayAddon.modules;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import AutoplayAddon.AutoPlay.Movement.AIDS;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -63,11 +63,11 @@ public class Follower extends Module {
 
     @Override
     public void onActivate() {
-        AIDS.init(true);
+        GotoUtil.init(true);
     }
     @Override
     public void onDeactivate() {
-        AIDS.disable();
+        GotoUtil.disable();
     }
 
 

@@ -67,7 +67,9 @@ public class SimpleClickTp extends Module {
             Vec3d raycastEnd = cameraPos.add(rotationVec.multiply(300.0));
             BlockPos blockpos = mc.world.raycast(new RaycastContext(cameraPos, raycastEnd, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos().up();
             Vec3d pos = new Vec3d((blockpos.getX() + .5), blockpos.getY(), (blockpos.getZ() + .5));
+            Movement.currentPosition = mc.player.getPos();
             MoveToUtil.moveTo(pos);
+            mc.player.setPosition(pos.x, pos.y, pos.z);
         })
         .build()
     );

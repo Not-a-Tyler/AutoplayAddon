@@ -1,6 +1,6 @@
 package AutoplayAddon.AutoPlay.Controller;
 import AutoplayAddon.AutoPlay.Actions.MineUtil;
-import AutoplayAddon.AutoPlay.Movement.AIDS;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import AutoplayAddon.AutoPlay.Locator.CanPickUpTest;
 import net.minecraft.item.Item;
@@ -18,7 +18,7 @@ public class SmartMine {
             Vec3d targetpos = collectableBlock.get(0);
             Vec3d airGapPos = collectableBlock.get(1);
             if (PlayerUtils.distanceTo(targetpos) > 5) {
-                AIDS.setPos(airGapPos);
+                GotoUtil.setPos(airGapPos);
             }
             ChatUtils.info("Mining target block at: " + targetpos.getX() + " " + targetpos.getY() + " " + targetpos.getZ());
             new MineUtil().mine(BlockPos.ofFloored(targetpos));

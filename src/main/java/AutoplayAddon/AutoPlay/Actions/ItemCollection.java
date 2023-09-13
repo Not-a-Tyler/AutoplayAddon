@@ -3,7 +3,7 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 import AutoplayAddon.AutoPlay.Locator.GetLocUtil;
 import AutoplayAddon.AutoPlay.Locator.ValidPickupPoint;
-import AutoplayAddon.AutoPlay.Movement.AIDS;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.BlockPos;
@@ -22,7 +22,7 @@ public class ItemCollection {
             ChatUtils.info("Item found at: " + itemPosition.getX() + " " + itemPosition.getY() + " " + itemPosition.getZ());
             Vec3d test = ValidPickupPoint.findFitSpot(mc.world, itemPosition);
             if (test != null) {
-                AIDS.setPos(test);
+                GotoUtil.setPos(test);
                 return true;
             }
         }

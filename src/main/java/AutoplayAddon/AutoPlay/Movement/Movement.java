@@ -21,15 +21,14 @@ public class Movement {
     public static Boolean AIDSboolean = false;
     public static Boolean rotationControl = false;
     public static Thread currentMovementThread;
-    public static Vec3d currentPosition, to;
+    public static Vec3d currentPosition;
     public static float pitch, yaw;
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onServerPosUpdate(PacketEvent.Receive event) {
         if (event.packet instanceof PlayerPositionLookS2CPacket packet) {
             currentPosition = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
-            ChatUtils.info("Received packet and set current position to " + currentPosition);
-            AIDS.disable();
+            ChatUtils.error("Received packet and set current position to " + currentPosition);
         }
     }
 
@@ -40,19 +39,18 @@ public class Movement {
         }
     }
 
-
     public static boolean predictifPossible(Vec3d newPos) {
         int predict;
         double base = findFarthestDistance(newPos);
-        int packetsRequired = (int) Math.floor(Math.abs(base / 10.0));
+        int packetsRequired = ((int) Math.ceil(base / 10.0)) - 1;
         double delta = ServerSideValues.delta();
-        if (!ServerSideValues.hasMoved) delta = 19;
         if (ServerSideValues.hasMoved) {
-            predict = ((packetsRequired + 1) * 2);
+            predict = (packetsRequired * 2) + 1;
         } else {
-            predict = (packetsRequired + 2);
+            predict = (packetsRequired + 1);
         }
-        return !(delta < predict);
+        ChatUtils.info("Predicting " + predict + " packets");
+        return (delta >= predict);
     }
 
     public static double findFarthestDistance(Vec3d newPos) {
@@ -75,28 +73,35 @@ public class Movement {
         return Math.sqrt(dx*dx + dy*dy + dz*dz);
     }
 
+    public static boolean closeBy(Vec3d from, Vec3d to) {
+        double dx = from.x - to.x;
+        double dy = from.y - to.y;
+        double dz = from.z - to.z;
+        double squaredDistance = dx * dx + dy * dy + dz * dz;
+        return squaredDistance < 0.01;
+    }
 
     public static void moveTo(Vec3d pos) {
         if (currentMovementThread != null && currentMovementThread.isAlive()) {
             currentMovementThread.interrupt();
-            ChatUtils.info("Interrupted previous movement thread");
+            ChatUtils.error("Interrupted previous movement thread");
         }
-        currentMovementThread = new Thread(() -> {
-            if (AIDSboolean) {
-                AIDS.setPos(pos);
-                return;
-            }
-            to = pos;
-            mc.player.setNoGravity(true);
-            mc.player.setVelocity(Vec3d.ZERO);
-            currentPosition = mc.player.getPos();
-            MeteorClient.EVENT_BUS.subscribe(Movement.class);
-            GotoUtil.shortGoTo();
-            mc.player.setPosition(to);
-            MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
-            mc.player.setNoGravity(false);
-        });
-        currentMovementThread.start();
+        Boolean ignore;
+        if (AIDSboolean) {
+            ignore = false;
+        } else {
+            ignore = true;
+        }
+        new Thread(() -> {
+            ChatUtils.info(System.currentTimeMillis() + " Starting movement");
+            if (ignore) GotoUtil.init(false);
+            GotoUtil.setPos(pos);
+            if (ignore) GotoUtil.disable();
+            ChatUtils.info(System.currentTimeMillis() + " Movement finished");
+            mc.player.setPosition(pos);
+        }).start();
+
+
     }
 
 

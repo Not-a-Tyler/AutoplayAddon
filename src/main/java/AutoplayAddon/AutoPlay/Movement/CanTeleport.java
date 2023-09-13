@@ -1,7 +1,5 @@
 package AutoplayAddon.AutoPlay.Movement;
-import AutoplayAddon.AutoplayAddon;
 import com.google.common.collect.ImmutableList;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -33,8 +31,122 @@ public class CanTeleport {
     public static boolean tryY(Vec3d from, Vec3d to, double ytotest) {
         Vec3d fromWithOffset = new Vec3d(from.x, ytotest, from.z);
         Vec3d toWithOffset = new Vec3d(to.x, ytotest, to.z);
-        Box box = new Box(fromWithOffset.x - mc.player.getWidth() / 2, fromWithOffset.y, fromWithOffset.z - mc.player.getWidth() / 2, fromWithOffset.x + mc.player.getWidth() / 2, fromWithOffset.y + mc.player.getHeight(), fromWithOffset.z + mc.player.getWidth() / 2);
-        return mc.world.isSpaceEmpty(box) && oldCheck(fromWithOffset, toWithOffset);
+        Boolean isColliding = new FastBox(fromWithOffset).isCollidingWithBlocks();
+        if (isColliding) return false;
+        return lazyCheck(fromWithOffset, toWithOffset);
+    }
+
+
+    public static Boolean lazyCheck(Vec3d from, Vec3d to) {
+        FastBox fastBox = new FastBox(from);
+        Vec3d movement = new Vec3d(to.x - from.x, to.y - from.y, to.z - from.z);
+        double d = movement.x;
+        double e = movement.y;
+        double f = movement.z;
+        if (e != 0.0) {
+            e = OffsetCalcDouble(fastBox, Direction.Axis.Y, e);
+            if (e != 0.0) {
+                fastBox.offset(new Vec3d(0.0, e, 0.0));
+            }
+        }
+        boolean bl = Math.abs(d) < Math.abs(f);
+        if (bl && f != 0.0) {
+            if(OffsetCalcBool(fastBox, Direction.Axis.Z, f)) return false;
+            fastBox.offset(new Vec3d(0.0, 0.0, f));
+        }
+        if (d != 0.0) {
+            if(OffsetCalcBool(fastBox, Direction.Axis.X, d)) return false;
+            if (!bl) {
+                fastBox.offset(new Vec3d(d, 0.0, 0.0));
+            }
+        }
+        if (!bl && f != 0.0) {
+            if(OffsetCalcBool(fastBox, Direction.Axis.Z, f)) return false;
+        }
+        return true;
+    }
+
+
+    public static double OffsetCalcDouble(FastBox fastBox, Direction.Axis axis, double maxDist) {
+        double step = 0.9;
+        double currentOffset = 0.0;
+        double epsilon = 0.0625D;
+        Vec3d direction = Vec3d.ZERO;
+
+        switch(axis) {
+            case X:
+                direction = new Vec3d(1, 0, 0);
+                break;
+            case Y:
+                direction = new Vec3d(0, 1, 0);
+                break;
+            case Z:
+                direction = new Vec3d(0, 0, 1);
+                break;
+        }
+
+        direction = direction.multiply(Math.signum(maxDist));
+        FastBox bottom4Box = new FastBox(fastBox, true);
+
+        while (true) {
+            double offsetThisStep = step;
+
+            // Check if we are about to overshoot the maxDist
+            if ((currentOffset + offsetThisStep) > Math.abs(maxDist)) {
+                offsetThisStep = (Math.abs(maxDist) - currentOffset);
+            }
+
+            bottom4Box.offset(direction.multiply(offsetThisStep));
+
+            if (bottom4Box.isCollidingWithBlocks()) {
+                // If the box has collided, get the position of the bottom of the block above the current offset.
+                // For positive maxDist, use Math.ceil; for negative maxDist, use Math.floor
+                if (maxDist > 0) {
+                    return Math.ceil(currentOffset) - epsilon;
+                } else if (maxDist < 0) {
+                    return Math.floor(currentOffset) + epsilon;
+                } else {
+                    return 0.0;
+                }
+            }
+
+            if (Math.abs(currentOffset) >= Math.abs(maxDist)) return maxDist;
+
+            currentOffset += offsetThisStep;
+        }
+    }
+
+
+
+    public static Boolean OffsetCalcBool(FastBox fastBox, Direction.Axis axis, double maxDist) {
+        double step = 1.5;
+        double currentOffset = 0.0;
+        Vec3d direction = Vec3d.ZERO;
+        switch(axis) {
+            case X:
+                direction = new Vec3d(1, 0, 0);
+                break;
+            case Y:
+                direction = new Vec3d(0, 1, 0);
+                break;
+            case Z:
+                direction = new Vec3d(0, 0, 1);
+                break;
+        }
+        direction = direction.multiply(Math.signum(maxDist));
+        FastBox fullBox = new FastBox(fastBox, false);
+        if (fullBox.isCollidingWithBlocks()) return true;
+        while (true) {
+            double offsetThisStep = step;
+            // Check if we are about to overshoot the maxDist
+            if ((currentOffset + offsetThisStep) > Math.abs(maxDist)) {
+                offsetThisStep = (Math.abs(maxDist) - currentOffset);
+            }
+            fullBox.offset(direction.multiply(offsetThisStep));
+            if (fullBox.isCollidingWithBlocks()) return true;
+            if (Math.abs(currentOffset) >= Math.abs(maxDist)) return false;
+            currentOffset += offsetThisStep;
+        }
     }
 
 
@@ -80,112 +192,6 @@ public class CanTeleport {
         }
         return new Vec3d(d, e, f);
     }
-
-    public static Boolean lazyCheck(Vec3d from, Vec3d to) {
-        ChatUtils.info(String.valueOf(System.currentTimeMillis()));
-        Box newBox = new Box(to.x - mc.player.getWidth() / 2, to.y, to.z - mc.player.getWidth() / 2, to.x + mc.player.getWidth() / 2, to.y + mc.player.getHeight(), to.z + mc.player.getWidth() / 2);
-        if (!mc.world.isSpaceEmpty(newBox)) {
-            return false;
-        }
-        FastBox fastBox = new FastBox(from);
-
-        Vec3d movement = new Vec3d(to.x - from.x, to.y - from.y, to.z - from.z);
-        double d = movement.x;
-        double e = movement.y;
-        double f = movement.z;
-        if (e != 0.0) {
-            e = OffsetCalcDouble(fastBox, Direction.Axis.Y, e);
-            if (e != 0.0) {
-                fastBox.offset(new Vec3d(0.0, e, 0.0));
-            }
-        }
-        boolean bl = Math.abs(d) < Math.abs(f);
-        if (bl && f != 0.0) {
-            if(OffsetCalcBool(fastBox, Direction.Axis.Z, f)) return false;
-            fastBox.offset(new Vec3d(0.0, 0.0, f));
-        }
-        if (d != 0.0) {
-            if(OffsetCalcBool(fastBox, Direction.Axis.X, d)) return false;
-            if (!bl) {
-                fastBox.offset(new Vec3d(d, 0.0, 0.0));
-            }
-        }
-        if (!bl && f != 0.0) {
-            if(OffsetCalcBool(fastBox, Direction.Axis.Z, f)) return false;
-        }
-        return true;
-    }
-
-
-    public static double OffsetCalcDouble(FastBox fastBox, Direction.Axis axis, double maxDist) {
-        double step = 0.3;
-        double currentOffset = 0.0;
-        double lastValidOffset = 0.0;
-        Vec3d direction = Vec3d.ZERO;
-        switch(axis) {
-            case X:
-                direction = new Vec3d(1, 0, 0);
-                break;
-            case Y:
-                direction = new Vec3d(0, 1, 0);
-                break;
-            case Z:
-                direction = new Vec3d(0, 0, 1);
-                break;
-        }
-        direction = direction.multiply(Math.signum(maxDist));
-        FastBox tempBox = new FastBox(fastBox);
-        while (true) {
-            double offsetThisStep = step;
-            // Check if we are about to overshoot the maxDist
-            if ((currentOffset + offsetThisStep) > Math.abs(maxDist)) {
-                offsetThisStep = (Math.abs(maxDist) - currentOffset);
-            }
-            tempBox.offset(direction.multiply(offsetThisStep));
-            if (tempBox.isPlayerCollidingWithBlocks()) {
-                double whatever = lastValidOffset * Math.signum(maxDist);
-                //ChatUtils.info("offset calc ended: " + whatever);
-                return whatever;
-            } else {
-                lastValidOffset = currentOffset;
-            }
-            if (Math.abs(currentOffset) >= Math.abs(maxDist)) return maxDist;
-            currentOffset += offsetThisStep;
-        }
-    }
-
-    public static Boolean OffsetCalcBool(FastBox fastBox, Direction.Axis axis, double maxDist) {
-        double step = 0.3;
-        double currentOffset = 0.0;
-        Vec3d direction = Vec3d.ZERO;
-        switch(axis) {
-            case X:
-                direction = new Vec3d(1, 0, 0);
-                break;
-            case Y:
-                direction = new Vec3d(0, 1, 0);
-                break;
-            case Z:
-                direction = new Vec3d(0, 0, 1);
-                break;
-        }
-        direction = direction.multiply(Math.signum(maxDist));
-        FastBox tempBox = new FastBox(fastBox);
-        while (true) {
-            double offsetThisStep = step;
-            // Check if we are about to overshoot the maxDist
-            if ((currentOffset + offsetThisStep) > Math.abs(maxDist)) {
-                offsetThisStep = (Math.abs(maxDist) - currentOffset);
-            }
-            tempBox.offset(direction.multiply(offsetThisStep));
-            if (tempBox.isPlayerCollidingWithBlocks()) return true;
-            if (Math.abs(currentOffset) >= Math.abs(maxDist)) return false;
-            currentOffset += offsetThisStep;
-        }
-    }
-
-
-
 
 
     public static boolean oldCheck(Vec3d from, Vec3d to) {

@@ -71,6 +71,7 @@ public class ClickTp extends Module {
                 }
                 if (validPos != null && isChunkLoaded(validPos)) {
                     Vec3d toPos = new Vec3d(validPos.getX() + 0.5, validPos.getY(), validPos.getZ() + 0.5);
+                    ChatUtils.info("Distance: " + mc.player.getPos().distanceTo(toPos));
                     Movement.moveTo(toPos);
                 } else {
                     ChatUtils.error("No valid position found.");

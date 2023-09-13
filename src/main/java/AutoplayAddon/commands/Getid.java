@@ -7,6 +7,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.PlayerEntity;
 import meteordevelopment.meteorclient.commands.Command;
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 
 public class Getid extends Command {
@@ -16,8 +17,9 @@ public class Getid extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(argument("player", PlayerArgumentType.create()).executes(context -> {
+
             PlayerEntity e = PlayerArgumentType.get(context);
-            ChatUtils.info("player id is " + e.getId());
+            ChatUtils.info("player id is " + e.getId() + " width " + mc.player.getWidth() + " height " + mc.player.getHeight());
             return SINGLE_SUCCESS;
         }));
     }

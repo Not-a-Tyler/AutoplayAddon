@@ -34,8 +34,11 @@ public class AutoplayAddon extends MeteorAddon {
 //
 //        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
 //            blockCache.removeChunk(chunk);
-//        });
-
+//        });;
+        Modules.get().add(new AutoHorn());
+        Modules.get().add(new Fightbot());
+        Modules.get().add(new DeleteAllTest());
+        Modules.get().add(new BetterBreakerTest());
         Modules.get().add(new TimedTpAway());
         Modules.get().add(new AntiKick());
         Modules.get().add(new Disabler());
@@ -56,6 +59,7 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new CollisionRender());
         //Modules.get().add(new BetterFly());
 
+        Commands.add(new Blank());
         Commands.add(new StopSleeping());
         Commands.add(new GetClosestVehicleId());
         Commands.add(new Interact());
@@ -76,8 +80,6 @@ public class AutoplayAddon extends MeteorAddon {
         Commands.add(new ItemCollect());
         Commands.add(new SearchFor());
         Commands.add(new findcollectableblock());
-        // You can call this method to find the nearest block to a given position
-
 
     }
 

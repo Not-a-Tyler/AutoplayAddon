@@ -1,40 +1,39 @@
 package AutoplayAddon.AutoPlay.Movement;
 import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import AutoplayAddon.Tracker.ServerSideValues;
-import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.systems.modules.Modules;
-import meteordevelopment.meteorclient.systems.modules.movement.Flight;
+import java.util.Queue;
+import java.util.LinkedList;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
-import java.text.DecimalFormat;
 
 
 public class MoveToUtil extends Movement {
-    private static void sendPacket(PlayerMoveC2SPacket packet) {
-        ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
-        ServerSideValues.HandleMovepacket(packet);
+    public static Queue<Object> packetQueue = new LinkedList<>();
+
+    public static void sendAllPacketsFromQueue() {
+        ChatUtils.info("SENDING " + packetQueue.size() + " packets");
+        while (!packetQueue.isEmpty()) {
+            Object packet = packetQueue.poll();
+            if (packet instanceof PlayerMoveC2SPacket) {
+                ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately((PlayerMoveC2SPacket) packet, null);
+            } else if (packet instanceof VehicleMoveC2SPacket) {
+                ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately((VehicleMoveC2SPacket) packet, null);
+            }
+        }
     }
 
-    private static void sendVehiclePacket(VehicleMoveC2SPacket packet) {
-        ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
-       // ServerSideValues.HandleMovepacket(packet);
+
+    public static void handlePacket(PlayerMoveC2SPacket packet) {
+        ServerSideValues.HandleMovePacketSafe(packet);
+        packetQueue.add(packet);
     }
+
     private static float toYaw, toPitch;
-    static DecimalFormat e = new DecimalFormat("#.##");
 
     public static void moveTo(Vec3d newPos) {
-        if (currentPosition == null) {
-            currentPosition = mc.player.getPos();
-        }
-        //ChatUtils.info("starting move to");
-        Module flight = Modules.get().get(Flight.class);
-        if (flight.isActive()) {
-            flight.toggle();
-        }
-
         if (rotationControl) {
             toPitch = pitch;
             toYaw = yaw;
@@ -43,24 +42,25 @@ public class MoveToUtil extends Movement {
             toYaw = mc.player.getYaw();
         }
         double base = findFarthestDistance(newPos);
-        int packetsRequired = (int) Math.floor(Math.abs(base / 10.0));
+        int packetsRequired = ((int) Math.ceil(base / 10.0)) - 1;
+        ChatUtils.info("Getting i value to " + packetsRequired);
         sendpackets(packetsRequired);
         moveplayer(newPos);
-        //ChatUtils.info("ending move to");
     }
 
 
     public static void sendpackets(int packetsRequired) {
         if (mc.player.hasVehicle()) {
-            for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
-                sendVehiclePacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
+            while ((packetsRequired > ServerSideValues.i2) && (ServerSideValues.delta() >= 0)) {
+                packetQueue.add(new VehicleMoveC2SPacket(mc.player.getVehicle()));
             }
         } else {
-            for (int packetNumber = 0; packetNumber < (packetsRequired); packetNumber++) {
+            while ((packetsRequired > ServerSideValues.i2) && (ServerSideValues.delta() >= 0)) {
+                //ChatUtils.info("sending charge packet");
                 if (ServerSideValues.allowedPlayerTicks > 20) {
-                    sendPacket(new PlayerMoveC2SPacket.Full(currentPosition.x, currentPosition.y, currentPosition.z, toYaw, toPitch, true));
+                    handlePacket(new PlayerMoveC2SPacket.Full(currentPosition.x, currentPosition.y, currentPosition.z, toYaw, toPitch, true));
                 } else {
-                    sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
+                    handlePacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
                 }
             }
         }
@@ -69,12 +69,13 @@ public class MoveToUtil extends Movement {
     public static void moveplayer(Vec3d newPos) {
         if (mc.player.hasVehicle()) {
             mc.player.getVehicle().setPosition(newPos.x, newPos.y, newPos.z);
-            sendVehiclePacket(new VehicleMoveC2SPacket(mc.player.getVehicle()));
+            packetQueue.add(new VehicleMoveC2SPacket(mc.player.getVehicle()));
         } else {
+            ChatUtils.info("sending tp packet");
             if (ServerSideValues.allowedPlayerTicks > 20) {
-                sendPacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, toYaw, toPitch, true));
+                handlePacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, toYaw, toPitch, true));
             } else {
-                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
+                handlePacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));
             }
         }
         currentPosition = newPos;

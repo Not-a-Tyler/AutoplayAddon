@@ -1,7 +1,4 @@
 package AutoplayAddon.AutoPlay.Other;
-import AutoplayAddon.AutoPlay.Movement.Movement;
-import AutoplayAddon.modules.CollisionRender;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.BlockPos;
@@ -12,25 +9,28 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class FastBox {
 
-    private Box box;
     public List<Vec3d> corners;
-    public FastBox(FastBox other) {
-        this.box = new Box(other.box.minX, other.box.minY, other.box.minZ, other.box.maxX, other.box.maxY, other.box.maxZ);
-        this.corners = new ArrayList<>(other.corners);
+    public FastBox(FastBox other, boolean bottomOnly) {
+        if (bottomOnly) {
+            List<Vec3d> bottomCorners = Arrays.asList(
+                other.corners.get(0),  // bottom front left
+                other.corners.get(1),  // bottom front right
+                other.corners.get(6),  // bottom back left
+                other.corners.get(7)   // bottom back right
+            );
+            this.corners = bottomCorners;
+        } else {
+            this.corners = new ArrayList<>(other.corners);
+        }
     }
-
-
     public FastBox(Vec3d to) {
-        this.box = new Box(to.x - mc.player.getWidth() / 2, to.y, to.z - mc.player.getWidth() / 2, to.x + mc.player.getWidth() / 2, to.y + mc.player.getHeight(), to.z + mc.player.getWidth() / 2);
-        calculateCorners();
+        Box box = new Box(to.x - 0.3, to.y, to.z - 0.3, to.x + 0.3, to.y + mc.player.getHeight(), to.z + 0.3);
+        box.expand(-0.0625D);
+        calculateCorners(box);
     }
 
-    public FastBox(Box box) {
-        this.box = box;
-        calculateCorners();
-    }
 
-    private void calculateCorners() {
+    protected void calculateCorners(Box box) {
         double minX = box.minX;
         double minY = box.minY;
         double minZ = box.minZ;
@@ -41,18 +41,18 @@ public class FastBox {
         double midY = minY + (maxY - minY) / 2;
 
         this.corners = Arrays.asList(
-                new Vec3d(minX, minY, minZ),  // bottom front left
-                new Vec3d(maxX, minY, minZ),  // bottom front right
-                new Vec3d(minX, maxY, minZ),  // top front left
-                new Vec3d(maxX, maxY, minZ),  // top front right
-                new Vec3d(minX, midY, minZ),  // center front left
-                new Vec3d(maxX, midY, minZ),  // center front right
-                new Vec3d(minX, minY, maxZ),  // bottom back left
-                new Vec3d(maxX, minY, maxZ),  // bottom back right
-                new Vec3d(minX, maxY, maxZ),  // top back left
-                new Vec3d(maxX, maxY, maxZ),  // top back right
-                new Vec3d(minX, midY, maxZ),  // center back left
-                new Vec3d(maxX, midY, maxZ)   // center back right
+            new Vec3d(minX, minY, minZ),  // bottom front left
+            new Vec3d(maxX, minY, minZ),  // bottom front right
+            new Vec3d(minX, maxY, minZ),  // top front left
+            new Vec3d(maxX, maxY, minZ),  // top front right
+            new Vec3d(minX, midY, minZ),  // center front left
+            new Vec3d(maxX, midY, minZ),  // center front right
+            new Vec3d(minX, minY, maxZ),  // bottom back left
+            new Vec3d(maxX, minY, maxZ),  // bottom back right
+            new Vec3d(minX, maxY, maxZ),  // top back left
+            new Vec3d(maxX, maxY, maxZ),  // top back right
+            new Vec3d(minX, midY, maxZ),  // center back left
+            new Vec3d(maxX, midY, maxZ)   // center back right
         );
     }
 
@@ -69,17 +69,15 @@ public class FastBox {
         return this;
     }
 
-    public boolean isPlayerCollidingWithBlocks() {
+    public boolean isCollidingWithBlocks() {
         for (Vec3d corner : this.corners) {
             BlockPos blockPos = vecToBlockPos(corner);
             if (mc.world.getBlockState(blockPos).isSolid()) {
-                Movement.fastBoxBadList.add(new FastBox(this));
-                ChatUtils.info("i say no");
+                //Movement.fastBoxBadList.add(new FastBox(this, false));
                 return true;
             }
         }
-        Movement.fastBoxList.add(new FastBox(this));
+       // Movement.fastBoxList.add(new FastBox(this, false));
         return false;
     }
-
 }

@@ -1,5 +1,5 @@
 package AutoplayAddon.modules;
-import AutoplayAddon.AutoPlay.Movement.AIDS;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -20,7 +20,7 @@ public class FreecamFly extends Module {
 
     @Override
     public void onActivate() {
-        AIDS.init(false);
+        GotoUtil.init(false);
         Module freecam = Modules.get().get(Freecam.class);
         if (!freecam.isActive()) {
             freecam.toggle();
@@ -30,7 +30,7 @@ public class FreecamFly extends Module {
     @Override
     public void onDeactivate() {
         Camera camera = mc.gameRenderer.getCamera();
-        AIDS.disable();
+        GotoUtil.disable();
         Module freecam = Modules.get().get(Freecam.class);
         if (freecam.isActive()) {
             freecam.toggle();
@@ -42,7 +42,7 @@ public class FreecamFly extends Module {
     @EventHandler(priority = EventPriority.HIGHEST + 3)
     private void onTick(TickEvent.Pre event) {
         if (!Movement.AIDSboolean) {
-            AIDS.disable();
+            GotoUtil.disable();
             toggle();
         }
         Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
