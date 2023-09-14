@@ -1,5 +1,6 @@
 package AutoplayAddon.modules;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.MoveToUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.settings.EntityTypeListSetting;
@@ -11,6 +12,7 @@ import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Set;
@@ -58,11 +60,14 @@ public class InfiniteAura  extends Module {
             Thread waitForTickEventThread1 = new Thread(() -> {
                 ChatUtils.info("hitting " + finalClosestEntity.getName());
                 Vec3d startingPos = mc.player.getPos();
-                GotoUtil.init(false);
+                GotoUtil.init(false, false);
                 GotoUtil.setPos(finalClosestEntity.getPos());
-                mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
+                PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(finalClosestEntity, false);
+                MoveToUtil.packetQueue.add(packet);
+                //mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
                 GotoUtil.setPos(startingPos);
                 GotoUtil.disable();
+                MoveToUtil.sendAllPacketsFromQueue();
             });
             waitForTickEventThread1.start();
         })

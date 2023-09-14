@@ -17,11 +17,9 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class Movement {
     public static ArrayList<FastBox> fastBoxList = new ArrayList<>();
     public static ArrayList<FastBox> fastBoxBadList = new ArrayList<>();
-
-    public static Boolean AIDSboolean = false;
-    public static Boolean rotationControl = false;
+    public static boolean AutoSetPosition, autoSendPackets, rotationControl, AIDSboolean, currentlyMoving;
     public static Thread currentMovementThread;
-    public static Vec3d currentPosition;
+    public static Vec3d currentPosition, to;
     public static float pitch, yaw;
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -39,18 +37,22 @@ public class Movement {
         }
     }
 
-    public static boolean predictifPossible(Vec3d newPos) {
+    public static boolean predictifPossible(Vec3d newPos, String reason) {
         int predict;
         double base = findFarthestDistance(newPos);
         int packetsRequired = ((int) Math.ceil(base / 10.0)) - 1;
-        double delta = ServerSideValues.delta();
         if (ServerSideValues.hasMoved) {
-            predict = (packetsRequired * 2) + 1;
+            predict = (packetsRequired * 2);
         } else {
-            predict = (packetsRequired + 1);
+            predict = packetsRequired;
         }
-        ChatUtils.info("Predicting " + predict + " packets");
-        return (delta >= predict);
+        double ivalue = predict + 1;
+        double value = (predict - ServerSideValues.i2);
+        if (value <= 0) value = 0;
+        value = value + 1;
+
+        //ChatUtils.info("For " + reason + " we will use " + ivalue + " packets so we need " + value + );
+        return (ServerSideValues.delta() >= value);
     }
 
     public static double findFarthestDistance(Vec3d newPos) {
@@ -73,6 +75,28 @@ public class Movement {
         return Math.sqrt(dx*dx + dy*dy + dz*dz);
     }
 
+
+    public static void init(Boolean automaticallySetPosition, Boolean autopacket) {
+        if (mc.player == null) return;
+        MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
+        MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
+        MeteorClient.EVENT_BUS.subscribe(GotoUtil.class);
+        currentPosition = mc.player.getPos();
+        mc.player.setNoGravity(true);
+        to = mc.player.getPos();
+        AIDSboolean = true;
+        autoSendPackets = autopacket;
+        AutoSetPosition = automaticallySetPosition;
+    }
+    public static void disable() {
+        MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
+        MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
+        AIDSboolean = false;
+        currentlyMoving = false;
+        if (mc.player == null) return;
+        mc.player.setNoGravity(false);
+    }
+
     public static boolean closeBy(Vec3d from, Vec3d to) {
         double dx = from.x - to.x;
         double dy = from.y - to.y;
@@ -93,14 +117,13 @@ public class Movement {
             ignore = true;
         }
         new Thread(() -> {
-            ChatUtils.info(System.currentTimeMillis() + " Starting movement");
-            if (ignore) GotoUtil.init(false);
+           // ChatUtils.info(System.currentTimeMillis() + " Starting movement");
+            if (ignore) GotoUtil.init(false, true);
             GotoUtil.setPos(pos);
             if (ignore) GotoUtil.disable();
-            ChatUtils.info(System.currentTimeMillis() + " Movement finished");
+           // ChatUtils.info(System.currentTimeMillis() + " Movement finished");
             mc.player.setPosition(pos);
         }).start();
-
 
     }
 

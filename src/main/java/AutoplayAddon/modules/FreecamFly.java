@@ -20,7 +20,7 @@ public class FreecamFly extends Module {
 
     @Override
     public void onActivate() {
-        GotoUtil.init(false);
+        GotoUtil.init(false, true);
         Module freecam = Modules.get().get(Freecam.class);
         if (!freecam.isActive()) {
             freecam.toggle();

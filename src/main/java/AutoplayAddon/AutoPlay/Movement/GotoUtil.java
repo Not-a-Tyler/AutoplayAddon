@@ -1,7 +1,6 @@
 package AutoplayAddon.AutoPlay.Movement;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
@@ -9,7 +8,6 @@ import net.minecraft.util.math.Vec3d;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class GotoUtil extends Movement {
-    static boolean AutoSetPosition;
     static double y;
     static CompletableFuture<Void>  tickEventFuture;
     static Vec3d to;
@@ -27,27 +25,27 @@ public class GotoUtil extends Movement {
 
     private static boolean stage() {
         while (mc.player != null) {
-            ChatUtils.info("Stage Starting: " + stage);
+         //   ChatUtils.info("Stage Starting: " + stage);
             if (stage == 4) {
                 ChatUtils.error("finished via stage 4");
                 return true;
             }
             if (CanTeleport.lazyCheck(currentPosition, to)) {
-                if (predictifPossible(to)) {
-                    ChatUtils.info("Directly teleporting");
+                if (predictifPossible(to, "direct teleport")) {
+                 //   ChatUtils.info("Directly teleporting");
                     MoveToUtil.moveTo(to);
                     return true;
                 } else {
                     MoveToUtil.sendAllPacketsFromQueue();
-                    ChatUtils.info("Waiting 3 ticks and directly teleporting");
+                  //  ChatUtils.info("Waiting 3 ticks and directly teleporting");
                     waitTicks = 3;
                     return false;
                 }
             }
             Vec3d newPos = getStage(currentPosition, to, stage);
-            if (!predictifPossible(newPos)) {
+            if (!predictifPossible(newPos, "next stage")) {
                 MoveToUtil.sendAllPacketsFromQueue();
-                ChatUtils.info("Waiting 3 ticks and staying on stage");
+             //   ChatUtils.info("Waiting 3 ticks and staying on stage");
                 waitTicks = 3;
                 return false;
             }
@@ -70,45 +68,27 @@ public class GotoUtil extends Movement {
         }
 
         if (!currentlyMoving) return;
-        ChatUtils.info("Tick");
+     //   ChatUtils.info("Tick");
         if (stage()) {
             currentlyMoving = false;
-            ChatUtils.info("completed");
+         //   ChatUtils.info("completed");
             tickEventFuture.complete(null);
         }
     }
 
 
-    public static void init(Boolean automaticallySetPosition) {
-        if (mc.player == null) return;
-        MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
-        MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
-        MeteorClient.EVENT_BUS.subscribe(GotoUtil.class);
-        currentPosition = mc.player.getPos();
-        mc.player.setNoGravity(true);
-        to = mc.player.getPos();
-        AIDSboolean = true;
-        AutoSetPosition = automaticallySetPosition;
-    }
-    public static void disable() {
-        MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
-        MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
-        AIDSboolean = false;
-        currentlyMoving = false;
-        if (mc.player == null) return;
-        mc.player.setNoGravity(false);
-    }
-
     public static void setPos(Vec3d pos) {
-        MoveToUtil.packetQueue.clear();
-        mc.player.networkHandler.sendChatMessage("Teleporting to " + pos);
-        ChatUtils.info("");
-        ChatUtils.info("");
-        ChatUtils.info("Teleporting to " + pos);
+//        if (!autoSendPackets) {
+//            MoveToUtil.packetQueue.clear();
+//        }
+//        mc.player.networkHandler.sendChatMessage("Teleporting to " + pos);
+//        ChatUtils.info("");
+//        ChatUtils.info("");
+//        ChatUtils.info("Teleporting to " + pos);
         to = pos;
         if (!closeBy(currentPosition, to)) {
             if (AutoSetPosition) {
-                mc.player.setPosition(to);
+                //mc.player.setPosition(to);
             }
             y = CanTeleport.searchY(currentPosition, to);
             if (y == -1337) {
@@ -120,18 +100,20 @@ public class GotoUtil extends Movement {
             tickEventFuture = new CompletableFuture<>();
             if (!stage()) {
                 currentlyMoving = true;
-                ChatUtils.info("subscribing");
+             //   ChatUtils.info("subscribing");
                 try {
                     tickEventFuture.get();
                 } catch (InterruptedException | ExecutionException e) {
                     ChatUtils.error("goto utils interupped " + e);
                 }
             }
-            MoveToUtil.sendAllPacketsFromQueue();
+            if (autoSendPackets) {
+                MoveToUtil.sendAllPacketsFromQueue();
+            }
         }
-        mc.player.networkHandler.sendChatMessage("Finished teleporting to " + pos);
-        ChatUtils.info("finished setting pos");
-        ChatUtils.info("");
-        ChatUtils.info("");
+//        mc.player.networkHandler.sendChatMessage("Finished teleporting to " + pos);
+//        ChatUtils.info("finished setting pos");
+//        ChatUtils.info("");
+//        ChatUtils.info("");
     }
 }

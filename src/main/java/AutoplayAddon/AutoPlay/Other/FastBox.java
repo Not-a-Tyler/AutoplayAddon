@@ -23,6 +23,14 @@ public class FastBox {
             this.corners = new ArrayList<>(other.corners);
         }
     }
+
+
+    public void setPosition(Vec3d to) {
+        Box box = new Box(to.x - 0.3, to.y, to.z - 0.3, to.x + 0.3, to.y + mc.player.getHeight(), to.z + 0.3);
+        box.expand(-0.0625D);
+        calculateCorners(box);
+    }
+
     public FastBox(Vec3d to) {
         Box box = new Box(to.x - 0.3, to.y, to.z - 0.3, to.x + 0.3, to.y + mc.player.getHeight(), to.z + 0.3);
         box.expand(-0.0625D);
@@ -69,15 +77,29 @@ public class FastBox {
         return this;
     }
 
-    public boolean isCollidingWithBlocks() {
+    public List<BlockPos> getOccupiedBlockPos() {
+        List<BlockPos> occupiedBlocks = new ArrayList<>();
         for (Vec3d corner : this.corners) {
             BlockPos blockPos = vecToBlockPos(corner);
+            if (!occupiedBlocks.contains(blockPos)) {
+                occupiedBlocks.add(blockPos);
+            }
+        }
+        return occupiedBlocks;
+    }
+
+    public boolean isCollidingWithBlocks() {
+        List <BlockPos> cache = new ArrayList<>();
+        for (Vec3d corner : this.corners) {
+            BlockPos blockPos = vecToBlockPos(corner);
+            if (cache.contains(blockPos)) {
+                continue;
+            }
+            cache.add(blockPos);
             if (mc.world.getBlockState(blockPos).isSolid()) {
-                //Movement.fastBoxBadList.add(new FastBox(this, false));
                 return true;
             }
         }
-       // Movement.fastBoxList.add(new FastBox(this, false));
         return false;
     }
 }

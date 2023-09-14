@@ -52,7 +52,7 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new AutoSteal());
         Modules.get().add(new FreecamFly());
         //Modules.get().add(new StacisBotTest());
-        Modules.get().add(new LOTEST());
+      //  Modules.get().add(new LOTEST());
         Modules.get().add(new UpFly());
         Modules.get().add(new SimpleClickTp());
         Modules.get().add(new LongDistanceTest());

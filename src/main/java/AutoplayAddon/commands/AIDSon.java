@@ -14,7 +14,7 @@ public class AIDSon extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            GotoUtil.init(true);
+            GotoUtil.init(true, true);
             return SINGLE_SUCCESS;
         });
     }

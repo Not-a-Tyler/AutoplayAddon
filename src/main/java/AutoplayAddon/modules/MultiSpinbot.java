@@ -125,7 +125,7 @@ public class MultiSpinbot extends Module {
             }
         } else if (type.get() == Type.Client) {
             if (!Movement.AIDSboolean) {
-                GotoUtil.init(true);
+                GotoUtil.init(true, true);
             }
             ClientData clientData = readFromMemoryMappedFile(clientNumber.get());
             if (clientData != null) {

@@ -47,7 +47,7 @@ public class DeleteAllTest extends Module {
                             Vec3d startingPos = mc.player.getPos();
                             Boolean ignore = false;
                             if (!Movement.AIDSboolean) {
-                                GotoUtil.init(false);
+                                GotoUtil.init(false, true);
                             } else {
                                 ignore = true;
                             }

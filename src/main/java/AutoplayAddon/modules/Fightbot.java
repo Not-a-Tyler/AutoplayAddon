@@ -39,7 +39,7 @@ public class Fightbot extends Module {
 
     @Override
     public void onActivate() {
-        GotoUtil.init(true);
+        GotoUtil.init(true, true);
     }
     @Override
     public void onDeactivate() {

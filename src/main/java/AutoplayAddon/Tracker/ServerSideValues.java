@@ -9,6 +9,7 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.BlockState;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
 import net.minecraft.util.math.BlockPos;
@@ -32,6 +33,9 @@ public class ServerSideValues {
 
     public static int delta() {
         return allowedPlayerTicks - (i2 + i);
+    }
+    public static int ii() {
+        return (i2 + i);
     }
 
 
@@ -103,16 +107,16 @@ public class ServerSideValues {
             allowedPlayerTicks = 20;
         }
 
-        String packetType = "unknown";
-        if (packet instanceof PlayerMoveC2SPacket.Full) packetType = "Full";
-        if (packet instanceof PlayerMoveC2SPacket.OnGroundOnly) packetType = "OnGroundOnly";
-        if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) packetType = "PositionAndOnGround";
-        if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround) packetType = "LookAndOnGround";
-        if (d10 > 0) {
-            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta() + " MOVED D10: " + d10);
-        } else {
-            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta());
-        }
+//        String packetType = "unknown";
+//        if (packet instanceof PlayerMoveC2SPacket.Full) packetType = "Full";
+//        if (packet instanceof PlayerMoveC2SPacket.OnGroundOnly) packetType = "OnGroundOnly";
+//        if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) packetType = "PositionAndOnGround";
+//        if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround) packetType = "LookAndOnGround";
+//        if (d10 > 0) {
+//            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta() + " MOVED D10: " + d10);
+//        } else {
+//            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta());
+//        }
 
 
         if (hasPos) {
@@ -144,6 +148,8 @@ public class ServerSideValues {
     private static void onRecievePacket(PacketEvent.Send event) {
         if (event.packet instanceof OpenScreenS2CPacket packet) {
             lastSyncId = packet.getSyncId();
+        }
+        if (event.packet instanceof EntityPositionS2CPacket packet) {
         }
     }
 
