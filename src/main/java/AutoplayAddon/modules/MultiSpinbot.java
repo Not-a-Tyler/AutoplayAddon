@@ -25,6 +25,12 @@ public class MultiSpinbot extends Module {
     public MultiSpinbot() {
         super(AutoplayAddon.autoplay, "bot-controller", "Allows multiple players to circle around a player in a synchronized fashion");
     }
+    private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
+        .name("formation-mode")
+        .description("The formation mode, either line or circle.")
+        .defaultValue(Mode.Circle)
+        .build());
+
 
     private final Setting<Type> type = sgGeneral.add(new EnumSetting.Builder<Type>()
         .name("mode")
@@ -73,6 +79,7 @@ public class MultiSpinbot extends Module {
         .build());
 
 
+
     @Override
     public void onActivate() {
         init();
@@ -95,6 +102,11 @@ public class MultiSpinbot extends Module {
             e.printStackTrace();
         }
     }
+    public enum Mode {
+        Line,
+        Circle
+    }
+
 
     public enum Type {
         Client,
@@ -107,11 +119,9 @@ public class MultiSpinbot extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         if (type.get() == Type.Server) {
-            double incrementAngle = (2 * Math.PI * spinSpeed.get() / 360.0);  // Convert the spin speed to radians per tick
+             // Convert the spin speed to radians per tick
             for (int id = 1; id <= totalClients.get(); id++) {
-                double currentAngle = clientAngles.getOrDefault(id, 0.0);
-                Vec3d pos = calculatePositionBasedOnAngle(currentAngle);
-                clientAngles.put(id, currentAngle + incrementAngle);
+                Vec3d pos = calculatePositionBasedOnAngle(id);
                 boolean sneakingStatus;
                 float pitch, yaw;
                 if (mimicsneak.get()) {
@@ -200,10 +210,23 @@ public class MultiSpinbot extends Module {
         clientData.yaw = yaw;
         return clientData;
     }
-
-    private Vec3d calculatePositionBasedOnAngle(double angle) {
-        double dx = Math.cos(angle) * distanceFromPlayer.get();
-        double dz = Math.sin(angle) * distanceFromPlayer.get();
-        return new Vec3d(mc.player.getX() + dx, mc.player.getY(), mc.player.getZ() + dz);
+    private Vec3d calculatePositionBasedOnAngle(int id) {
+        if (mode.get() == Mode.Circle) {
+            double incrementAngle = (2 * Math.PI * spinSpeed.get() / 360.0);
+            double currentAngle = clientAngles.getOrDefault(id, 0.0);
+            double dx = Math.cos(currentAngle) * distanceFromPlayer.get();
+            double dz = Math.sin(currentAngle) * distanceFromPlayer.get();
+            clientAngles.put(id, currentAngle + incrementAngle);
+            return new Vec3d(mc.player.getX() + dx, mc.player.getY(), mc.player.getZ() + dz);
+        } else if (mode.get() == Mode.Line) {
+            double offset = (clientNumber.get() - totalClients.get() / 2.0) * distanceFromPlayer.get();
+            double dx = Math.sin(-mc.player.getYaw() * (Math.PI / 180)) * offset;
+            double dz = Math.cos(mc.player.getYaw() * (Math.PI / 180)) * offset;
+            return new Vec3d(mc.player.getX() + dx, mc.player.getY(), mc.player.getZ() + dz);
+        }
+        return mc.player.getPos();
     }
+
+
+
 }

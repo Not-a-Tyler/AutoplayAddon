@@ -35,16 +35,12 @@ public class AutoplayAddon extends MeteorAddon {
 //        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
 //            blockCache.removeChunk(chunk);
 //        });;
-        Modules.get().add(new AutoHorn());
         Modules.get().add(new Fightbot());
         Modules.get().add(new DeleteAllTest());
-        Modules.get().add(new BetterBreakerTest());
-        Modules.get().add(new TimedTpAway());
-        Modules.get().add(new AntiKick());
         Modules.get().add(new Disabler());
+        Modules.get().add(new BlockFarmer());
         Modules.get().add(new Speedrun());
         //Modules.get().add(new TeleportInfo());
-        Modules.get().add(new BlockDebug());
         Modules.get().add(new ClickTp());
         Modules.get().add(new InfiniteAura());
         Modules.get().add(new Follower());
@@ -52,7 +48,7 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new AutoSteal());
         Modules.get().add(new FreecamFly());
         //Modules.get().add(new StacisBotTest());
-      //  Modules.get().add(new LOTEST());
+        Modules.get().add(new LOTEST());
         Modules.get().add(new UpFly());
         Modules.get().add(new SimpleClickTp());
         Modules.get().add(new LongDistanceTest());
@@ -69,6 +65,7 @@ public class AutoplayAddon extends MeteorAddon {
         Commands.add(new Smack());
         Commands.add(new AIDSon());
         Commands.add(new AIDSoff());
+        Commands.add(new Trap());
         Commands.add(new Stop());
         Commands.add(new TpTo());
         Commands.add(new TestCommand());

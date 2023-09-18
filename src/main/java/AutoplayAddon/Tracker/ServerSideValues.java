@@ -1,6 +1,7 @@
 package AutoplayAddon.Tracker;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
+import meteordevelopment.meteorclient.events.entity.player.InteractItemEvent;
 import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -8,10 +9,8 @@ import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.BlockState;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
-import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
+import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -23,11 +22,10 @@ public class ServerSideValues {
 
     public static boolean hasMoved, clientIsFloating = false;
     public static int lastSyncId;
-    static double prevx;
-    static double prevy;
-    static double prevz= 0;
+    static double prevy, prevx, prevz;
+    static long lastLimitedPacket = -1;
     public static Vec3d tickpos = new Vec3d(0,0,0);
-    public static int i, i2, allowedPlayerTicks, aboveGroundTickCount;
+    public static int i, i2, allowedPlayerTicks, aboveGroundTickCount, limitedPackets;
     private static int receivedMovePacketCount, knownMovePacketCount, knownMovePacketCount2, receivedMovePacketCount2, lasttick;
 
 
@@ -38,6 +36,41 @@ public class ServerSideValues {
         return (i2 + i);
     }
 
+    @EventHandler()
+    private static void onJoinServer(GameJoinedEvent event) {
+        prevz= 0;
+        tickpos = new Vec3d(0,0,0);
+        hasMoved = false;
+        i = 0;
+        i2 = 0;
+        allowedPlayerTicks = 1;
+        lastLimitedPacket = -1;
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST - 2)
+    private static void onSendPacket(PacketEvent.Send event) {
+        if (event.packet instanceof PlayerMoveC2SPacket packet) {
+            HandleMovepacket(packet, true);
+        }
+        if (event.packet instanceof PlayerInteractBlockC2SPacket packet) {
+            if(!handleUse()) {
+                event.setCancelled(true);
+                event.cancel();
+            }
+        }
+        if (event.packet instanceof PlayerInteractItemC2SPacket packet) {
+            if (!handleUse()) {
+                event.setCancelled(true);
+                event.cancel();
+            }
+        }
+    }
+    @EventHandler(priority = EventPriority.LOWEST - 2)
+    private static void onRecievePacket(PacketEvent.Send event) {
+        if (event.packet instanceof OpenScreenS2CPacket packet) {
+            lastSyncId = packet.getSyncId();
+        }
+    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     private static void onTick(TickEvent.Pre event) {
@@ -127,30 +160,27 @@ public class ServerSideValues {
         clientIsFloating = d7 >= -0.03125D && noBlocksAround();
     }
 
-    @EventHandler()
-    private static void onJoinServer(GameJoinedEvent event) {
-        prevz= 0;
-        tickpos = new Vec3d(0,0,0);
-        hasMoved = false;
-        i = 0;
-        i2 = 0;
-        allowedPlayerTicks = 1;
+
+    public static int threshhold = 305;
+    public static Boolean handleUse() {
+        if (lastLimitedPacket != -1 && System.currentTimeMillis() - lastLimitedPacket < threshhold && limitedPackets++ >= 8) {
+            return false;
+        }
+        if (lastLimitedPacket == -1 || System.currentTimeMillis() - lastLimitedPacket >= threshhold) { // Paper
+            lastLimitedPacket = System.currentTimeMillis();
+            limitedPackets = 0;
+            return true;
+        }
+        return true;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST - 2)
-    private static void onSendPacket(PacketEvent.Send event) {
-        if (event.packet instanceof PlayerMoveC2SPacket packet) {
-            HandleMovepacket(packet, true);
-        }
-    }
 
-    @EventHandler(priority = EventPriority.LOWEST - 2)
-    private static void onRecievePacket(PacketEvent.Send event) {
-        if (event.packet instanceof OpenScreenS2CPacket packet) {
-            lastSyncId = packet.getSyncId();
+
+    public static boolean canPlace() {
+        if (lastLimitedPacket != -1 && System.currentTimeMillis() - lastLimitedPacket < threshhold && (limitedPackets + 1) >= 8) {
+            return false;
         }
-        if (event.packet instanceof EntityPositionS2CPacket packet) {
-        }
+        return true;
     }
 
 

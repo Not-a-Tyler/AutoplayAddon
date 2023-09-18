@@ -1,4 +1,6 @@
 package AutoplayAddon.AutoPlay.Other;
+import AutoplayAddon.AutoPlay.Movement.Movement;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.BlockPos;
@@ -36,9 +38,62 @@ public class FastBox {
         box.expand(-0.0625D);
         calculateCorners(box);
     }
+    public FastBox(Box box) {
+        box.expand(-0.0625D);
+        calculateCorners(box);
+    }
 
 
-    protected void calculateCorners(Box box) {
+    private void calculateCorners(Box box) {
+        double minX = box.minX;
+        double minY = box.minY;
+        double minZ = box.minZ;
+        double maxX = box.maxX;
+        double maxY = box.maxY;
+        double maxZ = box.maxZ;
+
+        List<Double> xPoints = generatePoints(minX, maxX);
+        List<Double> yPoints = generatePoints(minY, maxY);
+        List<Double> zPoints = generatePoints(minZ, maxZ);
+
+        List<Vec3d> allPoints = new ArrayList<>();
+
+        for (double x : xPoints) {
+            for (double y : yPoints) {
+                for (double z : zPoints) {
+                    allPoints.add(new Vec3d(x, y, z));
+                }
+            }
+        }
+        this.corners = allPoints;
+    }
+
+    private List<Double> generatePoints(double min, double max) {
+        List<Double> points = new ArrayList<>();
+
+        double diff = max - min;
+        int numPoints = (int) Math.ceil(diff);
+
+        // If the box is a single unit or smaller, just add the two ends.
+        if (numPoints <= 1) {
+            points.add(min);
+            points.add(max);
+            return points;
+        }
+
+        double interval = diff / numPoints;
+
+        for (int i = 0; i <= numPoints; i++) {
+            points.add(min + (interval * i));
+        }
+
+        return points;
+    }
+
+
+
+
+    protected void calculateCornersold(Box box) {
         double minX = box.minX;
         double minY = box.minY;
         double minZ = box.minZ;
@@ -90,6 +145,7 @@ public class FastBox {
 
     public boolean isCollidingWithBlocks() {
         List <BlockPos> cache = new ArrayList<>();
+        Movement.fastBoxList.add(this);
         for (Vec3d corner : this.corners) {
             BlockPos blockPos = vecToBlockPos(corner);
             if (cache.contains(blockPos)) {
@@ -97,6 +153,7 @@ public class FastBox {
             }
             cache.add(blockPos);
             if (mc.world.getBlockState(blockPos).isSolid()) {
+                Movement.fastBoxBadList.add(this);
                 return true;
             }
         }

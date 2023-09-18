@@ -51,7 +51,7 @@ public class Movement {
         if (value <= 0) value = 0;
         value = value + 1;
 
-        //ChatUtils.info("For " + reason + " we will use " + ivalue + " packets so we need " + value + );
+        //ChatUtils.info("For " + reason + " we will use " + ivalue + " packets so we need " + value);
         return (ServerSideValues.delta() >= value);
     }
 

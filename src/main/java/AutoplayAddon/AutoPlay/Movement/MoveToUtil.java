@@ -14,7 +14,7 @@ public class MoveToUtil extends Movement {
     public static Queue<Object> packetQueue = new LinkedList<>();
 
     public static void sendAllPacketsFromQueue() {
-        ChatUtils.info("SENDING " + packetQueue.size() + " packets");
+       // ChatUtils.info("SENDING " + packetQueue.size() + " packets");
         while (!packetQueue.isEmpty()) {
             Object packet = packetQueue.poll();
             if (packet instanceof PlayerMoveC2SPacket) {
@@ -43,7 +43,7 @@ public class MoveToUtil extends Movement {
         }
         double base = findFarthestDistance(newPos);
         int packetsRequired = ((int) Math.ceil(base / 10.0)) - 1;
-        ChatUtils.info("Getting i value to " + packetsRequired);
+      //  ChatUtils.info("Getting i value to " + packetsRequired);
         sendpackets(packetsRequired);
         moveplayer(newPos);
     }
@@ -71,7 +71,7 @@ public class MoveToUtil extends Movement {
             mc.player.getVehicle().setPosition(newPos.x, newPos.y, newPos.z);
             packetQueue.add(new VehicleMoveC2SPacket(mc.player.getVehicle()));
         } else {
-            ChatUtils.info("sending tp packet");
+          //  ChatUtils.info("sending tp packet");
             if (ServerSideValues.allowedPlayerTicks > 20) {
                 handlePacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, toYaw, toPitch, true));
             } else {

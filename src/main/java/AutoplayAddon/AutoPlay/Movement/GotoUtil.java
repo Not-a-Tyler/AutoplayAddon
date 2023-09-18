@@ -25,14 +25,14 @@ public class GotoUtil extends Movement {
 
     private static boolean stage() {
         while (mc.player != null) {
-         //   ChatUtils.info("Stage Starting: " + stage);
+           // ChatUtils.info("Stage Starting: " + stage);
             if (stage == 4) {
-                ChatUtils.error("finished via stage 4");
+              //  ChatUtils.error("finished via stage 4");
                 return true;
             }
             if (CanTeleport.lazyCheck(currentPosition, to)) {
                 if (predictifPossible(to, "direct teleport")) {
-                 //   ChatUtils.info("Directly teleporting");
+                //    ChatUtils.info("Directly teleporting");
                     MoveToUtil.moveTo(to);
                     return true;
                 } else {
@@ -45,7 +45,7 @@ public class GotoUtil extends Movement {
             Vec3d newPos = getStage(currentPosition, to, stage);
             if (!predictifPossible(newPos, "next stage")) {
                 MoveToUtil.sendAllPacketsFromQueue();
-             //   ChatUtils.info("Waiting 3 ticks and staying on stage");
+          //      ChatUtils.info("Waiting 3 ticks and staying on stage");
                 waitTicks = 3;
                 return false;
             }
@@ -78,40 +78,36 @@ public class GotoUtil extends Movement {
 
 
     public static void setPos(Vec3d pos) {
-//        if (!autoSendPackets) {
-//            MoveToUtil.packetQueue.clear();
-//        }
-//        mc.player.networkHandler.sendChatMessage("Teleporting to " + pos);
+        if (autoSendPackets) {
+            MoveToUtil.packetQueue.clear();
+        }
+        to = pos;
+        if (closeBy(currentPosition, to)) return;
+      //  mc.player.networkHandler.sendChatMessage("Teleporting to " + pos);
 //        ChatUtils.info("");
 //        ChatUtils.info("");
 //        ChatUtils.info("Teleporting to " + pos);
-        to = pos;
-        if (!closeBy(currentPosition, to)) {
-            if (AutoSetPosition) {
-                //mc.player.setPosition(to);
-            }
-            y = CanTeleport.searchY(currentPosition, to);
-            if (y == -1337) {
-                y = currentPosition.y;
-                stage = 2;
-            } else {
-                stage = 1;
-            }
-            tickEventFuture = new CompletableFuture<>();
-            if (!stage()) {
-                currentlyMoving = true;
-             //   ChatUtils.info("subscribing");
-                try {
-                    tickEventFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    ChatUtils.error("goto utils interupped " + e);
-                }
-            }
-            if (autoSendPackets) {
-                MoveToUtil.sendAllPacketsFromQueue();
+        y = CanTeleport.searchY(currentPosition, to);
+        if (y == -1337) {
+            y = currentPosition.y;
+            stage = 2;
+        } else {
+            stage = 1;
+        }
+        tickEventFuture = new CompletableFuture<>();
+        if (!stage()) {
+            currentlyMoving = true;
+         //   ChatUtils.info("subscribing");
+            try {
+                tickEventFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                ChatUtils.error("goto utils interupped " + e);
             }
         }
-//        mc.player.networkHandler.sendChatMessage("Finished teleporting to " + pos);
+        if (autoSendPackets) {
+            MoveToUtil.sendAllPacketsFromQueue();
+        }
+        //mc.player.networkHandler.sendChatMessage("Finished teleporting to " + pos);
 //        ChatUtils.info("finished setting pos");
 //        ChatUtils.info("");
 //        ChatUtils.info("");
