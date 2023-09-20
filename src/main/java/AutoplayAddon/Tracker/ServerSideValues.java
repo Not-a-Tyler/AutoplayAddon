@@ -140,16 +140,16 @@ public class ServerSideValues {
             allowedPlayerTicks = 20;
         }
 
-//        String packetType = "unknown";
-//        if (packet instanceof PlayerMoveC2SPacket.Full) packetType = "Full";
-//        if (packet instanceof PlayerMoveC2SPacket.OnGroundOnly) packetType = "OnGroundOnly";
-//        if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) packetType = "PositionAndOnGround";
-//        if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround) packetType = "LookAndOnGround";
-//        if (d10 > 0) {
-//            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta() + " MOVED D10: " + d10);
-//        } else {
-//            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta());
-//        }
+        String packetType = "unknown";
+        if (packet instanceof PlayerMoveC2SPacket.Full) packetType = "Full";
+        if (packet instanceof PlayerMoveC2SPacket.OnGroundOnly) packetType = "OnGroundOnly";
+        if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) packetType = "PositionAndOnGround";
+        if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround) packetType = "LookAndOnGround";
+        if (d10 > 0) {
+            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta() + " MOVED D10: " + d10);
+        } else {
+            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta());
+        }
 
 
         if (hasPos) {

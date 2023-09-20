@@ -8,17 +8,17 @@ import java.util.List;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class CanTeleport {
 
-    public static double searchY(Vec3d from, Vec3d to) {
+    public static int searchY(Vec3d from, Vec3d to) {
         double fromy = from.y;
         if (tryY(from, to, fromy)) {
             // id if current player y works
             return -1337;
         }
-        double ytotest = 0;
+        int ytotest = 0;
         boolean validTeleportFound = false;
         int searchOffset = 0;
         while (!validTeleportFound) {
-            ytotest = (fromy + searchOffset);
+            ytotest = (int) (fromy + searchOffset);
             if (tryY(from, to, ytotest)) {
                 validTeleportFound = true;
             } else {

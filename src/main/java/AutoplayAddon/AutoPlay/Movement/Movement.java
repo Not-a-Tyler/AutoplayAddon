@@ -11,6 +11,8 @@ import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
@@ -57,8 +59,13 @@ public class Movement {
 
     public static double findFarthestDistance(Vec3d newPos) {
         Vec3d tickpos = ServerSideValues.tickpos;
+        List<Vec3d> positions = Arrays.asList(tickpos, currentPosition);
+        return maxDist(newPos, positions);
+    }
+
+    public static double maxDist(Vec3d newPos, List<Vec3d> positions) {
         double maxDistance = Double.MIN_VALUE;
-        for (Vec3d vec3d : new Vec3d[] { tickpos, currentPosition }) {
+        for (Vec3d vec3d : positions) {
             double distance = calculateDistance(newPos, vec3d);
             if (distance > maxDistance) {
                 maxDistance = distance;
@@ -80,7 +87,7 @@ public class Movement {
         if (mc.player == null) return;
         MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
         MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
-        MeteorClient.EVENT_BUS.subscribe(GotoUtil.class);
+        MeteorClient.EVENT_BUS.subscribe(GotoQueue.class);
         currentPosition = mc.player.getPos();
         mc.player.setNoGravity(true);
         to = mc.player.getPos();
@@ -89,7 +96,7 @@ public class Movement {
         AutoSetPosition = automaticallySetPosition;
     }
     public static void disable() {
-        MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
+        MeteorClient.EVENT_BUS.unsubscribe(GotoQueue.class);
         MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
         AIDSboolean = false;
         currentlyMoving = false;
@@ -119,7 +126,7 @@ public class Movement {
         new Thread(() -> {
            // ChatUtils.info(System.currentTimeMillis() + " Starting movement");
             if (ignore) GotoUtil.init(false, true);
-            GotoUtil.setPos(pos);
+            GotoQueue.setPos(pos);
             if (ignore) GotoUtil.disable();
            // ChatUtils.info(System.currentTimeMillis() + " Movement finished");
             mc.player.setPosition(pos);

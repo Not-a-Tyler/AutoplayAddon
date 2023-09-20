@@ -1,6 +1,5 @@
 package AutoplayAddon.commands;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
-import AutoplayAddon.AutoPlay.Movement.MoveToUtil;
+import AutoplayAddon.AutoPlay.Movement.GotoQueue;
 import AutoplayAddon.AutoPlay.Other.FastBox;
 import AutoplayAddon.Tracker.ServerSideValues;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -9,6 +8,8 @@ import meteordevelopment.meteorclient.commands.arguments.PlayerArgumentType;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Blocks;
+
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.PlayerEntity;
 import meteordevelopment.meteorclient.commands.Command;
@@ -35,15 +36,16 @@ public class Trap extends Command {
         MeteorClient.EVENT_BUS.subscribe(this);
     }
     List<BlockPos> trapBlocks;
+    Vec3d startingPos;
     PlayerEntity e;
     Boolean trapping = false;
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(argument("player", PlayerArgumentType.create()).executes(context -> {
+            startingPos = mc.player.getPos();
             e = PlayerArgumentType.get(context);
             trapBlocks = getTrap(e.getBoundingBox());
             ChatUtils.info("Trapping " + e.getName() + " with " + trapBlocks.size() + " blocks");
-            GotoUtil.init(false, true);
             attemptTrap(e);
             return SINGLE_SUCCESS;
         }));
@@ -58,8 +60,7 @@ public class Trap extends Command {
 
     private void attemptTrap(PlayerEntity e) {
         Thread waitForTickEventThread1 = new Thread(() -> {
-            Vec3d startingPos = mc.player.getPos();
-            GotoUtil.setPos(e.getPos());
+            GotoQueue.setPos(e.getPos());
             ChatUtils.info("we need to place " + trapBlocks.size() + " blocks");
             while (!trapBlocks.isEmpty()) {
                 BlockPos pos = trapBlocks.get(0);
@@ -68,7 +69,12 @@ public class Trap extends Command {
                     continue;
                 }
                 if (ServerSideValues.canPlace()) {
+                    // Set block pos client-sided
+                    mc.world.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState()); // Assuming YOUR_BLOCK is the block you want to set.
+
+                    // Send packet to server to interact with the block
                     mc.getNetworkHandler().sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(), Direction.UP, pos, false), 0));
+
                     ChatUtils.info("Placed block at " + pos.toShortString() + " on " + System.currentTimeMillis());
                     trapBlocks.remove(pos);
                 } else {
@@ -78,11 +84,11 @@ public class Trap extends Command {
             }
             ChatUtils.info("Finished trapping");
             trapping = false;
-            GotoUtil.setPos(startingPos);
-            GotoUtil.disable();
+            GotoQueue.setPos(startingPos);
         });
         waitForTickEventThread1.start();
     }
+
 
     private List<BlockPos> getTrap(Box box) {
         FastBox fastBox = new FastBox(box);
