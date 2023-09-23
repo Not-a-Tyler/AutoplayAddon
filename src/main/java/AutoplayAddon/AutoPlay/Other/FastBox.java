@@ -12,18 +12,8 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class FastBox {
 
     public List<Vec3d> corners;
-    public FastBox(FastBox other, boolean bottomOnly) {
-        if (bottomOnly) {
-            List<Vec3d> bottomCorners = Arrays.asList(
-                other.corners.get(0),  // bottom front left
-                other.corners.get(1),  // bottom front right
-                other.corners.get(6),  // bottom back left
-                other.corners.get(7)   // bottom back right
-            );
-            this.corners = bottomCorners;
-        } else {
-            this.corners = new ArrayList<>(other.corners);
-        }
+    public FastBox(FastBox other) {
+        this.corners = new ArrayList<>(other.corners);
     }
 
 
@@ -92,34 +82,6 @@ public class FastBox {
 
 
 
-
-    protected void calculateCornersold(Box box) {
-        double minX = box.minX;
-        double minY = box.minY;
-        double minZ = box.minZ;
-        double maxX = box.maxX;
-        double maxY = box.maxY;
-        double maxZ = box.maxZ;
-
-        double midY = minY + (maxY - minY) / 2;
-
-        this.corners = Arrays.asList(
-            new Vec3d(minX, minY, minZ),  // bottom front left
-            new Vec3d(maxX, minY, minZ),  // bottom front right
-            new Vec3d(minX, maxY, minZ),  // top front left
-            new Vec3d(maxX, maxY, minZ),  // top front right
-            new Vec3d(minX, midY, minZ),  // center front left
-            new Vec3d(maxX, midY, minZ),  // center front right
-            new Vec3d(minX, minY, maxZ),  // bottom back left
-            new Vec3d(maxX, minY, maxZ),  // bottom back right
-            new Vec3d(minX, maxY, maxZ),  // top back left
-            new Vec3d(maxX, maxY, maxZ),  // top back right
-            new Vec3d(minX, midY, maxZ),  // center back left
-            new Vec3d(maxX, midY, maxZ)   // center back right
-        );
-    }
-
-
     private BlockPos vecToBlockPos(Vec3d vec) {
         return new BlockPos((int) Math.floor(vec.x), (int) Math.floor(vec.y), (int) Math.floor(vec.z));
     }
@@ -145,7 +107,7 @@ public class FastBox {
 
     public boolean isCollidingWithBlocks() {
         List <BlockPos> cache = new ArrayList<>();
-        Movement.fastBoxList.add(this);
+        //Movement.fastBoxList.add(new FastBox(this));
         for (Vec3d corner : this.corners) {
             BlockPos blockPos = vecToBlockPos(corner);
             if (cache.contains(blockPos)) {
@@ -153,7 +115,7 @@ public class FastBox {
             }
             cache.add(blockPos);
             if (mc.world.getBlockState(blockPos).isSolid()) {
-                Movement.fastBoxBadList.add(this);
+           //     Movement.fastBoxList.add(new FastBox(this));
                 return true;
             }
         }

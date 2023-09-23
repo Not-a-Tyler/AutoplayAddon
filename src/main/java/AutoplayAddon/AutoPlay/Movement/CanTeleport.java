@@ -68,9 +68,9 @@ public class CanTeleport {
 
 
     public static double OffsetCalcDouble(FastBox fastBox, Direction.Axis axis, double maxDist) {
-        double step = 0.9;
+        double step = 0.3;
         double currentOffset = 0.0;
-        double epsilon = 0.0625D;
+        double lastOffset = 0.0;
         Vec3d direction = Vec3d.ZERO;
 
         switch(axis) {
@@ -86,7 +86,7 @@ public class CanTeleport {
         }
 
         direction = direction.multiply(Math.signum(maxDist));
-        FastBox bottom4Box = new FastBox(fastBox, true);
+        FastBox bottom4Box = new FastBox(fastBox);
 
         while (true) {
             double offsetThisStep = step;
@@ -97,22 +97,16 @@ public class CanTeleport {
             }
 
             bottom4Box.offset(direction.multiply(offsetThisStep));
+            currentOffset += offsetThisStep;
+
+
 
             if (bottom4Box.isCollidingWithBlocks()) {
-                // If the box has collided, get the position of the bottom of the block above the current offset.
-                // For positive maxDist, use Math.ceil; for negative maxDist, use Math.floor
-                if (maxDist > 0) {
-                    return Math.ceil(currentOffset) - epsilon;
-                } else if (maxDist < 0) {
-                    return Math.floor(currentOffset) + epsilon;
-                } else {
-                    return 0.0;
-                }
+                return (lastOffset * Math.signum(maxDist));
+            } else {
+                lastOffset = currentOffset;
             }
-
             if (Math.abs(currentOffset) >= Math.abs(maxDist)) return maxDist;
-
-            currentOffset += offsetThisStep;
         }
     }
 
@@ -134,7 +128,7 @@ public class CanTeleport {
                 break;
         }
         direction = direction.multiply(Math.signum(maxDist));
-        FastBox fullBox = new FastBox(fastBox, false);
+        FastBox fullBox = new FastBox(fastBox);
         if (fullBox.isCollidingWithBlocks()) return true;
         while (true) {
             double offsetThisStep = step;
@@ -143,9 +137,9 @@ public class CanTeleport {
                 offsetThisStep = (Math.abs(maxDist) - currentOffset);
             }
             fullBox.offset(direction.multiply(offsetThisStep));
+            currentOffset += offsetThisStep;
             if (fullBox.isCollidingWithBlocks()) return true;
             if (Math.abs(currentOffset) >= Math.abs(maxDist)) return false;
-            currentOffset += offsetThisStep;
         }
     }
 

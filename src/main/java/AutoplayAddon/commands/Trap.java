@@ -1,6 +1,8 @@
 package AutoplayAddon.commands;
 import AutoplayAddon.AutoPlay.Movement.GotoQueue;
+import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoPlay.Other.FastBox;
+import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import AutoplayAddon.Tracker.ServerSideValues;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.MeteorClient;
@@ -37,6 +39,7 @@ public class Trap extends Command {
     }
     List<BlockPos> trapBlocks;
     Vec3d startingPos;
+    Boolean ignore = false;
     PlayerEntity e;
     Boolean trapping = false;
     @Override
@@ -45,7 +48,12 @@ public class Trap extends Command {
             startingPos = mc.player.getPos();
             e = PlayerArgumentType.get(context);
             trapBlocks = getTrap(e.getBoundingBox());
-            ChatUtils.info("Trapping " + e.getName() + " with " + trapBlocks.size() + " blocks");
+            ChatUtils.info("Trapping " + e.getName().getString() + " with " + trapBlocks.size() + " blocks " + System.currentTimeMillis());
+            ignore = true;
+            if (!Movement.AIDSboolean) {
+                GotoQueue.init(false, true);
+                ignore = false;
+            }
             attemptTrap(e);
             return SINGLE_SUCCESS;
         }));
@@ -61,30 +69,31 @@ public class Trap extends Command {
     private void attemptTrap(PlayerEntity e) {
         Thread waitForTickEventThread1 = new Thread(() -> {
             GotoQueue.setPos(e.getPos());
-            ChatUtils.info("we need to place " + trapBlocks.size() + " blocks");
-            while (!trapBlocks.isEmpty()) {
-                BlockPos pos = trapBlocks.get(0);
+            ChatUtils.info("we need to place " + trapBlocks.size() + " blocks ");
+
+            List<BlockPos> toRemove = new ArrayList<>();
+            for (BlockPos pos : trapBlocks) {
                 if (mc.world.getBlockState(pos).isSolid()) {
-                    trapBlocks.remove(pos);
+                    toRemove.add(pos);
                     continue;
                 }
                 if (ServerSideValues.canPlace()) {
-                    // Set block pos client-sided
-                    mc.world.setBlockState(pos, Blocks.OBSIDIAN.getDefaultState()); // Assuming YOUR_BLOCK is the block you want to set.
-
-                    // Send packet to server to interact with the block
-                    mc.getNetworkHandler().sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(), Direction.UP, pos, false), 0));
-
-                    ChatUtils.info("Placed block at " + pos.toShortString() + " on " + System.currentTimeMillis());
-                    trapBlocks.remove(pos);
+                    mc.world.setBlockState(pos, Blocks.GREEN_TERRACOTTA.getDefaultState());
+                    PlayerInteractBlockC2SPacket packet = new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(), Direction.UP, pos, false), 0);
+                    ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
+                    ServerSideValues.handleUse();
+                    toRemove.add(pos);
                 } else {
                     trapping = true;
                     return;
                 }
             }
-            ChatUtils.info("Finished trapping");
+            trapBlocks.removeAll(toRemove);
             trapping = false;
             GotoQueue.setPos(startingPos);
+            if(!ignore) GotoQueue.disable();
+            ChatUtils.info("Finished trapping " + System.currentTimeMillis());
+
         });
         waitForTickEventThread1.start();
     }
@@ -94,14 +103,17 @@ public class Trap extends Command {
         FastBox fastBox = new FastBox(box);
         List<BlockPos> collidedBlocks = fastBox.getOccupiedBlockPos();
         List<BlockPos> trapBlocks = new ArrayList<>();
-        // Find the highest and lowest Y values of the collided blocks
-        int minY = collidedBlocks.stream().min(Comparator.comparingInt(BlockPos::getY)).orElseThrow().getY();
-        int maxY = collidedBlocks.stream().max(Comparator.comparingInt(BlockPos::getY)).orElseThrow().getY();
 
-        // Determine the middle Y position between top and bottom of the entity
+        int minY = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
+
+        for (BlockPos pos : collidedBlocks) {
+            minY = Math.min(minY, pos.getY());
+            maxY = Math.max(maxY, pos.getY());
+        }
+
         int middleY = minY + (maxY - minY) / 2;
 
-        // Create a ring halfway between top and bottom
         for (BlockPos blockPos : collidedBlocks) {
             if (blockPos.getY() == middleY) {
                 for (Direction dir : Direction.values()) {
@@ -113,10 +125,6 @@ public class Trap extends Command {
                     }
                 }
             }
-        }
-
-        // Add blocks above and below the blocks that have the highest and lowest Y-values
-        for (BlockPos blockPos : collidedBlocks) {
             if (blockPos.getY() == maxY) {
                 trapBlocks.add(blockPos.up());
             }
@@ -124,6 +132,7 @@ public class Trap extends Command {
                 trapBlocks.add(blockPos.down());
             }
         }
+
         return trapBlocks;
     }
 }

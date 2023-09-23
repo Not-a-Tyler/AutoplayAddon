@@ -57,7 +57,7 @@ public class MoveToUtil extends Movement {
         } else {
             while ((packetsRequired > ServerSideValues.i2) && (ServerSideValues.delta() >= 0)) {
                 //ChatUtils.info("sending charge packet");
-                if (ServerSideValues.allowedPlayerTicks > 20) {
+                if (ServerSideValues.predictallowedPlayerTicks() > 20) {
                     handlePacket(new PlayerMoveC2SPacket.Full(currentPosition.x, currentPosition.y, currentPosition.z, toYaw, toPitch, true));
                 } else {
                     handlePacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
@@ -72,7 +72,7 @@ public class MoveToUtil extends Movement {
             packetQueue.add(new VehicleMoveC2SPacket(mc.player.getVehicle()));
         } else {
           //  ChatUtils.info("sending tp packet");
-            if (ServerSideValues.allowedPlayerTicks > 20) {
+            if (ServerSideValues.predictallowedPlayerTicks() > 20) {
                 handlePacket(new PlayerMoveC2SPacket.Full(newPos.x, newPos.y, newPos.z, toYaw, toPitch, true));
             } else {
                 handlePacket(new PlayerMoveC2SPacket.PositionAndOnGround(newPos.x, newPos.y, newPos.z, true));

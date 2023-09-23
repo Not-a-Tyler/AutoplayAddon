@@ -24,7 +24,7 @@ public class AutoplayAddon extends MeteorAddon {
     @Override
     public void onInitialize() {
         MeteorClient.EVENT_BUS.subscribe(ServerSideValues.class);
-        //eteorClient.EVENT_BUS.subscribe(blockCache);
+      //  MeteorClient.EVENT_BUS.subscribe(blockCache);
         LOG.info("Initializing AutoplayAddon");
 //
 //        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {

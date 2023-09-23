@@ -4,6 +4,7 @@ import AutoplayAddon.AutoPlay.Other.FastBox;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
+import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.KeybindSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
@@ -28,6 +29,22 @@ public class CollisionRender extends Module {
         super(AutoplayAddon.autoplay, "collision-render", "module used for testing");
     }
     List <BlockPos> blockPosList = new ArrayList<>();
+
+    private final Setting<Boolean> renderTrap = sgGeneral.add(new BoolSetting.Builder()
+        .name("render-trap")
+        .description("Renders a block overlay where you will be teleported.")
+        .defaultValue(true)
+        .build()
+    );
+
+
+    private final Setting<Boolean> renderPath = sgGeneral.add(new BoolSetting.Builder()
+        .name("render-path")
+        .description("Renders a block overlay where you will be teleported.")
+        .defaultValue(true)
+        .build()
+    );
+
 
     private final Setting<Keybind> cancelBlink = sgGeneral.add(new KeybindSetting.Builder()
         .name("Keybind to tp")
@@ -62,6 +79,7 @@ public class CollisionRender extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
+        if (!renderTrap.get()) return;
         List<BlockPos> tempBlocPosList = new ArrayList<>();
         blockPosList.clear();
 
@@ -100,54 +118,44 @@ public class CollisionRender extends Module {
                 }
             }
         }
-        ChatUtils.info("tempBlocPosList size: " + tempBlocPosList.size());
         blockPosList.addAll(tempBlocPosList);
     }
 
 
-
-
-    int frameCounter = 0; // Initialize a frame counter variable
     @EventHandler
     private void onRender3D(Render3DEvent event) {
-
-        for (BlockPos pos : blockPosList) {
-            // Using the provided box example:
-            event.renderer.box(
-                pos.getX(), pos.getY(), pos.getZ(),
-                pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1,
-                Color.CYAN, Color.BLUE, ShapeMode.Sides, 0
-            );
-        }
-        for (FastBox fastBox : Movement.fastBoxList) {
-            if (fastBox.corners == null) continue;
-            for (Vec3d corner1 : fastBox.corners) {
-                for (Vec3d corner2 : fastBox.corners) {
-                    if (corner1 == null || corner2 == null) continue;
-                    event.renderer.line(corner1.x, corner1.y, corner1.z, corner2.x, corner2.y, corner2.z, Color.ORANGE);
-                }
+        if (renderTrap.get() && !blockPosList.isEmpty()) {
+            for (BlockPos pos : blockPosList) {
+                event.renderer.box(
+                    pos.getX(), pos.getY(), pos.getZ(),
+                    pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1,
+                    Color.CYAN, Color.BLUE, ShapeMode.Sides, 0
+                );
             }
         }
-
-        for (FastBox fastBox : Movement.fastBoxBadList) {
-            for (Vec3d corner1 : fastBox.corners) {
-                for (Vec3d corner2 : fastBox.corners) {
-                    event.renderer.line(corner1.x, corner1.y, corner1.z, corner2.x, corner2.y, corner2.z, Color.RED);
+        if (renderPath.get()) {
+            try {
+                for (FastBox fastBox : Movement.fastBoxList) {
+                    if (fastBox.corners == null) continue;
+                    for (Vec3d corner1 : fastBox.corners) {
+                        for (Vec3d corner2 : fastBox.corners) {
+                            if (corner1 == null || corner2 == null) continue;
+                            event.renderer.line(corner1.x, corner1.y, corner1.z, corner2.x, corner2.y, corner2.z, Color.ORANGE);
+                        }
+                    }
                 }
+
+                for (FastBox fastBox : Movement.fastBoxBadList) {
+                    for (Vec3d corner1 : fastBox.corners) {
+                        for (Vec3d corner2 : fastBox.corners) {
+                            event.renderer.line(corner1.x, corner1.y, corner1.z, corner2.x, corner2.y, corner2.z, Color.RED);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                //("error in collision render " + e);
             }
-        }
 
-
-        frameCounter++; // Increment the frame counter
-
-        if (frameCounter == 120) {
-            int boxCount = Movement.fastBoxList.size(); // Get the count of boxes to render
-            System.out.println("Number of boxes to render: " + boxCount); // Print the box count
-            frameCounter = 0; // Reset the frame counter
         }
     }
-
-
-
-
 }

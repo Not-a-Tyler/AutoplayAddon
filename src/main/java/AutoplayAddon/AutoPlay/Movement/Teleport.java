@@ -21,12 +21,12 @@ public class Teleport extends Movement {
         this.currentPos = currentPos;
         this.destination = destination;
     }
-    private void sendPacket(Vec3d position, Boolean setTo20) {
+    private void sendPacket(Vec3d position) {
         PlayerMoveC2SPacket packet;
-        if (setTo20) {
-            packet = new PlayerMoveC2SPacket.OnGroundOnly(true);
-        } else {
+        if (ServerSideValues.predictallowedPlayerTicks() > 20) {
             packet = new PlayerMoveC2SPacket.Full(position.x, position.y, position.z, yaw, pitch, true);
+        } else {
+            packet = new PlayerMoveC2SPacket.PositionAndOnGround(position.x, position.y, position.z, true);
         }
         ServerSideValues.HandleMovePacketSafe(packet);
         ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
@@ -37,13 +37,13 @@ public class Teleport extends Movement {
         return (((int) Math.ceil(base / 10.0)) - 1) - currentPackets;
     }
 
-    public void execute(Boolean setTo20) {
+    public void execute() {
 //        double base = maxDist(destination, Arrays.asList(ServerSideValues.tickpos, currentPosition));
 //        int packetsRequired = ((int) Math.ceil(base / 10.0)) - 1;
 //        for (int i = 0; i < packetsRequired; i++) {
 //            sendPacket(currentPosition);
 //        }
-        sendPacket(destination, setTo20);
+        sendPacket(destination);
         currentPosition = destination;
     }
 

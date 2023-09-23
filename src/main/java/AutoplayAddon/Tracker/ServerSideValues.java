@@ -25,12 +25,17 @@ public class ServerSideValues {
     static double prevy, prevx, prevz;
     static long lastLimitedPacket = -1;
     public static Vec3d tickpos = new Vec3d(0,0,0);
-    public static int i, i2, allowedPlayerTicks, aboveGroundTickCount, limitedPackets;
-    private static int receivedMovePacketCount, knownMovePacketCount, knownMovePacketCount2, receivedMovePacketCount2, lasttick;
+    public static int i, i2, aboveGroundTickCount, limitedPackets;
+    private static int receivedMovePacketCount, knownMovePacketCount, knownMovePacketCount2, receivedMovePacketCount2, lasttick, allowedPlayerTicksPredict, allowedPlayerTicks;
 
 
     public static int delta() {
-        return allowedPlayerTicks - (i2 + i);
+        return predictallowedPlayerTicks() - (i2 + i);
+    }
+    public static int predictallowedPlayerTicks() {
+        allowedPlayerTicksPredict = allowedPlayerTicks;
+        allowedPlayerTicksPredict += (System.currentTimeMillis() / 50) - lasttick;
+        return Math.max(allowedPlayerTicksPredict, 1);
     }
     public static int ii() {
         return (i2 + i);
@@ -88,7 +93,7 @@ public class ServerSideValues {
             tickpos = mc.player.getPos();
         }
         knownMovePacketCount = receivedMovePacketCount;
-        receivedMovePacketCount2 = knownMovePacketCount2;
+        knownMovePacketCount2 = receivedMovePacketCount2;
         i = 0;
         i2 = 0;
     }
@@ -146,9 +151,9 @@ public class ServerSideValues {
         if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) packetType = "PositionAndOnGround";
         if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround) packetType = "LookAndOnGround";
         if (d10 > 0) {
-            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta() + " MOVED D10: " + d10);
+            System.out.println(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta() + " MOVED D10: " + d10);
         } else {
-            ChatUtils.info(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta());
+            System.out.println(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta());
         }
 
 

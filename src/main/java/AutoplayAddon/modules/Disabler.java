@@ -40,7 +40,7 @@ public class Disabler extends Module {
             float Pitch = packet.getPitch(mc.player.getPitch());
             boolean Ground = packet.isOnGround();
             PlayerMoveC2SPacket newPacket = null;
-            if (ServerSideValues.allowedPlayerTicks > 20) {
+            if (ServerSideValues.predictallowedPlayerTicks() > 20) {
                 if (packet.changesLook()) return;
                 newPacket = new PlayerMoveC2SPacket.Full(X, Y, Z, Yaw, Pitch, Ground);
             } else {

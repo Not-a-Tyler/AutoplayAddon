@@ -8,6 +8,7 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
@@ -99,6 +100,7 @@ public class Movement {
         MeteorClient.EVENT_BUS.unsubscribe(GotoQueue.class);
         MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
         AIDSboolean = false;
+        GotoQueue.tasks.clear();
         currentlyMoving = false;
         if (mc.player == null) return;
         mc.player.setNoGravity(false);
@@ -124,12 +126,9 @@ public class Movement {
             ignore = true;
         }
         new Thread(() -> {
-           // ChatUtils.info(System.currentTimeMillis() + " Starting movement");
-            if (ignore) GotoUtil.init(false, true);
+            if (ignore) GotoUtil.init(true, true);
             GotoQueue.setPos(pos);
             if (ignore) GotoUtil.disable();
-           // ChatUtils.info(System.currentTimeMillis() + " Movement finished");
-            mc.player.setPosition(pos);
         }).start();
 
     }

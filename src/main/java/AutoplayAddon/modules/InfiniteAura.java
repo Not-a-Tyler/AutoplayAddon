@@ -1,8 +1,10 @@
 package AutoplayAddon.modules;
+import AutoplayAddon.AutoPlay.Movement.GotoQueue;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.MoveToUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
+import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import meteordevelopment.meteorclient.settings.EntityTypeListSetting;
 import meteordevelopment.meteorclient.settings.KeybindSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -16,6 +18,8 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Set;
+
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class InfiniteAura  extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -31,8 +35,6 @@ public class InfiniteAura  extends Module {
         .defaultValue(EntityType.PLAYER)
         .build()
     );
-
-
 
 
     private final Setting<Keybind> test = sgGeneral.add(new KeybindSetting.Builder()
@@ -58,16 +60,26 @@ public class InfiniteAura  extends Module {
             if (closestEntity == null) return;
             Entity finalClosestEntity = closestEntity;
             Thread waitForTickEventThread1 = new Thread(() -> {
+                ChatUtils.info("");
+                ChatUtils.info("");
                 ChatUtils.info("hitting " + finalClosestEntity.getName());
                 Vec3d startingPos = mc.player.getPos();
-                GotoUtil.init(false, false);
-                GotoUtil.setPos(finalClosestEntity.getPos());
+                boolean ignore;
+                if (Movement.AIDSboolean) {
+                    ignore = false;
+                } else {
+                    ignore = true;
+                }
+
+                if (ignore) GotoUtil.init(false, true);
+                GotoQueue.setPos(finalClosestEntity.getPos());
                 PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(finalClosestEntity, false);
-                MoveToUtil.packetQueue.add(packet);
-                //mc.interactionManager.attackEntity(mc.player, finalClosestEntity);
-                GotoUtil.setPos(startingPos);
-                GotoUtil.disable();
-                MoveToUtil.sendAllPacketsFromQueue();
+                ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
+                GotoQueue.setPos(startingPos);
+                if (ignore) GotoUtil.disable();
+                ChatUtils.info("done");
+                ChatUtils.info("");
+                ChatUtils.info("");
             });
             waitForTickEventThread1.start();
         })
