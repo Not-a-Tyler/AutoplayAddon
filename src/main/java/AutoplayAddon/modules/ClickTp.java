@@ -80,7 +80,6 @@ public class ClickTp extends Module {
                 ChatUtils.error("No valid position found.");
             }
         })
-
         .build()
     );
 

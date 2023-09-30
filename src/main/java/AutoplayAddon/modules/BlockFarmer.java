@@ -1,9 +1,7 @@
 package AutoplayAddon.modules;
 
 import AutoplayAddon.AutoplayAddon;
-import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import AutoplayAddon.Tracker.ServerSideValues;
-import meteordevelopment.meteorclient.events.entity.player.InteractBlockEvent;
 import meteordevelopment.meteorclient.events.entity.player.StartBreakingBlockEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -18,15 +16,10 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-
-import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class BlockFarmer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();

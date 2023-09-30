@@ -7,7 +7,6 @@ import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.commands.Commands;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +34,13 @@ public class AutoplayAddon extends MeteorAddon {
 //        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
 //            blockCache.removeChunk(chunk);
 //        });;
+        Modules.get().add(new Door());
         Modules.get().add(new Fightbot());
         Modules.get().add(new DeleteAllTest());
         Modules.get().add(new Disabler());
         Modules.get().add(new BlockFarmer());
         Modules.get().add(new Speedrun());
+        Modules.get().add(new ExplodeCalc());
         //Modules.get().add(new TeleportInfo());
         Modules.get().add(new ClickTp());
         Modules.get().add(new InfiniteAura());
@@ -56,9 +57,11 @@ public class AutoplayAddon extends MeteorAddon {
         //Modules.get().add(new BetterFly());
 
         Commands.add(new Blank());
+        Commands.add(new infAnchor());
         Commands.add(new StopSleeping());
         Commands.add(new GetClosestVehicleId());
         Commands.add(new Interact());
+        Commands.add(new TPBack());
         Commands.add(new SendFull());
         Commands.add(new AcceptTp());
         Commands.add(new Getid());

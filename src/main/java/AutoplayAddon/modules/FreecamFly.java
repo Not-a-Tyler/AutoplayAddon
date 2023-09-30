@@ -1,13 +1,13 @@
 package AutoplayAddon.modules;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
+import AutoplayAddon.AutoPlay.Other.FastBox;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.systems.modules.render.Freecam;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.render.Camera;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -20,6 +20,8 @@ public class FreecamFly extends Module {
 
     @Override
     public void onActivate() {
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        mc.player.setPos(cameraPos.x, -66, cameraPos.z);
         GotoUtil.init(false, true);
         Module freecam = Modules.get().get(Freecam.class);
         if (!freecam.isActive()) {
@@ -27,38 +29,32 @@ public class FreecamFly extends Module {
         }
     }
 
+
     @Override
     public void onDeactivate() {
         Camera camera = mc.gameRenderer.getCamera();
+        Vec3d cameraPos = camera.getPos();
+        Vec3d playerPos = new Vec3d(cameraPos.x, cameraPos.y - mc.player.getEyeHeight(mc.player.getPose()), cameraPos.z);
+        mc.player.setPos(playerPos.x, playerPos.y, playerPos.z);
         GotoUtil.disable();
+        mc.player.setPitch(camera.getPitch());
+        mc.player.setYaw(camera.getYaw());
         Module freecam = Modules.get().get(Freecam.class);
         if (freecam.isActive()) {
             freecam.toggle();
         }
-        mc.player.setPitch(camera.getPitch());
-        mc.player.setYaw(camera.getYaw());
     }
+
+
 
     @EventHandler(priority = EventPriority.HIGHEST + 3)
     private void onTick(TickEvent.Pre event) {
-        if (!Movement.AIDSboolean) {
-            GotoUtil.disable();
-            toggle();
-        }
         Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
-        double playerEyeHeight = mc.player.getEyeHeight(mc.player.getPose());
-        mc.player.setPosition(new Vec3d(cameraPos.x, -66, cameraPos.z));
+        mc.player.setPos(cameraPos.x, -66, cameraPos.z);
         Vec3d playerPos = new Vec3d(cameraPos.x, cameraPos.y - mc.player.getEyeHeight(mc.player.getPose()), cameraPos.z);
-        Box box = new Box(
-            playerPos.x - mc.player.getWidth() / 2,
-            playerPos.y,
-            playerPos.z - mc.player.getWidth() / 2,
-            playerPos.x + mc.player.getWidth() / 2,
-            playerPos.y + mc.player.getHeight(),
-            playerPos.z + mc.player.getWidth() / 2
-        );
+        FastBox fatsbox = new FastBox(playerPos);
 
-        if (mc.world.isSpaceEmpty(box)) {
+        if (!fatsbox.isCollidingWithBlocks()) {
             Movement.moveTo(playerPos);
         }
     }

@@ -10,7 +10,6 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
@@ -20,7 +19,6 @@ import net.minecraft.util.math.Vec3d;
 import AutoplayAddon.AutoplayAddon;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class CollisionRender extends Module {
@@ -69,7 +67,7 @@ public class CollisionRender extends Module {
         .action(() -> {
             //loop through entitiesd
             for (Entity entity : mc.world.getEntities()) {
-                Movement.fastBoxList.add(new FastBox(entity.getBoundingBox()));
+                Movement.fastBoxList.add(new FastBox(entity));
             }
         })
         .build()
@@ -84,39 +82,43 @@ public class CollisionRender extends Module {
         blockPosList.clear();
 
         for (Entity entity : mc.world.getEntities()) {
-            FastBox fastBox = new FastBox(entity.getBoundingBox());
+            FastBox fastBox = new FastBox(entity);
             List<BlockPos> collidedBlocks = fastBox.getOccupiedBlockPos();
 
-            // Find the highest and lowest Y values of the collided blocks
-            int minY = collidedBlocks.stream().min(Comparator.comparingInt(BlockPos::getY)).orElseThrow().getY();
-            int maxY = collidedBlocks.stream().max(Comparator.comparingInt(BlockPos::getY)).orElseThrow().getY();
+            int minX = Integer.MAX_VALUE;
+            int maxX = Integer.MIN_VALUE;
+            int minY = Integer.MAX_VALUE;
+            int maxY = Integer.MIN_VALUE;
+            int minZ = Integer.MAX_VALUE;
+            int maxZ = Integer.MIN_VALUE;
 
-            // Determine the middle Y position between top and bottom of the entity
-            int middleY = minY + (maxY - minY) / 2;
+            for (BlockPos pos : collidedBlocks) {
+                minX = Math.min(minX, pos.getX());
+                maxX = Math.max(maxX, pos.getX());
+                minY = Math.min(minY, pos.getY());
+                maxY = Math.max(maxY, pos.getY());
+                minZ = Math.min(minZ, pos.getZ());
+                maxZ = Math.max(maxZ, pos.getZ());
+            }
 
-            // Create a ring halfway between top and bottom
             for (BlockPos blockPos : collidedBlocks) {
-                if (blockPos.getY() == middleY) {
-                    for (Direction dir : Direction.values()) {
-                        if (dir != Direction.UP && dir != Direction.DOWN) {
-                            BlockPos offsetPos = blockPos.offset(dir);
-                            if (!collidedBlocks.contains(offsetPos)) {
-                                tempBlocPosList.add(offsetPos);
-                            }
-                        }
+                for (Direction dir : Direction.values()) {
+                    BlockPos offsetPos = blockPos.offset(dir);
+                    if (!collidedBlocks.contains(offsetPos)) {
+                        tempBlocPosList.add(offsetPos);
                     }
                 }
             }
 
-            // Add blocks above and below the blocks that have the highest and lowest Y-values
-            for (BlockPos blockPos : collidedBlocks) {
-                if (blockPos.getY() == maxY) {
-                    tempBlocPosList.add(blockPos.up());
-                }
-                if (blockPos.getY() == minY) {
-                    tempBlocPosList.add(blockPos.down());
+            // Cover the top and bottom extremes
+            for (int x = minX; x <= maxX; x++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    tempBlocPosList.add(new BlockPos(x, minY - 1, z));
+                    tempBlocPosList.add(new BlockPos(x, maxY + 1, z));
                 }
             }
+
+
         }
         blockPosList.addAll(tempBlocPosList);
     }
@@ -129,7 +131,7 @@ public class CollisionRender extends Module {
                 event.renderer.box(
                     pos.getX(), pos.getY(), pos.getZ(),
                     pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1,
-                    Color.CYAN, Color.BLUE, ShapeMode.Sides, 0
+                    Color.CYAN, Color.BLUE, ShapeMode.Lines, 0
                 );
             }
         }

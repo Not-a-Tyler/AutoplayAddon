@@ -6,7 +6,6 @@ import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.world.chunk.Chunk;
 import java.util.*;
 import java.util.concurrent.ExecutorService;

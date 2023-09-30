@@ -1,6 +1,5 @@
 package AutoplayAddon.modules;
 import AutoplayAddon.AutoplayAddon;
-import AutoplayAddon.Mixins.PlayerMoveC2SPacketMixin;
 import AutoplayAddon.Tracker.ServerSideValues;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.mixininterface.IPlayerMoveC2SPacket;
@@ -8,12 +7,9 @@ import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.util.math.Vec3d;
-import org.w3c.dom.events.Event;
 
 public class Disabler extends Module {
     public Disabler() {

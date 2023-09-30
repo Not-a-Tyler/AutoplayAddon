@@ -20,7 +20,7 @@ public class Teleport extends Command {
         builder.then(argument("pos", ClientPosArgumentType.pos()).executes(ctx -> {
             Vec3d pos = ClientPosArgumentType.getPos(ctx, "pos");
             info("pos: " + pos);
-            Movement.moveTo(new Vec3d(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5));
+            Movement.moveTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
             return SINGLE_SUCCESS;
         }));
     }

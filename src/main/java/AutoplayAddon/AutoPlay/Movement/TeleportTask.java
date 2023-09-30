@@ -9,22 +9,19 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 
 
-public class Teleport extends Movement {
+public class TeleportTask extends Movement {
     private Vec3d destination;
     private Vec3d currentPos;
     private int currentPackets;
-    float yaw, pitch;
-    public Teleport(Vec3d destination, Vec3d currentPos, int currentPackets) {
+    public TeleportTask(Vec3d destination, Vec3d currentPos, int currentPackets) {
         this.currentPackets = currentPackets;
-        this.yaw = rotationControl ? Movement.yaw : mc.player.getYaw();
-        this.pitch = rotationControl ? Movement.pitch : mc.player.getPitch();
         this.currentPos = currentPos;
         this.destination = destination;
     }
     private void sendPacket(Vec3d position) {
         PlayerMoveC2SPacket packet;
         if (ServerSideValues.predictallowedPlayerTicks() > 20) {
-            packet = new PlayerMoveC2SPacket.Full(position.x, position.y, position.z, yaw, pitch, true);
+            packet = new PlayerMoveC2SPacket.Full(position.x, position.y, position.z, mc.player.getYaw(), mc.player.getPitch(), true);
         } else {
             packet = new PlayerMoveC2SPacket.PositionAndOnGround(position.x, position.y, position.z, true);
         }
@@ -33,7 +30,10 @@ public class Teleport extends Movement {
     }
 
     public int getPacketsRequired() {
+        // server will get the amount of packets required from either the last tick position or the players position
+        // which ever is larger
         double base = maxDist(destination, Arrays.asList(ServerSideValues.tickpos, currentPos));
+        //ChatUtils.info("distance for pathfind tp is " + base);
         return (((int) Math.ceil(base / 10.0)) - 1) - currentPackets;
     }
 

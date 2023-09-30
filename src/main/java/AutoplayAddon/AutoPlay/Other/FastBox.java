@@ -1,34 +1,38 @@
 package AutoplayAddon.AutoPlay.Other;
-import AutoplayAddon.AutoPlay.Movement.Movement;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.BlockPos;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
+
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class FastBox {
 
     public List<Vec3d> corners;
+    public Vec3d position;
     public FastBox(FastBox other) {
         this.corners = new ArrayList<>(other.corners);
+        this.position = other.position;
     }
 
-
-    public void setPosition(Vec3d to) {
-        Box box = new Box(to.x - 0.3, to.y, to.z - 0.3, to.x + 0.3, to.y + mc.player.getHeight(), to.z + 0.3);
-        box.expand(-0.0625D);
-        calculateCorners(box);
-    }
+//    public void setPosition(Vec3d to) {
+//        this.position = to;
+//        Box box = new Box(to.x - 0.3, to.y, to.z - 0.3, to.x + 0.3, to.y + mc.player.getHeight(), to.z + 0.3);
+//        box.expand(-0.0625D);
+//        calculateCorners(box);
+//    }
 
     public FastBox(Vec3d to) {
+        this.position = to;
         Box box = new Box(to.x - 0.3, to.y, to.z - 0.3, to.x + 0.3, to.y + mc.player.getHeight(), to.z + 0.3);
         box.expand(-0.0625D);
         calculateCorners(box);
     }
-    public FastBox(Box box) {
+    public FastBox(Entity entity) {
+        this.position = entity.getPos();
+        Box box = entity.getBoundingBox();
         box.expand(-0.0625D);
         calculateCorners(box);
     }
@@ -86,13 +90,28 @@ public class FastBox {
         return new BlockPos((int) Math.floor(vec.x), (int) Math.floor(vec.y), (int) Math.floor(vec.z));
     }
 
-    public FastBox offset(Vec3d velocity) {
+    public void offset(Vec3d velocity) {
+        this.position = position.add(velocity);
         for (int i = 0; i < corners.size(); i++) {
             Vec3d corner = corners.get(i);
             corners.set(i, corner.add(velocity));
         }
-        return this;
     }
+
+    public static Vec3d getDirectionFromYawAndPitch(float yaw, float pitch) {
+        double y = -Math.sin(Math.toRadians(pitch));
+        double xzFactor = Math.cos(Math.toRadians(pitch));
+        double x = -xzFactor * Math.sin(Math.toRadians(yaw));
+        double z = xzFactor * Math.cos(Math.toRadians(yaw));
+        return new Vec3d(x, y, z).normalize();
+    }
+
+    public void offsetInLookDirection(double blocks) {
+        Vec3d lookDirection = getDirectionFromYawAndPitch(mc.player.getYaw(1.0F), mc.player.getPitch(1.0F));
+        Vec3d offset = lookDirection.multiply(blocks);
+        offset(offset);
+    }
+
 
     public List<BlockPos> getOccupiedBlockPos() {
         List<BlockPos> occupiedBlocks = new ArrayList<>();
@@ -115,7 +134,7 @@ public class FastBox {
             }
             cache.add(blockPos);
             if (mc.world.getBlockState(blockPos).isSolid()) {
-           //     Movement.fastBoxList.add(new FastBox(this));
+                //Movement.fastBoxList.add(new FastBox(this));
                 return true;
             }
         }

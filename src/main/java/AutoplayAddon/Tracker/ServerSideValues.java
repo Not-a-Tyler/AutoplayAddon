@@ -1,7 +1,6 @@
 package AutoplayAddon.Tracker;
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.GotoUtilReference;
 import AutoplayAddon.AutoPlay.Movement.Movement;
-import meteordevelopment.meteorclient.events.entity.player.InteractItemEvent;
 import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -36,9 +35,6 @@ public class ServerSideValues {
         allowedPlayerTicksPredict = allowedPlayerTicks;
         allowedPlayerTicksPredict += (System.currentTimeMillis() / 50) - lasttick;
         return Math.max(allowedPlayerTicksPredict, 1);
-    }
-    public static int ii() {
-        return (i2 + i);
     }
 
     @EventHandler()
@@ -87,7 +83,7 @@ public class ServerSideValues {
         }
         hasMoved = false;
         if (mc.player == null) return;
-        if (Movement.AIDSboolean || GotoUtil.currentlyMoving) {
+        if (Movement.AIDSboolean || GotoUtilReference.currentlyMoving) {
             tickpos = Movement.currentPosition;
         } else {
             tickpos = mc.player.getPos();
@@ -136,6 +132,7 @@ public class ServerSideValues {
         allowedPlayerTicks = Math.max(allowedPlayerTicks, 1);
         lasttick = (int) (System.currentTimeMillis() / 50);
         if ((i2 + i) > Math.max(allowedPlayerTicks, 5)) {
+            ChatUtils.error("Packet spam detected, server reset i value");
             i = 0;
             i2 = 1;
         }
@@ -145,16 +142,17 @@ public class ServerSideValues {
             allowedPlayerTicks = 20;
         }
 
-        String packetType = "unknown";
-        if (packet instanceof PlayerMoveC2SPacket.Full) packetType = "Full";
-        if (packet instanceof PlayerMoveC2SPacket.OnGroundOnly) packetType = "OnGroundOnly";
-        if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) packetType = "PositionAndOnGround";
-        if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround) packetType = "LookAndOnGround";
-        if (d10 > 0) {
-            System.out.println(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta() + " MOVED D10: " + d10);
-        } else {
-            System.out.println(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta());
-        }
+
+//        String packetType = "unknown";
+//        if (packet instanceof PlayerMoveC2SPacket.Full) packetType = "Full";
+//        if (packet instanceof PlayerMoveC2SPacket.OnGroundOnly) packetType = "OnGroundOnly";
+//        if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround) packetType = "PositionAndOnGround";
+//        if (packet instanceof PlayerMoveC2SPacket.LookAndOnGround) packetType = "LookAndOnGround";
+//        if (d10 > 0) {
+//            System.out.println(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta() + " MOVED D10: " + d10);
+//        } else {
+//            System.out.println(packetType + " allowed: " + allowedPlayerTicks + " i: " + (i2 + i) + " delta: " + delta());
+//        }
 
 
         if (hasPos) {

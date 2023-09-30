@@ -8,34 +8,6 @@ import java.util.List;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class CanTeleport {
 
-    public static int searchY(Vec3d from, Vec3d to) {
-        double fromy = from.y;
-        if (tryY(from, to, fromy)) {
-            // id if current player y works
-            return -1337;
-        }
-        int ytotest = 0;
-        boolean validTeleportFound = false;
-        int searchOffset = 0;
-        while (!validTeleportFound) {
-            ytotest = (int) (fromy + searchOffset);
-            if (tryY(from, to, ytotest)) {
-                validTeleportFound = true;
-            } else {
-                searchOffset = (searchOffset <= 0) ? 1 - searchOffset : -searchOffset;
-            }
-        }
-        return ytotest;
-    }
-
-    public static boolean tryY(Vec3d from, Vec3d to, double ytotest) {
-        Vec3d fromWithOffset = new Vec3d(from.x, ytotest, from.z);
-        Vec3d toWithOffset = new Vec3d(to.x, ytotest, to.z);
-        Boolean isColliding = new FastBox(fromWithOffset).isCollidingWithBlocks();
-        if (isColliding) return false;
-        return lazyCheck(fromWithOffset, toWithOffset);
-    }
-
 
     public static Boolean lazyCheck(Vec3d from, Vec3d to) {
         FastBox fastBox = new FastBox(from);
@@ -111,7 +83,6 @@ public class CanTeleport {
     }
 
 
-
     public static Boolean OffsetCalcBool(FastBox fastBox, Direction.Axis axis, double maxDist) {
         double step = 1.5;
         double currentOffset = 0.0;
@@ -145,7 +116,6 @@ public class CanTeleport {
 
 
     public static Vec3d adjustMovementForCollisionsold(Box box, Vec3d movement) {
-        // ChatUtils.info("check starting " + System.currentTimeMillis());
         if (movement.lengthSquared() == 0.0) return movement;
         List<VoxelShape> entityCollisions = mc.player.getWorld().getEntityCollisions(mc.player, box.stretch(movement));
         ImmutableList.Builder<VoxelShape> builder = ImmutableList.builderWithExpectedSize(entityCollisions.size() + 1);
@@ -154,7 +124,6 @@ public class CanTeleport {
         }
         builder.addAll(mc.player.getWorld().getBlockCollisions(mc.player, box.stretch(movement)));
         List<VoxelShape> allCollisions = builder.build();
-        //ChatUtils.info("midway point collisions " + allCollisions.size() + " time " + System.currentTimeMillis());
         if (allCollisions.isEmpty()) return movement;
         double d = movement.x;
         double e = movement.y;

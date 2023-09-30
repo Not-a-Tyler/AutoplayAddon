@@ -1,5 +1,4 @@
 package AutoplayAddon.commands;
-import AutoplayAddon.AutoPlay.Movement.Movement;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.arguments.PlayerArgumentType;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;

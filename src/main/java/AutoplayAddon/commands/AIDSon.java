@@ -1,6 +1,6 @@
 package AutoplayAddon.commands;
 
-import AutoplayAddon.AutoPlay.Movement.GotoUtil;
+import AutoplayAddon.AutoPlay.Movement.GotoUtilReference;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.Command;
 import net.minecraft.command.CommandSource;
@@ -14,7 +14,7 @@ public class AIDSon extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            GotoUtil.init(true, true);
+            GotoUtilReference.init(true, true);
             return SINGLE_SUCCESS;
         });
     }

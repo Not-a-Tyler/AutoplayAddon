@@ -3,7 +3,7 @@ import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import AutoplayAddon.Tracker.ServerSideValues;
 import java.util.Queue;
 import java.util.LinkedList;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
+
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;

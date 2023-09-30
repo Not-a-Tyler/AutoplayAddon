@@ -8,7 +8,6 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ public class Movement {
     @EventHandler(priority = EventPriority.HIGHEST + 1)
     private static void onSendMovePacket(PacketEvent.Send event) {
         if (event.packet instanceof PlayerMoveC2SPacket) {
+            event.setCancelled(true);
             event.cancel();
         }
     }
@@ -79,16 +79,16 @@ public class Movement {
         double dx = pos2.x - pos1.x;
         double dy = pos2.y - pos1.y;
         double dz = pos2.z - pos1.z;
-
         return Math.sqrt(dx*dx + dy*dy + dz*dz);
     }
+
 
 
     public static void init(Boolean automaticallySetPosition, Boolean autopacket) {
         if (mc.player == null) return;
         MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
         MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
-        MeteorClient.EVENT_BUS.subscribe(GotoQueue.class);
+        MeteorClient.EVENT_BUS.subscribe(GotoUtil.class);
         currentPosition = mc.player.getPos();
         mc.player.setNoGravity(true);
         to = mc.player.getPos();
@@ -97,10 +97,10 @@ public class Movement {
         AutoSetPosition = automaticallySetPosition;
     }
     public static void disable() {
-        MeteorClient.EVENT_BUS.unsubscribe(GotoQueue.class);
+        MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
         MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
         AIDSboolean = false;
-        GotoQueue.tasks.clear();
+        GotoUtil.pathGoals.clear();
         currentlyMoving = false;
         if (mc.player == null) return;
         mc.player.setNoGravity(false);
@@ -111,7 +111,7 @@ public class Movement {
         double dy = from.y - to.y;
         double dz = from.z - to.z;
         double squaredDistance = dx * dx + dy * dy + dz * dz;
-        return squaredDistance < 0.01;
+        return squaredDistance < 0.005;
     }
 
     public static void moveTo(Vec3d pos) {
@@ -119,16 +119,16 @@ public class Movement {
             currentMovementThread.interrupt();
             ChatUtils.error("Interrupted previous movement thread");
         }
-        Boolean ignore;
+        boolean ignore;
         if (AIDSboolean) {
             ignore = false;
         } else {
             ignore = true;
         }
         new Thread(() -> {
-            if (ignore) GotoUtil.init(true, true);
-            GotoQueue.setPos(pos);
-            if (ignore) GotoUtil.disable();
+            if (ignore) init(true, true);
+            GotoUtil.setPos(pos, false);
+            if (ignore) disable();
         }).start();
 
     }

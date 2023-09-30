@@ -1,5 +1,5 @@
 package AutoplayAddon.commands;
-import AutoplayAddon.AutoPlay.Movement.GotoQueue;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoPlay.Other.FastBox;
 import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
@@ -13,20 +13,18 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import meteordevelopment.meteorclient.commands.Command;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
@@ -47,11 +45,11 @@ public class Trap extends Command {
         builder.then(argument("player", PlayerArgumentType.create()).executes(context -> {
             startingPos = mc.player.getPos();
             e = PlayerArgumentType.get(context);
-            trapBlocks = getTrap(e.getBoundingBox());
+            trapBlocks = getTrap(e);
             ChatUtils.info("Trapping " + e.getName().getString() + " with " + trapBlocks.size() + " blocks " + System.currentTimeMillis());
             ignore = true;
             if (!Movement.AIDSboolean) {
-                GotoQueue.init(false, true);
+                GotoUtil.init(false, true);
                 ignore = false;
             }
             attemptTrap(e);
@@ -68,7 +66,7 @@ public class Trap extends Command {
 
     private void attemptTrap(PlayerEntity e) {
         Thread waitForTickEventThread1 = new Thread(() -> {
-            GotoQueue.setPos(e.getPos());
+            GotoUtil.setPos(e.getPos(), false);
             ChatUtils.info("we need to place " + trapBlocks.size() + " blocks ");
 
             List<BlockPos> toRemove = new ArrayList<>();
@@ -90,8 +88,8 @@ public class Trap extends Command {
             }
             trapBlocks.removeAll(toRemove);
             trapping = false;
-            GotoQueue.setPos(startingPos);
-            if(!ignore) GotoQueue.disable();
+            GotoUtil.setPos(startingPos,false);
+            if(!ignore) GotoUtil.disable();
             ChatUtils.info("Finished trapping " + System.currentTimeMillis());
 
         });
@@ -99,8 +97,8 @@ public class Trap extends Command {
     }
 
 
-    private List<BlockPos> getTrap(Box box) {
-        FastBox fastBox = new FastBox(box);
+    private List<BlockPos> getTrap(Entity e) {
+        FastBox fastBox = new FastBox(e);
         List<BlockPos> collidedBlocks = fastBox.getOccupiedBlockPos();
         List<BlockPos> trapBlocks = new ArrayList<>();
 
