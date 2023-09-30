@@ -13,7 +13,9 @@ public class SmartMine {
 
 
     public static void mineBlocks(List<Item> targetBlocks) {
+        ChatUtils.info("Searching for target block " + System.currentTimeMillis());
         List<Vec3d> collectableBlock = CanPickUpTest.findCollectableItem(targetBlocks);
+        ChatUtils.info("Found target block " + System.currentTimeMillis());
         if (collectableBlock != null) {
             Vec3d targetpos = collectableBlock.get(0);
             Vec3d airGapPos = collectableBlock.get(1);

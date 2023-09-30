@@ -80,5 +80,4 @@ public class AirGapFinder {
         double dz = pos1.getZ() - pos2.getZ();
         return dx * dx + dy * dy + dz * dz;
     }
-
 }

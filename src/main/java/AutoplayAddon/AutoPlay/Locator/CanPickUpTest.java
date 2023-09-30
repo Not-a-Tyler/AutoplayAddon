@@ -70,8 +70,7 @@ public class CanPickUpTest {
     }
 
     public static boolean isAirOrNonSolid(BlockPos pos) {
-      //  return !AutoplayAddon.blockCache..contains(pos);
-        return true;
+        return !AutoplayAddon.blockCache.blockExistsAt(pos);
     }
 
 

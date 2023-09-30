@@ -7,6 +7,7 @@ import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.commands.Commands;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,17 +24,17 @@ public class AutoplayAddon extends MeteorAddon {
     @Override
     public void onInitialize() {
         MeteorClient.EVENT_BUS.subscribe(ServerSideValues.class);
-      //  MeteorClient.EVENT_BUS.subscribe(blockCache);
+        MeteorClient.EVENT_BUS.subscribe(blockCache);
         LOG.info("Initializing AutoplayAddon");
-//
-//        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
-//            blockCache.addChunk(chunk);
-//        });
-//
-//
-//        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
-//            blockCache.removeChunk(chunk);
-//        });;
+
+        ClientChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
+            blockCache.addChunk(chunk);
+        });
+
+
+        ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
+            blockCache.removeChunk(chunk);
+        });;
         Modules.get().add(new Door());
         Modules.get().add(new Fightbot());
         Modules.get().add(new DeleteAllTest());

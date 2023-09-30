@@ -29,13 +29,11 @@ public class Mine extends Command {
         // Specific item
         builder.then(argument("item", ItemStackArgumentType.itemStack(REGISTRY_ACCESS)).executes(context -> printItemName(player -> {
             ItemStack stack = ItemStackArgumentType.getItemStackArgument(context, "item").createStack(1, false);
-
-            if (stack == null || stack.getItem() == Items.AIR) ChatUtils.info("e");
-            ChatUtils.info(stack.getItem().getName().getString());
+            if (stack == null || stack.getItem() == Items.AIR) ChatUtils.error("Invalid item");
+            ChatUtils.info("Attempting to mine " + stack.getItem().getName().getString());
             List<Item> itemslist = Collections.singletonList(stack.getItem());
             new Thread(() -> {
                 SmartMine.mineBlocks(itemslist);
-
             }).start();
         })));
     }
