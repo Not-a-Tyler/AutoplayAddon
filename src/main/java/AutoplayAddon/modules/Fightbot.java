@@ -2,14 +2,17 @@ package AutoplayAddon.modules;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.GotoUtilReference;
 import AutoplayAddon.AutoplayAddon;
+import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import meteordevelopment.meteorclient.settings.*;
@@ -39,12 +42,13 @@ public class Fightbot extends Module {
 
     @Override
     public void onActivate() {
-        GotoUtilReference.init(true, true);
+        GotoUtil.init(true, true);
     }
     @Override
     public void onDeactivate() {
-        GotoUtilReference.disable();
+        GotoUtil.disable();
     }
+
     int attackTick = 0;
 
     @EventHandler
@@ -56,13 +60,14 @@ public class Fightbot extends Module {
             if (entity instanceof PlayerEntity targetPlayer) {
                 if (targetName.equals(targetPlayer.getGameProfile().getName())) {
                     attackTick++;
-                    if (attackTick > 20) {
+                    if (mc.player.getAttackCooldownProgress(0.5f) >= 1) {
                         attackTick = 0;
                         mc.player.setPosition(targetPlayer.getPos());
                         new Thread(() -> {
-                            ChatUtils.info("fightiung");
-                            GotoUtilReference.setPos(targetPlayer.getPos());
-                            mc.interactionManager.attackEntity(mc.player, targetPlayer);
+                            ChatUtils.info("hitting " + targetPlayer.getGameProfile().getName());
+                            GotoUtil.setPos(targetPlayer.getPos(), false);
+                            PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(targetPlayer, false);
+                            ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
                         }).start();
                         handlePlayerMovement(targetPlayer);
                     } else {
@@ -79,7 +84,7 @@ public class Fightbot extends Module {
         Vec3d desiredPos = getDesiredPositionBasedOnMode(centerPos);
         if (desiredPos != null) {
             new Thread(() -> {
-                GotoUtilReference.setPos(desiredPos);
+                GotoUtil.setPos(desiredPos, false);
             }).start();
         }
     }

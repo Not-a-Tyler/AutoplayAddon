@@ -10,6 +10,7 @@ import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.render.Camera;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
@@ -64,6 +65,10 @@ public class ClickTp extends Module {
                 BlockPos validPos = null;
                 for (int y = pos.getY(); y < pos.getY() + maxSearchHeight; y++) {
                     BlockPos temppos = new BlockPos(pos.getX(), y, pos.getZ());
+                    if (mc.player.getHeight() < 0.9) {
+                        validPos = temppos.up();
+                        break;
+                    }
                     if (mc.world.isAir(temppos) && mc.world.isAir(temppos.up())) {
                         validPos = temppos;
                         break;
@@ -96,6 +101,10 @@ public class ClickTp extends Module {
         BlockPos validPos = null;
         for (int y = pos.getY(); y < pos.getY() + maxSearchHeight; y++) {
             BlockPos temppos = new BlockPos(pos.getX(), y, pos.getZ());
+            if (mc.player.getHeight() < 0.9) {
+                validPos = temppos.up();
+                break;
+            }
             if (mc.world.isAir(temppos) && mc.world.isAir(temppos.up())) {
                 validPos = temppos;
                 break;

@@ -15,11 +15,15 @@ import AutoplayAddon.commands.*;
 import AutoplayAddon.modules.*;
 import net.minecraft.item.*;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class AutoplayAddon extends MeteorAddon {
     public static final Logger LOG = LoggerFactory.getLogger("AutoplayAddon starting");
     public static final Category autoplay = new Category("Autoplay", Items.TNT.getDefaultStack());
     public static BlockCache blockCache = new BlockCache();
+    public static ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     public void onInitialize() {
@@ -34,7 +38,8 @@ public class AutoplayAddon extends MeteorAddon {
 
         ClientChunkEvents.CHUNK_UNLOAD.register((world, chunk) -> {
             blockCache.removeChunk(chunk);
-        });;
+        });
+        Modules.get().add(new CobbleNuker());;
         Modules.get().add(new Door());
         Modules.get().add(new Fightbot());
         Modules.get().add(new DeleteAllTest());
@@ -53,10 +58,14 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new LOTEST());
         Modules.get().add(new UpFly());
         Modules.get().add(new SimpleClickTp());
+        Modules.get().add(new TorchSpam());
+        Modules.get().add(new BackAndForth());
         Modules.get().add(new LongDistanceTest());
         Modules.get().add(new CollisionRender());
+        Modules.get().add(new uhhhh());
         //Modules.get().add(new BetterFly());
 
+        Commands.add(new Craw());
         Commands.add(new Blank());
         Commands.add(new infAnchor());
         Commands.add(new StopSleeping());

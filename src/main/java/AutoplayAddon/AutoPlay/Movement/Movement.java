@@ -2,6 +2,8 @@ package AutoplayAddon.AutoPlay.Movement;
 import AutoplayAddon.AutoPlay.Other.FastBox;
 import AutoplayAddon.Tracker.ServerSideValues;
 import meteordevelopment.meteorclient.MeteorClient;
+import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
+import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
@@ -38,6 +40,15 @@ public class Movement {
             event.setCancelled(true);
             event.cancel();
         }
+    }
+
+    @EventHandler()
+    private static void onJoinServer(GameJoinedEvent event) {
+        disable();
+    }
+    @EventHandler()
+    private static void onLeaveServer(GameLeftEvent event) {
+        disable();
     }
 
     public static boolean predictifPossible(Vec3d newPos, String reason) {
@@ -81,8 +92,6 @@ public class Movement {
         double dz = pos2.z - pos1.z;
         return Math.sqrt(dx*dx + dy*dy + dz*dz);
     }
-
-
 
     public static void init(Boolean automaticallySetPosition, Boolean autopacket) {
         if (mc.player == null) return;

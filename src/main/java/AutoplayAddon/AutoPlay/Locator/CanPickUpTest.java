@@ -14,6 +14,7 @@ import java.util.*;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class CanPickUpTest {
+    static BlockCache blockCache = AutoplayAddon.blockCache;
 
     public static List<Vec3d> findCollectableItem(List<Item> targetItems) {
         List<Block> targetBlocks = new ArrayList<>();
@@ -34,44 +35,43 @@ public class CanPickUpTest {
 
     public static List<Vec3d> findCollectableBlock(List<Block> targetBlocks) {
         BlockPos playerPos = mc.player.getBlockPos();
-        BlockCache blockCache = AutoplayAddon.blockCache;
-
-        List<BlockCache.BlockData> collectableBlocks = new ArrayList<>();
-        for (Block block : targetBlocks) {
-            if (blockCache.blockMap.containsKey(block)) {
-                collectableBlocks.addAll(blockCache.blockMap.get(block));
-            }
-        }
-        ChatUtils.info(String.valueOf(System.currentTimeMillis()));
-        collectableBlocks.sort(Comparator.comparingInt(blockData -> blockData.getPos().getManhattanDistance(playerPos)));
-        ChatUtils.info(String.valueOf(System.currentTimeMillis()));
-        for (BlockCache.BlockData blockData : collectableBlocks) {
-            BlockPos pos = blockData.getPos();
-            if (isAirOrNonSolid(pos.add(0, 1, 0)) || isAirOrNonSolid(pos.add(0, -1, 0)) || hasAirAdjacent(pos)) {
-                Vec3d airGapPos = AirGapFinder.findAirGapNearBlock(pos, 5);
-                if (airGapPos != null) {
-                    return List.of(new Vec3d(pos.getX(), pos.getY(), pos.getZ()), airGapPos);
+        int maxDistance = 100; // You can adjust this value based on your needs
+        for (int distance = 1; distance <= maxDistance; distance++) {
+            for (int dx = -distance; dx <= distance; dx++) {
+                for (int dy = -distance; dy <= distance; dy++) {
+                    for (int dz = -distance; dz <= distance; dz++) {
+                        if (Math.abs(dx) != distance && Math.abs(dy) != distance && Math.abs(dz) != distance) {
+                            continue; // This ensures we're only checking the outer layer of blocks at each distance
+                        }
+                        BlockPos checkPos = playerPos.add(dx, dy, dz);
+                        Block checkBlock = mc.world.getBlockState(checkPos).getBlock();
+                        if (targetBlocks.contains(checkBlock)) {
+                            if (!blockCache.isBlockAt(checkPos.add(0, 1, 0)) || !blockCache.isBlockAt(checkPos.add(0, -1, 0)) || hasAirAdjacent(checkPos)) {
+                                Vec3d airGapPos = AirGapFinder.findAirGapNearBlock(checkPos, 5);
+                                if (airGapPos != null) {
+                                    return List.of(new Vec3d(checkPos.getX(), checkPos.getY(), checkPos.getZ()), airGapPos);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-        ChatUtils.info(String.valueOf(System.currentTimeMillis()));
         return null;
     }
+
 
     public static boolean hasAirAdjacent(BlockPos pos) {
         // use blockpos.add because its faster than blockpos.up or blockpos.down etc
         for (BlockPos blockPos : ValidPickupPoint.getSurroundingBlocks(pos)) {
-            if ((isAirOrNonSolid(blockPos.add(0, 1, 0)) && isAirOrNonSolid(blockPos)) ||
-                (isAirOrNonSolid(blockPos.add(0, -1, 0)) && isAirOrNonSolid(blockPos.add(0, -2, 0)))) {
+            if ((!blockCache.isBlockAt(blockPos.add(0, 1, 0)) && !blockCache.isBlockAt(blockPos)) ||
+                (!blockCache.isBlockAt(blockPos.add(0, -1, 0)) && !blockCache.isBlockAt(blockPos.add(0, -2, 0)))) {
                 return true;
             }
         }
         return false;
     }
 
-    public static boolean isAirOrNonSolid(BlockPos pos) {
-        return !AutoplayAddon.blockCache.blockExistsAt(pos);
-    }
 
 
 }

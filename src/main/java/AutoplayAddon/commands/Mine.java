@@ -33,7 +33,7 @@ public class Mine extends Command {
             ChatUtils.info("Attempting to mine " + stack.getItem().getName().getString());
             List<Item> itemslist = Collections.singletonList(stack.getItem());
             new Thread(() -> {
-                SmartMine.mineBlocks(itemslist);
+                SmartMine.mineBlocks(itemslist, 5);
             }).start();
         })));
     }

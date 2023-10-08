@@ -1,5 +1,6 @@
 package AutoplayAddon.AutoPlay.Movement;
 
+import AutoplayAddon.AutoPlay.Other.Packet;
 import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import AutoplayAddon.Tracker.ServerSideValues;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -26,7 +27,7 @@ public class TeleportTask extends Movement {
             packet = new PlayerMoveC2SPacket.PositionAndOnGround(position.x, position.y, position.z, true);
         }
         ServerSideValues.HandleMovePacketSafe(packet);
-        ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
+        Packet.packetQueue.add(packet);
     }
 
     public int getPacketsRequired() {
@@ -38,11 +39,6 @@ public class TeleportTask extends Movement {
     }
 
     public void execute() {
-//        double base = maxDist(destination, Arrays.asList(ServerSideValues.tickpos, currentPosition));
-//        int packetsRequired = ((int) Math.ceil(base / 10.0)) - 1;
-//        for (int i = 0; i < packetsRequired; i++) {
-//            sendPacket(currentPosition);
-//        }
         sendPacket(destination);
         currentPosition = destination;
     }

@@ -42,7 +42,6 @@ public class MineUtil {
         double z2 = z1 + 1;
 
         event.renderer.box(x1, y1, z1, x2, y2, z2, new SettingColor(255, 0, 255, 15), new SettingColor(255, 0, 255, 15), ShapeMode.Both, 0);
-
     }
 
 

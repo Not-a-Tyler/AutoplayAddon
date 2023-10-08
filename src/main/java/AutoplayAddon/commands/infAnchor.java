@@ -2,6 +2,7 @@ package AutoplayAddon.commands;
 
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Other.FastBox;
+import AutoplayAddon.AutoPlay.Other.Packet;
 import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import meteordevelopment.meteorclient.commands.Command;
@@ -32,21 +33,20 @@ public class infAnchor extends Command {
     private void switchToHotbar(Item targetItem) {
         for (int i = 0; i < 9; i++) {
             if (mc.player.getInventory().getStack(i).getItem() == targetItem) {
-                UpdateSelectedSlotC2SPacket switchpacket = new UpdateSelectedSlotC2SPacket(i);
-                ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(switchpacket, null);
+                Packet.sendPacket(new UpdateSelectedSlotC2SPacket(i));
             }
         }
     }
 
     private void switchToEmptyHotbarSlot() {
         for (int i = 0; i < 9; i++) {
-            if (mc.player.getInventory().getStack(i).isEmpty()) {
-                UpdateSelectedSlotC2SPacket switchpacket = new UpdateSelectedSlotC2SPacket(i);
-                ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(switchpacket, null);
+            if (mc.player.getInventory().getStack(i).isEmpty() && mc.player.getInventory().getStack(i).getItem() != Items.GLOWSTONE) {
+                Packet.sendPacket(new UpdateSelectedSlotC2SPacket(i));
                 break;
             }
         }
     }
+
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(argument("player", PlayerArgumentType.create()).executes(context -> {
@@ -55,22 +55,15 @@ public class infAnchor extends Command {
             Thread waitForTickEventThread1 = new Thread(() -> {
                 ChatUtils.info("hitting " + e.getName());
                 GotoUtil.init(false, true);
-
-
-                BlockPos finalBlockPos = getTrap(e);
-
+                BlockPos finalBlockPos = getAnchorPos(e);
                 GotoUtil.setPos(e.getPos(), true);
-
                 ChatUtils.info("Trapping " + e.getName().getString() + " at " + finalBlockPos);
                 switchToHotbar(Items.RESPAWN_ANCHOR);
-                PlayerInteractBlockC2SPacket placePacket = new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(finalBlockPos.toCenterPos(), Direction.EAST, finalBlockPos, false), 0);
-                ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(placePacket, null);
+                Packet.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(finalBlockPos.toCenterPos(), Direction.EAST, finalBlockPos, false), 0));
                 switchToHotbar(Items.GLOWSTONE);
-                PlayerInteractBlockC2SPacket boomPacket = new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(finalBlockPos.toCenterPos(), Direction.EAST, finalBlockPos, false), 0);
-                ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(boomPacket, null);
+                Packet.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(finalBlockPos.toCenterPos(), Direction.EAST, finalBlockPos, false), 0));
                 switchToEmptyHotbarSlot();
-                PlayerInteractBlockC2SPacket usePacket = new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(finalBlockPos.toCenterPos(), Direction.EAST, finalBlockPos, false), 0);
-                ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(usePacket, null);
+                Packet.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(finalBlockPos.toCenterPos(), Direction.EAST, finalBlockPos, false), 0));
                 GotoUtil.setPos(startingPos, false);
                 GotoUtil.disable();
             });
@@ -79,7 +72,7 @@ public class infAnchor extends Command {
         }));
     }
 
-    private BlockPos getTrap(Entity e) {
+    private BlockPos getAnchorPos(Entity e) {
         FastBox fastBox = new FastBox(e);
         List<BlockPos> collidedBlocks = fastBox.getOccupiedBlockPos();
         List<BlockPos> trapBlocks = new ArrayList<>();
@@ -121,7 +114,7 @@ public class infAnchor extends Command {
         for (BlockPos block : trapBlocks) {
             if (mc.world.getBlockState(block).isSolid()) continue;
             double distance = block.toCenterPos().distanceTo(e.getPos());
-            if (distance > farthestDistance) {
+            if (distance < farthestDistance) {
                 farthestDistance = distance;
                 farthestBlock = block;
             }

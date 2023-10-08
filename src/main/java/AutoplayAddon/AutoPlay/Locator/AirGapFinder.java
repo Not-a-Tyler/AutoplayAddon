@@ -14,32 +14,32 @@ import java.util.stream.Collectors;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class AirGapFinder {
+    static BlockCache blockCache = AutoplayAddon.blockCache;
     public static List<Vec3d> findClosestValidStandingPos(List<Block> targetBlocks, double maxAirGapDistance) {
         BlockPos playerPos = mc.player.getBlockPos();
+        BlockCache blockCache = AutoplayAddon.blockCache;
 
-        BlockCache blockCache = AutoplayAddon.blockCache; // Initialize the BlockCache. This could be also passed as an argument if it's being used elsewhere.
-
-        // Filter cached blocks to only include target blocks
-        List<BlockCache.BlockData> filteredBlocks = targetBlocks.stream()
-            .flatMap(block -> blockCache.blockMap.getOrDefault(block, new ArrayList<>()).stream())
+        // Get a list of positions of target blocks
+        List<BlockPos> filteredPositions = blockCache.blockMap.entrySet().stream()
+            .filter(entry -> targetBlocks.contains(entry.getValue()))
+            .map(entry -> entry.getKey())
             .collect(Collectors.toList());
 
-        // Sort filtered blocks from nearest to furthest
-        Collections.sort(filteredBlocks, Comparator.comparingInt(blockData -> blockData.getPos().getManhattanDistance(playerPos)));
+        // Sort positions from nearest to furthest
+        filteredPositions.sort(Comparator.comparingInt(pos -> pos.getManhattanDistance(playerPos)));
 
-        // Iterate through the sorted list of blocks
-        for (BlockCache.BlockData blockData : filteredBlocks) {
-            BlockPos currentPos = blockData.getPos();
+        // Iterate through the sorted list of positions
+        for (BlockPos currentPos : filteredPositions) {
             Vec3d airGapPos = findAirGapNearBlock(currentPos, maxAirGapDistance);
             if (airGapPos != null) {
-                ChatUtils.info("Foumd");
+                ChatUtils.info("Found");
                 List<Vec3d> result = new ArrayList<>();
-                result.add(new Vec3d(currentPos.getX(), currentPos.getY(), currentPos.getZ())); // Convert BlockPos to Vec3d
+                result.add(new Vec3d(currentPos.getX(), currentPos.getY(), currentPos.getZ()));
                 result.add(airGapPos);
                 return result;
             }
         }
-        ChatUtils.info("Dident find");
+        ChatUtils.info("Didn't find");
         return null;
     }
 
@@ -56,7 +56,7 @@ public class AirGapFinder {
                 continue; // Skip if already beyond current closest distance
             }
 
-            if (CanPickUpTest.isAirOrNonSolid(pos) && CanPickUpTest.isAirOrNonSolid(pos.add(0, 1, 0))) {
+            if (!blockCache.isBlockAt(pos) && !blockCache.isBlockAt(pos.add(0, 1, 0))) {
                 if (squaredDistance < minSquaredDistance) {
                     closestValidPos = pos.toImmutable();
                     minSquaredDistance = squaredDistance;

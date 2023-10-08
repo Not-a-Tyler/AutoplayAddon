@@ -58,9 +58,7 @@ public class Speedrun extends Module {
     public void onActivate() {
         mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
         Thread waitForTickEventThread = new Thread(() -> {
-            for (int i = 0; i < 3; i++) {
-                SmartMine.mineBlocks(Arrays.asList(Lists.LOG));
-            }
+            SmartMine.mineBlocks(Arrays.asList(Lists.LOG), amount.get());
             WaitUtil.wait1sec();
             ItemCollection.collect(Arrays.asList(Lists.LOG));
             WaitUtil.wait1sec();
@@ -75,9 +73,7 @@ public class Speedrun extends Module {
             CraftUtil.craftItem(Items.WOODEN_PICKAXE, 1);
             WaitUtil.wait1sec();
             List<Item> targetBlocks2 = Collections.singletonList(Items.STONE);
-            for (int i = 0; i < amount2.get(); i++) {
-                SmartMine.mineBlocks(targetBlocks2);
-            }
+            SmartMine.mineBlocks(targetBlocks2, amount2.get());
             WaitUtil.wait1sec();
             List<Item> targetBlocks3 = Collections.singletonList(Items.COBBLESTONE);
             ItemCollection.collect(targetBlocks3);
@@ -85,22 +81,20 @@ public class Speedrun extends Module {
             CraftUtil.craftItem(Items.STONE_PICKAXE, 1);
             WaitUtil.wait1sec();
             List<Item> targetBlocks4 = Collections.singletonList(Items.IRON_ORE);
-            for (int i = 0; i < amount2.get(); i++) {
-                SmartMine.mineBlocks(targetBlocks4);
-            }
-            WaitUtil.wait1sec();
-            List<Item> targetBlocks5 = Collections.singletonList(Items.RAW_IRON);
-            ItemCollection.collect(targetBlocks5);
-            WaitUtil.wait1sec();
-            for (int i = 0; i < 9; i++) {
-                SmartMine.mineBlocks(targetBlocks2);
-            }
+//                SmartMine.mineBlocks(targetBlocks4);
+//            WaitUtil.wait1sec();
+//            List<Item> targetBlocks5 = Collections.singletonList(Items.RAW_IRON);
+//            ItemCollection.collect(targetBlocks5);
+//            WaitUtil.wait1sec();
+//            for (int i = 0; i < 9; i++) {
+//                SmartMine.mineBlocks(targetBlocks2);
+//            }
             WaitUtil.wait1sec();
             ItemCollection.collect(targetBlocks3);
             WaitUtil.wait1sec();
             List<Item> targetBlocks6 = Collections.singletonList(Items.COAL_ORE);
             List<Item> targetBlocks7 = Collections.singletonList(Items.COAL);
-            SmartMine.mineBlocks(targetBlocks6);
+           // SmartMine.mineBlocks(targetBlocks6);
             WaitUtil.wait1sec();
             ItemCollection.collect(targetBlocks7);
             WaitUtil.wait1sec();

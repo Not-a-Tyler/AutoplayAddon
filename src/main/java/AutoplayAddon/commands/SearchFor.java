@@ -28,15 +28,15 @@ public class SearchFor extends Command {
             Block block = Block.getBlockFromItem(stack.getItem());
             ChatUtils.info("Looking for " + block.getName().getString());
             long startTime = System.currentTimeMillis();
-            BlockPos bruz = AutoplayAddon.blockCache.getNearestBlock(block);
-            long endTime = System.currentTimeMillis(); // Get the current time after calculating BlockPos
-            long timeTaken = endTime - startTime; // Calculate the time taken in milliseconds
-            ChatUtils.info("Time taken: " + timeTaken + " milliseconds");
-            if (bruz != null) {
-                ChatUtils.info(bruz.toShortString());
-            } else {
-                ChatUtils.info("Didn't find anything");
-            }
+//            BlockPos bruz = AutoplayAddon.blockCache.getNearestBlock(block);
+//            long endTime = System.currentTimeMillis(); // Get the current time after calculating BlockPos
+//            long timeTaken = endTime - startTime; // Calculate the time taken in milliseconds
+//            ChatUtils.info("Time taken: " + timeTaken + " milliseconds");
+//            if (bruz != null) {
+//                ChatUtils.info(bruz.toShortString());
+//            } else {
+//                ChatUtils.info("Didn't find anything");
+//            }
         })));
     }
 

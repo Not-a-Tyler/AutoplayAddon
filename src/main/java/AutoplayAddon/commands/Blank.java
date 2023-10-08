@@ -5,6 +5,7 @@ import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.command.CommandSource;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Blank extends Command {
     public Blank() {
@@ -13,11 +14,7 @@ public class Blank extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            ChatUtils.info("sending blank mess1age");
-            //mc.player.networkHandler.sendChatMessage("\t");
-            //mc.player.networkHandler.sendChatMessage(" ");
-            //mc.player.networkHandler.sendChatMessage("\u00AD");
-            //mc.player.networkHandler.sendChatMessage("͏");
+            ChatUtils.info("sending blank mess1age " + mc.player.getHeight());
             return SINGLE_SUCCESS;
         });
     }
