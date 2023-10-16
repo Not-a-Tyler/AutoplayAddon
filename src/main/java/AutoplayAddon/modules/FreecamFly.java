@@ -25,7 +25,7 @@ public class FreecamFly extends Module {
     public void onActivate() {
         Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
         mc.player.setPos(cameraPos.x, -66, cameraPos.z);
-        GotoUtil.init(false, true);
+        GotoUtil.init();
         Module freecam = Modules.get().get(Freecam.class);
         if (!freecam.isActive()) {
             freecam.toggle();

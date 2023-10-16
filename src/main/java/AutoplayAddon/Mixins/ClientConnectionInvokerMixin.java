@@ -9,6 +9,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(ClientConnection.class)
 public interface ClientConnectionInvokerMixin {
     @Invoker("sendImmediately")
-    void _sendImmediately(Packet<?> packet, PacketCallbacks callbacks);
-
+    void _sendImmediately(Packet<?> packet, PacketCallbacks callbacks, boolean flush);
 }

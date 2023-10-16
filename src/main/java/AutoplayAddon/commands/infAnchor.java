@@ -54,9 +54,9 @@ public class infAnchor extends Command {
             Vec3d startingPos = mc.player.getPos();
             Thread waitForTickEventThread1 = new Thread(() -> {
                 ChatUtils.info("hitting " + e.getName());
-                GotoUtil.init(false, true);
+                GotoUtil.init();
                 BlockPos finalBlockPos = getAnchorPos(e);
-                GotoUtil.setPos(e.getPos(), true);
+                GotoUtil.setPos(e.getPos(), true, true, false);
                 ChatUtils.info("Trapping " + e.getName().getString() + " at " + finalBlockPos);
                 switchToHotbar(Items.RESPAWN_ANCHOR);
                 Packet.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(finalBlockPos.toCenterPos(), Direction.EAST, finalBlockPos, false), 0));
@@ -64,7 +64,7 @@ public class infAnchor extends Command {
                 Packet.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(finalBlockPos.toCenterPos(), Direction.EAST, finalBlockPos, false), 0));
                 switchToEmptyHotbarSlot();
                 Packet.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(finalBlockPos.toCenterPos(), Direction.EAST, finalBlockPos, false), 0));
-                GotoUtil.setPos(startingPos, false);
+                GotoUtil.setPos(startingPos, false, true, false);
                 GotoUtil.disable();
             });
             waitForTickEventThread1.start();

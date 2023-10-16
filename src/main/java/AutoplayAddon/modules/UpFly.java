@@ -9,7 +9,8 @@ import meteordevelopment.meteorclient.systems.modules.misc.AutoReconnect;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.VehicleMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
+
+import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import AutoplayAddon.AutoplayAddon;
@@ -71,7 +72,7 @@ public class UpFly extends Module {
                 autoReconnect.toggle();
             }
             // disconnect
-            mc.player.networkHandler.onDisconnect(new DisconnectS2CPacket(Text.literal("too close to destination")));
+            mc.player.networkHandler.onDisconnect(new DisconnectS2CPacket(Text.of("Disconnected by server.")));
 
             toggle();
             return;

@@ -22,7 +22,7 @@ public class ItemCollection {
             ChatUtils.info("Item found at: " + itemPosition.getX() + " " + itemPosition.getY() + " " + itemPosition.getZ());
             Vec3d test = ValidPickupPoint.findFitSpot(mc.world, itemPosition);
             if (test != null) {
-                GotoUtil.setPos(test, false);
+                GotoUtil.setPos(test, false, true, true);
                 return true;
             }
         }

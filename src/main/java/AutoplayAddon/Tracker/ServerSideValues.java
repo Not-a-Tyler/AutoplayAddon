@@ -1,8 +1,6 @@
 package AutoplayAddon.Tracker;
-import AutoplayAddon.AutoPlay.Movement.GotoUtilReference;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
-import AutoplayAddon.AutoplayAddon;
-import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -33,6 +31,7 @@ public class ServerSideValues {
     private static long minTimep;
     private static long sump;
     private static int headp; // inclusive
+    public static int ticks;
     private static int tailp; // exclusive
     public static boolean hasMoved, clientIsFloating = false;
     public static int lastSyncId;
@@ -57,6 +56,7 @@ public class ServerSideValues {
 
     @EventHandler(priority = EventPriority.LOWEST)
     private static void onTick(TickEvent.Pre event) {
+        ++ticks;
         if (clientIsFloating) {
             ++aboveGroundTickCount;
         } else {
@@ -65,7 +65,7 @@ public class ServerSideValues {
         }
         hasMoved = false;
         if (mc.player == null) return;
-        if (Movement.AIDSboolean || GotoUtilReference.currentlyMoving) {
+        if (Movement.AIDSboolean || GotoUtil.currentlyMoving) {
             tickpos = Movement.currentPosition;
         } else {
             tickpos = mc.player.getPos();
@@ -106,9 +106,7 @@ public class ServerSideValues {
         if (!(event.packet instanceof QueryPingC2SPacket || event.packet instanceof QueryRequestC2SPacket || event.packet instanceof HandshakeC2SPacket)) updateAndAdd(1, System.nanoTime());
 
         if (event.packet instanceof PlayerMoveC2SPacket packet) {
-            //AutoplayAddon.executorService.submit(() -> {
-                HandleMovepacket(packet, true);
-            //});
+            HandleMovepacket(packet, true);
         }
         if (event.packet instanceof PlayerInteractBlockC2SPacket packet) {
             if(!handleUse()) {
@@ -173,8 +171,6 @@ public class ServerSideValues {
     }
 
 
-
-
     public static Boolean canSendPackets(final long count, final long currTime) {
         // Duplicate necessary variables to prevent modification
         long predictedSum = sump;
@@ -223,15 +219,7 @@ public class ServerSideValues {
         tmpCounts[tmpTail] += count;
         predictedSum += count;
         double rate = (double)predictedSum / ((double)intervalp * 1.0E-9);
-        return rate < 470;
-    }
-
-
-
-
-    // returns in units per second
-    public static double getRate() {
-        return (double)sump / ((double)intervalp * 1.0E-9);
+        return rate < 490;
     }
 
 
@@ -241,7 +229,6 @@ public class ServerSideValues {
             lastSyncId = packet.getSyncId();
         }
     }
-
 
 
     public static void HandleMovePacketSafe(PlayerMoveC2SPacket packet) {
@@ -326,7 +313,6 @@ public class ServerSideValues {
         }
         return true;
     }
-
 
 
     public static boolean canPlace() {

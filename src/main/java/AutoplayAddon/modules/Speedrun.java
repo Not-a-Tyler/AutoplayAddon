@@ -59,27 +59,17 @@ public class Speedrun extends Module {
         mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
         Thread waitForTickEventThread = new Thread(() -> {
             SmartMine.mineBlocks(Arrays.asList(Lists.LOG), amount.get());
-            WaitUtil.wait1sec();
             ItemCollection.collect(Arrays.asList(Lists.LOG));
-            WaitUtil.wait1sec();
             LogToPlankTest.Log2Plank();
-            WaitUtil.wait1sec();
             CraftUtil.craftItem(Items.STICK, 1);
-            WaitUtil.wait1sec();
             CraftUtil.craftItem(Items.CRAFTING_TABLE, 1);
-            WaitUtil.wait1sec();
             PlaceUtil.randomplace(Blocks.CRAFTING_TABLE);
-            WaitUtil.wait1sec();
             CraftUtil.craftItem(Items.WOODEN_PICKAXE, 1);
-            WaitUtil.wait1sec();
             List<Item> targetBlocks2 = Collections.singletonList(Items.STONE);
             SmartMine.mineBlocks(targetBlocks2, amount2.get());
-            WaitUtil.wait1sec();
             List<Item> targetBlocks3 = Collections.singletonList(Items.COBBLESTONE);
             ItemCollection.collect(targetBlocks3);
-            WaitUtil.wait1sec();
             CraftUtil.craftItem(Items.STONE_PICKAXE, 1);
-            WaitUtil.wait1sec();
             List<Item> targetBlocks4 = Collections.singletonList(Items.IRON_ORE);
 //                SmartMine.mineBlocks(targetBlocks4);
 //            WaitUtil.wait1sec();

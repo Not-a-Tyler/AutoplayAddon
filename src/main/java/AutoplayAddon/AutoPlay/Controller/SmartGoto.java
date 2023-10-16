@@ -23,7 +23,7 @@ public class SmartGoto {
         Vec3d airGapPos = collectableBlock.get(1);
         ChatUtils.info("Found air gap at: " + airGapPos.toString());
         if (airGapPos != null) {
-            GotoUtil.setPos(airGapPos, false);
+            GotoUtil.setPos(airGapPos, false, true, true);
             return currentPos;
         } else {
             ChatUtils.info("No target blocks found within the search radius.");

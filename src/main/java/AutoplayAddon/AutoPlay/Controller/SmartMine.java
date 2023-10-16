@@ -82,7 +82,7 @@ public class SmartMine {
 
     private static void mine(Vec3d targetCenterPos, Vec3d airGapPos) {
         if (PlayerUtils.distanceTo(targetCenterPos) > 5) {
-            GotoUtil.setPos(airGapPos, false);
+            GotoUtil.setPos(airGapPos, false, true, true);
         }
         targetBlockPos = BlockPos.ofFloored(targetCenterPos);
         ChatUtils.info("Mining block at " + targetBlockPos.toShortString());

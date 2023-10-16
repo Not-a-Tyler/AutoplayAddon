@@ -68,7 +68,7 @@ public class uhhhh extends Module {
                 }
                 Vec3d airGapPos = collectableBlock.get(1);
                 BlockPos blockPos = new BlockPos((int) airGapPos.x, (int) airGapPos.y, (int) airGapPos.z);
-                GotoUtil.setPos(airGapPos, false);
+                GotoUtil.setPos(airGapPos, false, true, true);
                 for (int x = -blockrange.get(); x <= blockrange.get(); x++) {
                     for (int y = -blockrange.get(); y <= blockrange.get(); y++) {
                         for (int z = -blockrange.get(); z <= blockrange.get(); z++) {

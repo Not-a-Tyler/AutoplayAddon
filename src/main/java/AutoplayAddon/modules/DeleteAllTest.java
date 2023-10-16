@@ -1,6 +1,6 @@
 package AutoplayAddon.modules;
 
-import AutoplayAddon.AutoPlay.Movement.GotoUtilReference;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.systems.modules.Module;
@@ -47,14 +47,14 @@ public class DeleteAllTest extends Module {
                             Vec3d startingPos = mc.player.getPos();
                             boolean ignore = false;
                             if (!Movement.AIDSboolean) {
-                                GotoUtilReference.init(false, true);
+                                GotoUtil.init();
                             } else {
                                 ignore = true;
                             }
                             double x = pos.getX() + 0.5;
                             double y = pos.getY() + 2;
                             double z = pos.getZ() + 0.5;
-                            GotoUtilReference.setPos(new Vec3d(x, y, z));
+                            //GotoUtil.setPos(new Vec3d(x, y, z));
                             mc.getNetworkHandler().sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, new BlockHitResult(pos.toCenterPos(), Direction.UP, pos, false), 0));
                             BlockEntity blockEntity = mc.world.getBlockEntity(pos);
                             int slots = 0;
@@ -74,10 +74,10 @@ public class DeleteAllTest extends Module {
                                // mc.interactionManager.clickSlot(ServerSideValues.lastSyncId + 1, i, 120, SlotActionType.SWAP, mc.player);
                             }
 
-                            GotoUtilReference.setPos(startingPos);
+                            //GotoUtil.setPos(startingPos);
                             if (!ignore) {
                                 ChatUtils.info("ending");
-                                GotoUtilReference.disable();
+                                GotoUtil.disable();
                             }
                         });
                         waitForTickEventThread1.start();

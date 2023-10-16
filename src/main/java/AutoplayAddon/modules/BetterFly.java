@@ -1,6 +1,6 @@
 package AutoplayAddon.modules;
 
-import AutoplayAddon.AutoPlay.Movement.GotoUtilReference;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Other.PlayerCopyEntity;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
@@ -120,7 +120,7 @@ public class BetterFly extends Module {
 
                 if (mc.world.isSpaceEmpty(box)) {
                         //ChatUtils.info("Sending packet");
-                    GotoUtilReference.setPos(packetPos);
+                    GotoUtil.setPos(packetPos, false, true, false);
                     ((IPlayerMoveC2SPacket) event.packet).setTag(13377);
                 }
             }

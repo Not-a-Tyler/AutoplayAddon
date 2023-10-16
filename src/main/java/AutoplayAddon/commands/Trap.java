@@ -2,6 +2,7 @@ package AutoplayAddon.commands;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoPlay.Other.FastBox;
+import AutoplayAddon.AutoPlay.Other.Packet;
 import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import AutoplayAddon.Tracker.ServerSideValues;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -49,7 +50,7 @@ public class Trap extends Command {
             ChatUtils.info("Trapping " + e.getName().getString() + " with " + trapBlocks.size() + " blocks " + System.currentTimeMillis());
             ignore = true;
             if (!Movement.AIDSboolean) {
-                GotoUtil.init(false, true);
+                GotoUtil.init();
                 ignore = false;
             }
             attemptTrap(e);
@@ -66,7 +67,7 @@ public class Trap extends Command {
 
     private void attemptTrap(PlayerEntity e) {
         Thread waitForTickEventThread1 = new Thread(() -> {
-            GotoUtil.setPos(e.getPos(), false);
+            GotoUtil.setPos(e.getPos(), false, true, false);
             ChatUtils.info("we need to place " + trapBlocks.size() + " blocks ");
 
             List<BlockPos> toRemove = new ArrayList<>();
@@ -77,8 +78,7 @@ public class Trap extends Command {
                 }
                 if (ServerSideValues.canPlace()) {
                     mc.world.setBlockState(pos, Blocks.GREEN_TERRACOTTA.getDefaultState());
-                    PlayerInteractBlockC2SPacket packet = new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(), Direction.UP, pos, false), 0);
-                    ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
+                    Packet.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(), Direction.UP, pos, false), 0));
                     ServerSideValues.handleUse();
                     toRemove.add(pos);
                 } else {
@@ -88,7 +88,7 @@ public class Trap extends Command {
             }
             trapBlocks.removeAll(toRemove);
             trapping = false;
-            GotoUtil.setPos(startingPos,false);
+            GotoUtil.setPos(startingPos,false, true, false);
             if(!ignore) GotoUtil.disable();
             ChatUtils.info("Finished trapping " + System.currentTimeMillis());
 

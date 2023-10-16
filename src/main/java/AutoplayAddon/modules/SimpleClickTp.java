@@ -1,6 +1,6 @@
 package AutoplayAddon.modules;
 import AutoplayAddon.AutoPlay.Movement.CanTeleport;
-import AutoplayAddon.AutoPlay.Movement.MoveToUtil;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
@@ -69,7 +69,7 @@ public class SimpleClickTp extends Module {
             BlockPos blockpos = mc.world.raycast(new RaycastContext(cameraPos, raycastEnd, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player)).getBlockPos().up();
             Vec3d pos = new Vec3d((blockpos.getX() + .5), blockpos.getY(), (blockpos.getZ() + .5));
             Movement.currentPosition = mc.player.getPos();
-            MoveToUtil.moveTo(pos);
+            //M.moveTo(pos);
             mc.player.setPosition(pos.x, pos.y, pos.z);
         })
         .build()

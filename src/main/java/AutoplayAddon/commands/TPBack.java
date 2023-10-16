@@ -31,10 +31,10 @@ public class TPBack extends Command {
                 } else {
                     ignore = true;
                 }
-                if (ignore) GotoUtil.init(false, true);
-                GotoUtil.setPos(pos, true);
+                if (ignore) GotoUtil.init();
+                GotoUtil.setPos(pos, true, true, false);
                 ChatUtils.info("time: " + System.currentTimeMillis() + " i2 between: " + ServerSideValues.i2);
-                GotoUtil.setPos(startingPos, false);
+                GotoUtil.setPos(startingPos, false, true, false);
                 if (ignore) GotoUtil.disable();
                 ChatUtils.info("time after: " + System.currentTimeMillis());
             }).start();

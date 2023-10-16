@@ -90,8 +90,8 @@ public class BackAndForth extends Module {
     public void onActivate() {
         new Thread(() -> {
             while (true) {
-                GotoUtil.setPos(pos1, false);
-                GotoUtil.setPos(pos2, false);
+                GotoUtil.setPos(pos1, false, true, false);
+                GotoUtil.setPos(pos2, false, true, false);
             }
         }).start();
     }

@@ -2,7 +2,7 @@ package AutoplayAddon.modules;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import AutoplayAddon.AutoPlay.Movement.GotoUtilReference;
+import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoplayAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -63,11 +63,11 @@ public class Follower extends Module {
 
     @Override
     public void onActivate() {
-        GotoUtilReference.init(true, true);
+        GotoUtil.init();
     }
     @Override
     public void onDeactivate() {
-        GotoUtilReference.disable();
+        GotoUtil.disable();
     }
 
 

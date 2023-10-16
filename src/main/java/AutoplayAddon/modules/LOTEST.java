@@ -24,11 +24,11 @@ public class LOTEST extends Module {
     private void onReceivePacket(PacketEvent.Receive event) {
         int EntityId = 0;
         Vec3d newPos = Vec3d.ZERO;
-        if (event.packet instanceof PlayerSpawnS2CPacket) {
-            PlayerSpawnS2CPacket packet = (PlayerSpawnS2CPacket) event.packet;
-            EntityId = packet.getId();
-            newPos = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
-        }
+//        if (event.packet instanceof PlayerSpawnS2CPacket) {
+//            PlayerSpawnS2CPacket packet = (PlayerSpawnS2CPacket) event.packet;
+//            EntityId = packet.getId();
+//            newPos = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
+//        }
         if (event.packet instanceof EntitySpawnS2CPacket) {
             EntitySpawnS2CPacket packet = (EntitySpawnS2CPacket) event.packet;
             EntityId = packet.getId();

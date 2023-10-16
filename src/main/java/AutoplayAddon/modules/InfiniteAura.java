@@ -2,12 +2,10 @@ package AutoplayAddon.modules;
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
 import AutoplayAddon.AutoPlay.Movement.Movement;
 import AutoplayAddon.AutoPlay.Other.FastBox;
+import AutoplayAddon.AutoPlay.Other.Packet;
 import AutoplayAddon.AutoplayAddon;
 import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
-import meteordevelopment.meteorclient.settings.EntityTypeListSetting;
-import meteordevelopment.meteorclient.settings.KeybindSetting;
-import meteordevelopment.meteorclient.settings.Setting;
-import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -26,6 +24,7 @@ public class InfiniteAura  extends Module {
         super(AutoplayAddon.autoplay, "infinite-aura", "test");
     }
     private final SettingGroup sgTargeting = settings.createGroup("Targeting");
+
 
     private final Setting<Set<EntityType<?>>> entities = sgTargeting.add(new EntityTypeListSetting.Builder()
         .name("entities")
@@ -101,11 +100,10 @@ public class InfiniteAura  extends Module {
                     ignore = true;
                 }
 
-                if (ignore) GotoUtil.init(false, true);
-                GotoUtil.setPos(finalClosestEntity.getPos(), true);
-                PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(finalClosestEntity, false);
-                ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
-                GotoUtil.setPos(startingPos, false);
+                if (ignore) GotoUtil.init();
+                GotoUtil.setPos(finalClosestEntity.getPos(), true, true, false);
+                Packet.sendPacket(PlayerInteractEntityC2SPacket.attack(finalClosestEntity, false));
+                GotoUtil.setPos(startingPos, false, true, false);
                 if (ignore) GotoUtil.disable();
                 ChatUtils.info("Hit " + finalClosestEntity.getName().getString());
                 //ChatUtils.info("");

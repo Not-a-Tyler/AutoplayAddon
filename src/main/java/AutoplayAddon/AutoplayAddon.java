@@ -59,6 +59,8 @@ public class AutoplayAddon extends MeteorAddon {
         Modules.get().add(new UpFly());
         Modules.get().add(new SimpleClickTp());
         Modules.get().add(new TorchSpam());
+        Modules.get().add(new BetterMine());
+        Modules.get().add(new PacketLogger());
         Modules.get().add(new BackAndForth());
         Modules.get().add(new LongDistanceTest());
         Modules.get().add(new CollisionRender());

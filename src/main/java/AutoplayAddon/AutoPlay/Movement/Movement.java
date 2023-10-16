@@ -21,7 +21,7 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class Movement {
     public static ArrayList<FastBox> fastBoxList = new ArrayList<>();
     public static ArrayList<FastBox> fastBoxBadList = new ArrayList<>();
-    public static boolean AutoSetPosition, autoSendPackets, rotationControl, AIDSboolean, currentlyMoving;
+    public static boolean rotationControl, AIDSboolean, currentlyMoving;
     public static Thread currentMovementThread;
     public static Vec3d currentPosition, to;
     public static float pitch, yaw;
@@ -93,7 +93,7 @@ public class Movement {
         return Math.sqrt(dx*dx + dy*dy + dz*dz);
     }
 
-    public static void init(Boolean automaticallySetPosition, Boolean autopacket) {
+    public static void init() {
         if (mc.player == null) return;
         MeteorClient.EVENT_BUS.unsubscribe(Movement.class);
         MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
@@ -102,8 +102,6 @@ public class Movement {
         mc.player.setNoGravity(true);
         to = mc.player.getPos();
         AIDSboolean = true;
-        autoSendPackets = autopacket;
-        AutoSetPosition = automaticallySetPosition;
     }
     public static void disable() {
         MeteorClient.EVENT_BUS.unsubscribe(GotoUtil.class);
@@ -135,8 +133,8 @@ public class Movement {
             ignore = true;
         }
         new Thread(() -> {
-            if (ignore) init(true, true);
-            GotoUtil.setPos(pos, false);
+            if (ignore) init();
+            GotoUtil.setPos(pos, false, true, true);
             if (ignore) disable();
         }).start();
 

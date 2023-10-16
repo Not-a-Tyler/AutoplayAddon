@@ -3,7 +3,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import AutoplayAddon.AutoPlay.Movement.GotoUtil;
-import AutoplayAddon.AutoPlay.Movement.GotoUtilReference;
+import AutoplayAddon.AutoPlay.Other.Packet;
 import AutoplayAddon.AutoplayAddon;
 import AutoplayAddon.Mixins.ClientConnectionInvokerMixin;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -42,7 +42,7 @@ public class Fightbot extends Module {
 
     @Override
     public void onActivate() {
-        GotoUtil.init(true, true);
+        GotoUtil.init();
     }
     @Override
     public void onDeactivate() {
@@ -65,9 +65,8 @@ public class Fightbot extends Module {
                         mc.player.setPosition(targetPlayer.getPos());
                         new Thread(() -> {
                             ChatUtils.info("hitting " + targetPlayer.getGameProfile().getName());
-                            GotoUtil.setPos(targetPlayer.getPos(), false);
-                            PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(targetPlayer, false);
-                            ((ClientConnectionInvokerMixin) mc.getNetworkHandler().getConnection())._sendImmediately(packet, null);
+                            GotoUtil.setPos(targetPlayer.getPos(), false, true, false);
+                            Packet.sendPacket(PlayerInteractEntityC2SPacket.attack(targetPlayer, false));
                         }).start();
                         handlePlayerMovement(targetPlayer);
                     } else {
@@ -84,7 +83,7 @@ public class Fightbot extends Module {
         Vec3d desiredPos = getDesiredPositionBasedOnMode(centerPos);
         if (desiredPos != null) {
             new Thread(() -> {
-                GotoUtil.setPos(desiredPos, false);
+                GotoUtil.setPos(desiredPos, false, true, true);
             }).start();
         }
     }

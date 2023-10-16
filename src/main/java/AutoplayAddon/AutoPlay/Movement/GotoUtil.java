@@ -19,21 +19,19 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class GotoUtil extends Movement {
     static CompletableFuture<Void> tickEventFuture;
-    static Boolean returningToStart = false;
+    static Boolean returningToStart = false, setPos = false;
     static List<TeleportTask> bigestPath = new ArrayList<>();
     public static List<TeleportTask> returnPath = new ArrayList<>();
     static List<TeleportTask> pathGoals = new ArrayList<>();
     @EventHandler(priority = EventPriority.LOWEST - 1)
     private static void onTick(TickEvent.Pre event) {
         if (mc.player == null) return;
-        if (AutoSetPosition && !closeBy(mc.player.getPos(), currentPosition)) {
-            mc.player.setPos(currentPosition.x, currentPosition.y, currentPosition.z);
-        }
-        if (currentlyMoving) {attemptTeleport();}
+        if (setPos && !closeBy(mc.player.getPos(), currentPosition)) mc.player.setPosition(currentPosition);
+        if (currentlyMoving) attemptTeleport();
     }
 
 
-    private static Boolean attemptTeleport() {
+    private synchronized static Boolean attemptTeleport() {
 
         int packetsRequired = Path.calculatePackets(bigestPath);
 
@@ -89,24 +87,17 @@ public class GotoUtil extends Movement {
 
         for (TeleportTask task : pathGoals) task.execute();
 
-        if (autoSendPackets) Packet.sendAllPacketsInQueue();
-        //if (autoSendPackets) AutoplayAddon.executorService.submit(Packet::sendAllPacketsInQueue);
-
-        if (AutoSetPosition) {
-            mc.execute(() -> {
-                mc.player.setPos(to.x, to.y, to.z);
-            });
-        }
         currentlyMoving = false;
         tickEventFuture.complete(null);
         return true;
     }
 
 
-    public static void setPos(Vec3d pos, Boolean goback) {
+    public synchronized static void setPos(Vec3d pos, Boolean goBack, Boolean sendPackets, Boolean setClientSidedPos) {
         Packet.packetQueue.clear();
         ChatUtils.info("Starting Teleportation time: " + System.currentTimeMillis());
-        returningToStart = goback;
+        returningToStart = goBack;
+        setPos = setClientSidedPos;
         currentlyMoving = false;
         pathGoals.clear();
         to = pos;
@@ -128,14 +119,16 @@ public class GotoUtil extends Movement {
         } else {
             bigestPath = pathGoals;
         }
-        if (attemptTeleport()) return;
-        currentlyMoving = true;
-        // If you still want to block here (not recommended for UI threads)
-        try {
-            tickEventFuture.get();
-        } catch (CompletionException | InterruptedException | ExecutionException e) {
-            ChatUtils.error("ERROR");
-        }
-    }
+        Boolean currentlyMoving = !attemptTeleport();
 
+        if (currentlyMoving) {
+            try {
+                tickEventFuture.get();
+            } catch (CompletionException | InterruptedException | ExecutionException e) {
+                ChatUtils.error("ERROR");
+            }
+        }
+        if (setPos) mc.execute(() -> mc.player.setPosition(to));
+        if (sendPackets) Packet.sendAllPacketsInQueue();
+    }
 }
