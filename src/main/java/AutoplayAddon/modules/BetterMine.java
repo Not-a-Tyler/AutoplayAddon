@@ -1,5 +1,6 @@
 package AutoplayAddon.modules;
 
+import AutoplayAddon.AutoPlay.Mining.MineUtils;
 import AutoplayAddon.AutoPlay.Other.Packet;
 import AutoplayAddon.AutoplayAddon;
 import AutoplayAddon.Tracker.ServerSideValues;
@@ -9,10 +10,7 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.systems.modules.player.AutoTool;
-import meteordevelopment.meteorclient.systems.modules.render.BreakIndicators;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-//import meteordevelopment.meteorclient.utils.render.Box;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
@@ -23,7 +21,6 @@ import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.Direction;
-
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
 
@@ -43,6 +40,14 @@ public class BetterMine extends Module {
         .defaultValue(false)
         .build()
     );
+
+    private final Setting<Boolean> mineSecondary = sgGeneral.add(new BoolSetting.Builder()
+        .name("secondary-block")
+        .description("Clients will copy the servers sneaking status")
+        .defaultValue(false)
+        .build()
+    );
+
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
         .name("shape-mode")
         .description("How the shapes are rendered.")
@@ -56,6 +61,7 @@ public class BetterMine extends Module {
         .defaultValue(new SettingColor(25, 252, 25, 150))
         .build()
     );
+
 
     private final Setting<SettingColor> endColor = sgRender.add(new ColorSetting.Builder()
         .name("end-color")
@@ -75,33 +81,42 @@ public class BetterMine extends Module {
     }
 
 
-    private AbstractBlock.AbstractBlockState fastBlockState = null;
-    private BlockPos fastBlockPos = null, slowBlockPos = null;
+    private BlockState fastBlockState = null, secondaryBlockState = null;
+    private BlockPos fastBlockPos = null, secondaryBlockPos = null;
 
     @EventHandler
     private void onStartBreakingBlock(StartBreakingBlockEvent event) {
         event.cancel();
         event.setCancelled(true);
-        if (fastBlockPos != null || slowBlockPos != null) return;
+        if (fastBlockPos != null || secondaryBlockPos != null) return;
         destroyProgressFast = 0;
         destroyProgressSlow = 0;
         startTick = ServerSideValues.ticks;
-
         BlockPos hitBlockPos = event.blockPos;
-        slowBlockPos = hitBlockPos;
-        if (!mc.world.getBlockState(hitBlockPos.down()).isSolid()) {
+
+        BlockPos downBlock = hitBlockPos.down();
+        BlockState downBlockState = mc.world.getBlockState(downBlock);
+
+        secondaryBlockState = mc.world.getBlockState(hitBlockPos);
+        secondaryBlockPos = hitBlockPos;
+
+
+        if (!downBlockState.isSolid() || !mineSecondary.get()) {
+            secondaryBlockPos = null;
             fastBreak(hitBlockPos);
             return;
         }
 
-        if (canInstaBreak(hitBlockPos.down())) {
-            fastBreak(hitBlockPos.down());
+        if (MineUtils.canInstaBreak(secondaryBlockState, hitBlockPos)) {
+            ChatUtils.info("We can Insta Break the bottom below");
+            fastBreak(downBlock);
             fastBreak(hitBlockPos);
             return;
         }
-        if (canInstaBreak(hitBlockPos)) {
+        if (MineUtils.canInstaBreak(downBlockState, downBlock)) {
+            ChatUtils.info("We can Insta Break the block");
             fastBreak(hitBlockPos);
-            fastBreak(hitBlockPos.down());
+            fastBreak(downBlock);
             return;
         }
 
@@ -113,32 +128,31 @@ public class BetterMine extends Module {
     }
 
 
-    private boolean canInstaBreak(BlockPos blockPos) {
-        float f1 = mc.world.getBlockState(blockPos).calcBlockBreakingDelta(mc.player, mc.world, blockPos);
-        if (f1 >= 0.7F) return true;
-        return false;
-    }
-
     private void fastBreak(BlockPos blockPos) {
+
+        fastBlockState = mc.world.getBlockState(blockPos);
+        fastBlockPos = blockPos;
+
         if (swinghandclient.get()) mc.player.swingHand(mc.player.getActiveHand());
         if (swinghandserver.get()) Packet.sendPacket(new HandSwingC2SPacket(mc.player.getActiveHand()));
-        fastBlockPos = blockPos;
-        Packet.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, fastBlockPos, direction));
-        fastBlockState = mc.world.getBlockState(fastBlockPos);
-        float f1 = fastBlockState.calcBlockBreakingDelta(mc.player, mc.world, fastBlockPos);
+        Packet.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, blockPos, direction));
+        float f1 = fastBlockState.calcBlockBreakingDelta(mc.player, mc.world, blockPos);
+        float f2 = MineUtils.calcBlockBreakingDelta((BlockState) fastBlockState, blockPos);
+
+        if (f1 != f2) ChatUtils.info("Block breaking delta is different: " + f1 + " " + f2);
 
         if (f1 >= 1.0F) {
             ChatUtils.info("Insta Break with progress: " + f1);
-            mc.world.setBlockState(fastBlockPos, Blocks.AIR.getDefaultState());
+            mc.world.setBlockState(blockPos, Blocks.AIR.getDefaultState());
             fastBlockPos = null;
             fastBlockState = null;
             return;
         }
 
         if (f1 >= 0.7F) {
-            Packet.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, fastBlockPos, direction));
+            Packet.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, direction));
             ChatUtils.info("Block broken at start with progress: " + f1);
-            mc.world.setBlockState(fastBlockPos, Blocks.AIR.getDefaultState());
+            mc.world.setBlockState(blockPos, Blocks.AIR.getDefaultState());
             fastBlockPos = null;
             fastBlockState = null;
         }
@@ -147,12 +161,15 @@ public class BetterMine extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         int l = ServerSideValues.ticks - startTick;
-        if (fastBlockPos != null || slowBlockPos != null) {
+        if (fastBlockPos != null || secondaryBlockPos != null) {
             if (swinghandclient.get()) mc.player.swingHand(mc.player.getActiveHand());
             if (swinghandserver.get()) Packet.sendPacket(new HandSwingC2SPacket(mc.player.getActiveHand()));
         }
         if (fastBlockPos != null) {
             float fast = fastBlockState.calcBlockBreakingDelta(mc.player, mc.world, fastBlockPos) * (float) (l + 1);
+            if (MineUtils.calcBlockBreakingDelta((BlockState) fastBlockState, fastBlockPos) != fastBlockState.calcBlockBreakingDelta(mc.player, mc.world, fastBlockPos)) ChatUtils.info("Block breaking delta is different fast: " + fast);
+            if (MineUtils.calcBlockBreakingDelta((BlockState) fastBlockState, fastBlockPos) == fastBlockState.calcBlockBreakingDelta(mc.player, mc.world, fastBlockPos)) ChatUtils.info("its the same" + MineUtils.calcBlockBreakingDelta((BlockState) fastBlockState, fastBlockPos) + " " + fastBlockState.calcBlockBreakingDelta(mc.player, mc.world, fastBlockPos));
+
             destroyProgressFast = (fast / 0.7F); // Convert the range here.
             if (fast >= 0.7F) {
                 Packet.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, fastBlockPos, direction));
@@ -162,12 +179,14 @@ public class BetterMine extends Module {
                 destroyProgressFast = 0;
             }
         }
-        if (slowBlockPos != null) {
-            float slow = mc.world.getBlockState(slowBlockPos).calcBlockBreakingDelta(mc.player, mc.world, slowBlockPos) * (float) (l + 1);
+        if (secondaryBlockPos != null) {
+            float slow = secondaryBlockState.calcBlockBreakingDelta(mc.player, mc.world, secondaryBlockPos) * (float) (l + 1);
             destroyProgressSlow = slow; // Convert the range here.
             if (slow >= 1.0F) {
-                mc.world.setBlockState(slowBlockPos, Blocks.AIR.getDefaultState());
-                slowBlockPos = null;
+                ChatUtils.info("Removed slow block: " + slow);
+                mc.world.setBlockState(secondaryBlockPos, Blocks.AIR.getDefaultState());
+                secondaryBlockPos = null;
+                secondaryBlockState = null;
                 destroyProgressSlow = 0;
             }
         }
@@ -179,8 +198,8 @@ public class BetterMine extends Module {
         if (fastBlockPos != null) {
             renderBlockFromPos(event, fastBlockPos, destroyProgressFast);
         }
-        if (slowBlockPos != null) {
-            renderBlockFromPos(event, slowBlockPos, destroyProgressSlow);
+        if (secondaryBlockPos != null) {
+            renderBlockFromPos(event, secondaryBlockPos, destroyProgressSlow);
         }
     }
     private void renderBlockFromPos(Render3DEvent event, BlockPos blockPos, double progress) {
